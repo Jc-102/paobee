@@ -2937,7 +2937,6 @@ function handleAuthResult(res, name, phone) {
     email: displayEmail,
     phone: displayPhone
   }, { onConflict: 'id' }).then(function(res) {
-    if (res.error) console.error('Profile upsert error:', res.error.message);
     loadUserRole(user.id, displayName);
   });
 }
@@ -2955,7 +2954,6 @@ function loadUserRole(uid, displayName) {
       currentRole = 'customer';
       prof.name   = displayName;
     }
-    console.log('Role loaded:', currentRole);
     onAuthSuccess();
   });
 }
