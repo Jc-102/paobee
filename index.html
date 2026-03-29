@@ -2266,16 +2266,13 @@ var products=[
   {id:7,name:'Assorted Sweet Treats',cat:'Sweets',desc:'Mezcla de dulces y caramelos artesanales.',price:7.00,icon:'&#x1F36C;',photo:'',featured:false,allergens:[],stock:'in',ratings:[],avgRating:0}
 ];
 /* ── ORDERS (seed data) ────────────────────── */
-var orders=[
-  {id:1,num:'001',name:'Jan',phone:'787-555-0001',email:'',address:'',notes:'',delivery:'pickup',total:4.50,status:'preparing',date:'25 Mar',scheduledDate:'27 Mar',scheduledTime:'2:00 PM',payment:'cash',ptsEarned:4,ptsUnlocked:false,completedAt:null,items:[{id:1,name:'Strawberry Dream Cupcake',qty:1,price:4.50,icon:'&#x1F9C1;',photo:'',rated:false}]},
-  {id:2,num:'002',name:'Jan',phone:'787-555-0001',email:'',address:'456 Ocean Ave',notes:'Sin nueces',delivery:'delivery',total:11.00,status:'completed',date:'20 Mar',scheduledDate:'20 Mar',scheduledTime:'4:00 PM',payment:'athmovil',ptsEarned:11,ptsUnlocked:true,completedAt:Date.now()-25*3600*1000,items:[{id:2,name:'Chocolate Chip Cookies',qty:2,price:3.00,icon:'&#x1F36A;',photo:'',rated:false},{id:3,name:'Fudgy Brownies',qty:1,price:4.00,icon:'&#x1F7EB;',photo:'',rated:true}]}
-];
+var orders=[];
 /* ── LOYALTY ACCOUNT ───────────────────────── */
-var loyalty={points:120,history:[{type:'earn',desc:'Pedido #001 completado',sub:'20 Mar - Desbloqueado 72hrs despues',amount:6},{type:'spend',desc:'Canjeado al pagar',sub:'15 Mar - 50 pts = $5.00 off',amount:-50},{type:'earn',desc:'Pedido #002 completado',sub:'10 Mar',amount:11},{type:'pending',desc:'Pedido #003 pendiente',sub:'Se desbloquea 72hrs despues de entrega',amount:4}]};
+var loyalty={points:0,history:[]};
 /* ── USER PROFILE & CONFIG ─────────────────── */
-var prof={name:'Jan',phone:'787-555-0001',email:'',avatar_url:''};
+var prof={name:'',phone:'',email:'',avatar_url:''};
 var cfg={dark:false,notifOrders:true,notifPromos:false};
-var payMethods=[{id:1,type:'ath',username:'@myhandle'},{id:2,type:'pp',username:'@myemail'}];
+var payMethods=[];
 
 /* ══════════════════════════════════════════════
    STATE – runtime variables
@@ -2794,12 +2791,17 @@ function handleAuthResult(res, name, phone) {
   var displayName = name || meta.full_name || user.email || user.phone || 'Usuario';
   var displayPhone = phone || meta.phone || user.phone || '';
   /* upsert profile with name + email + phone */
+  /* set prof immediately so UI shows correct data even before DB responds */
+  prof.name  = displayName;
+  prof.email = user.email || '';
+  prof.phone = displayPhone;
   sb.from('profiles').upsert({
-    id: user.id,
-    name: displayName,
+    id:    user.id,
+    name:  displayName,
     email: user.email || '',
     phone: displayPhone
-  }, { onConflict: 'id' }).then(function() {
+  }, { onConflict: 'id' }).then(function(res) {
+    if (res.error) console.error('Profile upsert error:', res.error.message);
     loadUserRole(user.id, displayName);
   });
 }
