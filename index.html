@@ -2058,11 +2058,12 @@ to{transform:translateY(0);opacity:1}
 
 <!-- ══ AUTH SCREEN ══════════════════════════════════════════ -->
 <div id="auth-screen">
+  <div id="auth-back-btn" onclick="closeAuthWall()" style="display:none;position:absolute;top:16px;left:16px;background:var(--card);border:1px solid var(--border);border-radius:50px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--text);cursor:pointer">&#x2190; Volver</div>
   <div class="auth-logo">Paobee</div>
   <div class="auth-tag">Hecho con amor</div>
   <div class="auth-card">
     <div class="auth-tabs">
-      <button class="auth-tab active" id="atab-login" onclick="switchAuthTab('login')">Iniciar sesión</button>
+      <button class="auth-tab active" id="atab-login" onclick="switchAuthTab('login')">Iniciar sesion</button>
       <button class="auth-tab" id="atab-signup" onclick="switchAuthTab('signup')">Registrarse</button>
     </div>
     <div id="auth-msg"></div>
@@ -2262,7 +2263,7 @@ var orders=[];
 /* ── LOYALTY ACCOUNT ───────────────────────── */
 var loyalty={points:0,history:[]};
 /* ── USER PROFILE & CONFIG ─────────────────── */
-var prof={name:'',phone:'',email:'',avatar_url:''};
+var prof={name:'',phone:'',email:'',avatar_url:'',birthday_month:'',birthday_day:''};
 var cfg={dark:false,notifOrders:true,notifPromos:false};
 var payMethods=[];
 
@@ -2287,7 +2288,15 @@ function clearPP(prevId){var di=prevId.replace('-preview','-photo-data');var ui=
 /* ══════════════════════════════════════════════
    NAVIGATION
    ══════════════════════════════════════════════ */
+/* Screens that require login */
+var PROTECTED_SCREENS = ['track','settings','manager'];
+
 function goTo(s){
+  /* auth wall — redirect to login if not logged in */
+  if (!currentUser && PROTECTED_SCREENS.indexOf(s) >= 0) {
+    showAuthWall();
+    return;
+  }
   document.querySelectorAll('.screen').forEach(function(x){x.classList.remove('active');});
   document.querySelectorAll('.nav-item').forEach(function(x){x.classList.remove('active');});
   document.getElementById('screen-'+s).classList.add('active');
@@ -2299,6 +2308,20 @@ function goTo(s){
   else if(s==='track'){renderTrackActive();renderTrackHistory();}
   else if(s==='settings')renderSettings();
   updateCounts();
+}
+
+/* ── Show auth wall with back button ─────────── */
+function showAuthWall() {
+  var backBtn = document.getElementById('auth-back-btn');
+  if (backBtn) backBtn.style.display = 'block';
+  document.getElementById('auth-screen').style.display = 'flex';
+}
+
+/* ── Close auth wall (go back to browsing) ────── */
+function closeAuthWall() {
+  document.getElementById('auth-screen').style.display = 'none';
+  var backBtn = document.getElementById('auth-back-btn');
+  if (backBtn) backBtn.style.display = 'none';
 }
 
 /* ══════════════════════════════════════════════
@@ -2367,7 +2390,14 @@ function renderShop(){
    ══════════════════════════════════════════════ */
 function renderCart(mode){
   var el=document.getElementById('cart-content');var title=document.getElementById('cart-title');
-  if(mode==='checkout'){title.textContent=t('checkout');renderCheckout(el);return;}
+  if(mode==='checkout'){
+    /* require login to checkout */
+    if(!currentUser){
+      showAuthWall();
+      return;
+    }
+    title.textContent=t('checkout');renderCheckout(el);return;
+  }
   title.textContent=t('my_cart');
   var entries=Object.entries(cart).filter(function(e){return e[1]>0;});
   if(!entries.length){el.innerHTML='<div class="cart-empty"><div class="cart-empty-icon">&#x1F6D2;</div><h3>'+t('my_cart')+'</h3><p>'+t('no_active_sub')+'</p><button class="btn-pink" onclick="goTo(\'shop\')">'+t('browse_shop')+'</button></div>';return;}
@@ -2504,6 +2534,7 @@ function renderSettings(){
     +'<div class="sgroup"><div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#FDF0F3">&#x1F464;</div><div><div class="srow-lbl">'+t('name')+'</div></div></div><input style="border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;font-size:13px;color:var(--text);background:var(--ibg);width:120px;outline:none" id="pn" value="'+prof.name+'"></div>'
     +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#E3F2FD">&#x1F4DE;</div><div><div class="srow-lbl">'+t('phone')+'</div></div></div><input style="border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;font-size:13px;color:var(--text);background:var(--ibg);width:120px;outline:none" id="pp" value="'+prof.phone+'"></div>'
     +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#E8F5E9">&#x1F4E7;</div><div><div class="srow-lbl">'+t('email')+'</div></div></div><input style="border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;font-size:13px;color:var(--text);background:var(--ibg);width:120px;outline:none" id="pe" value="'+prof.email+'"></div>'
+    +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#FDF0F3">&#x1F382;</div><div><div class="srow-lbl">Cumpleanos</div></div></div><div style="display:flex;gap:6px"><select style="border:1.5px solid var(--border);border-radius:10px;padding:6px 8px;font-size:12px;color:var(--text);background:var(--ibg);outline:none" id="pb-month"><option value="">Mes</option><option value="1" '+(prof.birthday_month==='1'?'selected':'')+'>Ene</option><option value="2" '+(prof.birthday_month==='2'?'selected':'')+'>Feb</option><option value="3" '+(prof.birthday_month==='3'?'selected':'')+'>Mar</option><option value="4" '+(prof.birthday_month==='4'?'selected':'')+'>Abr</option><option value="5" '+(prof.birthday_month==='5'?'selected':'')+'>May</option><option value="6" '+(prof.birthday_month==='6'?'selected':'')+'>Jun</option><option value="7" '+(prof.birthday_month==='7'?'selected':'')+'>Jul</option><option value="8" '+(prof.birthday_month==='8'?'selected':'')+'>Ago</option><option value="9" '+(prof.birthday_month==='9'?'selected':'')+'>Sep</option><option value="10" '+(prof.birthday_month==='10'?'selected':'')+'>Oct</option><option value="11" '+(prof.birthday_month==='11'?'selected':'')+'>Nov</option><option value="12" '+(prof.birthday_month==='12'?'selected':'')+'>Dic</option></select><select style="border:1.5px solid var(--border);border-radius:10px;padding:6px 8px;font-size:12px;color:var(--text);background:var(--ibg);outline:none;width:60px" id="pb-day">'+(function(){var o='<option value="">Dia</option>';for(var d=1;d<=31;d++)o+='<option value="'+d+'" '+(prof.birthday_day===String(d)?'selected':'')+'>'+d+'</option>';return o;})()+'</select></div></div>'
     +'<div class="srow" style="justify-content:flex-end"><button onclick="savProf()" style="background:var(--pink);color:#fff;border:none;border-radius:10px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">'+t('save')+'</button></div></div>'
     +'<div class="stitle">Preferencias</div>'
     +'<div class="sgroup"><div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#F3E5F5">&#x1F319;</div><div><div class="srow-lbl">'+t('dark_mode')+'</div></div></div><label class="tog-sw"><input type="checkbox" '+(cfg.dark?'checked':'')+' onchange="togDark(this)"><span class="tog-sl"></span></label></div>'
@@ -2520,12 +2551,16 @@ function savProf() {
   prof.phone = document.getElementById('pp').value || prof.phone;
   prof.email = document.getElementById('pe').value || prof.email;
   /* save to Supabase */
+  prof.birthday_month = (document.getElementById('pb-month')||{}).value || prof.birthday_month;
+  prof.birthday_day   = (document.getElementById('pb-day')  ||{}).value || prof.birthday_day;
   if (currentUser) {
     sb.from('profiles').update({
-      name:       prof.name,
-      phone:      prof.phone,
-      email:      prof.email,
-      avatar_url: prof.avatar_url || null
+      name:           prof.name,
+      phone:          prof.phone,
+      email:          prof.email,
+      avatar_url:     prof.avatar_url     || null,
+      birthday_month: prof.birthday_month || null,
+      birthday_day:   prof.birthday_day   || null
     }).eq('id', currentUser.id).then(function(res) {
       if (res.error) { alert('Error guardando perfil.'); return; }
       renderSettings();
@@ -2808,6 +2843,7 @@ function renderAuthForm() {
     fields += '<div class="auth-fld"><label class="auth-lbl">Correo electronico</label><input class="auth-inp" id="auth-email" type="email" placeholder="tu@email.com"></div>';
     fields += '<div class="auth-fld"><label class="auth-lbl">Numero de telefono</label><input class="auth-inp" id="auth-phone" type="tel" placeholder="+1787XXXXXXX"></div>';
     fields += '<div class="auth-fld"><label class="auth-lbl">Contrasena</label><input class="auth-inp" id="auth-pass" type="password" placeholder="Minimo 6 caracteres"></div>';
+    fields += '<div class="auth-fld"><label class="auth-lbl">&#x1F382; Fecha de cumpleanos (opcional)</label><div style="display:flex;gap:8px"><select class="auth-inp" id="auth-bday-month" style="flex:1"><option value="">Mes</option><option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option><option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option><option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option></select><select class="auth-inp" id="auth-bday-day" style="width:90px">' + (function(){ var opts='<option value="">Dia</option>'; for(var d=1;d<=31;d++) opts+='<option value="'+d+'">'+d+'</option>'; return opts; })() + '</select></div></div>';
     fields += '<div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.6">&#x1F4F1; Tu numero se usara para actualizaciones de pedidos via WhatsApp.</div>';
   }
 
@@ -2849,11 +2885,13 @@ function handleAuth() {
     if (!email) { setAuthMsg('Por favor ingresa tu correo electronico.', 'err'); resetBtn(btn); return; }
     if (!phone) { setAuthMsg('Por favor ingresa tu numero de telefono.', 'err'); resetBtn(btn); return; }
     if (!pass || pass.length < 6) { setAuthMsg('La contrasena debe tener al menos 6 caracteres.', 'err'); resetBtn(btn); return; }
+    var bdayMonth = (document.getElementById('auth-bday-month')||{}).value || '';
+    var bdayDay   = (document.getElementById('auth-bday-day')  ||{}).value || '';
     sb.auth.signUp({
       email: email,
       password: pass,
-      options: { data: { full_name: name, phone: phone } }
-    }).then(function(res) { handleAuthResult(res, name, phone); });
+      options: { data: { full_name: name, phone: phone, birthday_month: bdayMonth, birthday_day: bdayDay } }
+    }).then(function(res) { handleAuthResult(res, name, phone, bdayMonth, bdayDay); });
   }
 }
 
@@ -2904,7 +2942,7 @@ function verifyOtp(phone, name) {
 }
 
 /* ── Handle auth result ──────────────────────── */
-function handleAuthResult(res, name, phone) {
+function handleAuthResult(res, name, phone, bdayMonth, bdayDay) {
   if (res.error) {
     setAuthMsg(res.error.message, 'err');
     var btn = document.getElementById('auth-submit-btn');
@@ -2931,11 +2969,18 @@ function handleAuthResult(res, name, phone) {
   prof.phone = displayPhone;
 
   /* save to Supabase profiles table */
+  var displayBdayMonth = bdayMonth || meta.birthday_month || '';
+  var displayBdayDay   = bdayDay   || meta.birthday_day   || '';
+  prof.birthday_month  = displayBdayMonth;
+  prof.birthday_day    = displayBdayDay;
+
   sb.from('profiles').upsert({
-    id:    user.id,
-    name:  displayName,
-    email: displayEmail,
-    phone: displayPhone
+    id:             user.id,
+    name:           displayName,
+    email:          displayEmail,
+    phone:          displayPhone,
+    birthday_month: displayBdayMonth || null,
+    birthday_day:   displayBdayDay   || null
   }, { onConflict: 'id' }).then(function(res) {
     loadUserRole(user.id, displayName);
   });
@@ -2949,7 +2994,9 @@ function loadUserRole(uid, displayName) {
       prof.name        = res.data.name       || displayName;
       prof.email       = res.data.email      || '';
       prof.phone       = res.data.phone      || '';
-      prof.avatar_url  = res.data.avatar_url || '';
+      prof.avatar_url      = res.data.avatar_url      || '';
+      prof.birthday_month  = res.data.birthday_month  || '';
+      prof.birthday_day    = res.data.birthday_day    || '';
     } else {
       currentRole = 'customer';
       prof.name   = displayName;
@@ -2961,6 +3008,8 @@ function loadUserRole(uid, displayName) {
 /* ── After successful login ──────────────────── */
 function onAuthSuccess() {
   document.getElementById('auth-screen').style.display = 'none';
+  var backBtn = document.getElementById('auth-back-btn');
+  if (backBtn) backBtn.style.display = 'none';
   applyRoleUI();
   renderUserPill();
   loadProductsFromDB();
@@ -3330,6 +3379,11 @@ renderAuthForm();
 /* Listen for existing session (user already logged in) */
 sb.auth.getSession().then(function(res) {
   var session = res.data && res.data.session;
+  /* always load products publicly — no login needed to browse */
+  loadProductsFromDB();
+  applyTranslations();
+  renderHome();
+  updateCounts();
   if (session && session.user) {
     currentUser = session.user;
     var meta = session.user.user_metadata || {};
@@ -3337,8 +3391,8 @@ sb.auth.getSession().then(function(res) {
     prof.name = displayName;
     loadUserRole(session.user.id, displayName);
   } else {
-    /* no session — show auth screen */
-    document.getElementById('auth-screen').style.display = 'flex';
+    /* no session — hide auth screen, show app, auth wall on protected screens */
+    document.getElementById('auth-screen').style.display = 'none';
   }
 });
 
