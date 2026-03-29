@@ -2087,7 +2087,7 @@ to{transform:translateY(0);opacity:1}
   <div class="sec"><div class="sec-hdr"><div class="sec-title"><span data-i18n="our_favs"></span><em data-i18n="favorites"></em></div><span class="see-all" onclick="goTo('shop')" data-i18n="view_all"></span></div></div>
   <div class="pgrid" id="home-featured"></div>
   <div id="about-anchor" class="sec"><div class="sec-hdr"><div class="sec-title"><span data-i18n="story_lbl"></span><em data-i18n="story_em"></em></div></div></div>
-  <div class="about-card"><div class="about-img">&#x1F9C1;</div><div class="about-body"><h3 data-i18n="about_title"></h3><p data-i18n="about_p1"></p><p data-i18n="about_p2"></p><div class="about-tags"><span class="about-tag" data-i18n="made_to_order"></span><span class="about-tag" data-i18n="no_preservatives"></span><span class="about-tag" data-i18n="home_kitchen"></span><span class="about-tag">Puerto Rico &#x1F1F5;&#x1F1F7;</span></div><div class="contact-row" style="margin-top:12px"><a class="cbtn wa" href="https://wa.me/17875550001" target="_blank">&#x1F4AC; WhatsApp</a><a class="cbtn ig" href="https://instagram.com/paobee" target="_blank">&#x1F4F8; @paobee</a></div></div></div>
+  <div class="about-card"><div class="about-img">&#x1F9C1;</div><div class="about-body"><h3 data-i18n="about_title"></h3><p data-i18n="about_p1"></p><p data-i18n="about_p2"></p><div class="about-tags"><span class="about-tag" data-i18n="made_to_order"></span><span class="about-tag" data-i18n="no_preservatives"></span><span class="about-tag" data-i18n="home_kitchen"></span><span class="about-tag">Puerto Rico &#x1F1F5;&#x1F1F7;</span></div><div class="contact-row" style="margin-top:12px"><a class="cbtn wa" href="https://wa.me/17879699171" target="_blank">&#x1F4AC; WhatsApp</a><a class="cbtn ig" href="https://www.instagram.com/paobee_/" target="_blank">&#x1F4F8; @paobee</a></div></div></div>
   <div style="height:8px"></div>
 </div>
 <div id="screen-shop" class="screen">
@@ -2123,7 +2123,7 @@ to{transform:translateY(0);opacity:1}
   <div class="nav-item" id="nav-settings" onclick="goTo('settings')"><div class="nav-icon">&#x2699;&#xFE0F;</div><div class="nav-lbl" data-i18n="settings"></div><div class="nav-dot"></div></div>
   <div class="nav-item" id="nav-manager" onclick="goTo('manager')"><div class="nav-icon">&#x1F469;&#x200D;&#x1F373;</div><div class="nav-lbl" data-i18n="manage"></div><div class="nav-dot"></div></div>
 </nav>
-<a class="wa-btn" href="https://wa.me/17875550001" target="_blank">&#x1F4AC;</a>
+<a class="wa-btn" href="https://wa.me/17879699171" target="_blank">&#x1F4AC;</a>
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="modal"><button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">&#x2715;</button><span class="modal-handle"></span><div class="modal-img" id="modal-img"></div><div class="modal-cat" id="modal-cat"></div><div class="modal-name" id="modal-name"></div><div class="modal-rating" id="modal-rating"></div><div class="modal-desc" id="modal-desc"></div><div class="allergen-box" id="modal-abox"><div class="allergen-title" data-i18n="contains"></div><div class="allergen-tags" id="modal-allergens"></div></div><div class="modal-bottom"><div class="modal-price" id="modal-price"></div><button class="modal-add-btn" id="modal-add-btn"></button></div></div>
 </div>
@@ -2786,19 +2786,22 @@ function handleAuthResult(res, name, phone) {
     return;
   }
   currentUser = user;
-  /* build display name from args or metadata */
-  var meta = user.user_metadata || {};
-  var displayName = name || meta.full_name || user.email || user.phone || 'Usuario';
-  var displayPhone = phone || meta.phone || user.phone || '';
-  /* upsert profile with name + email + phone */
-  /* set prof immediately so UI shows correct data even before DB responds */
+  /* build display name and phone from signup args or metadata */
+  var meta         = user.user_metadata || {};
+  var displayName  = name  || meta.full_name || user.email || 'Usuario';
+  var displayPhone = phone || meta.phone     || user.phone || '';
+  var displayEmail = user.email || '';
+
+  /* update prof immediately so Settings screen shows real data right away */
   prof.name  = displayName;
-  prof.email = user.email || '';
+  prof.email = displayEmail;
   prof.phone = displayPhone;
+
+  /* save to Supabase profiles table */
   sb.from('profiles').upsert({
     id:    user.id,
     name:  displayName,
-    email: user.email || '',
+    email: displayEmail,
     phone: displayPhone
   }, { onConflict: 'id' }).then(function(res) {
     if (res.error) console.error('Profile upsert error:', res.error.message);
