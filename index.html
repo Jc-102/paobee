@@ -2273,7 +2273,7 @@ var orders=[
 /* ── LOYALTY ACCOUNT ───────────────────────── */
 var loyalty={points:120,history:[{type:'earn',desc:'Pedido #001 completado',sub:'20 Mar - Desbloqueado 72hrs despues',amount:6},{type:'spend',desc:'Canjeado al pagar',sub:'15 Mar - 50 pts = $5.00 off',amount:-50},{type:'earn',desc:'Pedido #002 completado',sub:'10 Mar',amount:11},{type:'pending',desc:'Pedido #003 pendiente',sub:'Se desbloquea 72hrs despues de entrega',amount:4}]};
 /* ── USER PROFILE & CONFIG ─────────────────── */
-var prof={name:'Jan',phone:'787-555-0001',email:''};
+var prof={name:'Jan',phone:'787-555-0001',email:'',avatar_url:''};
 var cfg={dark:false,notifOrders:true,notifPromos:false};
 var payMethods=[{id:1,type:'ath',username:'@myhandle'},{id:2,type:'pp',username:'@myemail'}];
 
@@ -2499,7 +2499,17 @@ function renderSettings(){
     +'<div class="loyalty-card"><div class="loy-tag">'+t('paobee_rewards')+'</div><div class="loy-pts">'+loyalty.points+' pts</div><div class="loy-sub">= $'+Math.floor(loyalty.points/10).toFixed(2)+' canjeables</div><div class="loy-bg"><div class="loy-fill" style="width:'+pct+'%"></div></div><div class="loy-hint">'+(loyalty.points>=50?'Listo para canjear! &#x1F389;':'Necesitas '+(50-(loyalty.points%50))+' pts mas')+'</div><div class="loy-acts"><div class="loy-btn" onclick="togPtsH()">'+t('pts_history')+'</div>'+(loyalty.points>=50?'<div class="loy-btn red" onclick="goTo(\'shop\')">'+t('redeem')+'</div>':'')+'</div></div>'
     +'<div id="pts-h-sec" style="display:none;margin:0 16px 14px"><div class="pts-hcard"><div style="padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">'+t('pts_history')+'</div>'
     +loyalty.history.map(function(h){var bg=h.type==='earn'?'#E8F5E9':h.type==='spend'?'#FDF0F3':'#FFF8E1';var ic=h.type==='earn'?'&#x1F389;':h.type==='spend'?'&#x1F6CD;&#xFE0F;':'&#x23F3;';var cl=h.type==='earn'?'pts-earn':h.type==='spend'?'pts-spend':'pts-pend';return '<div class="pts-row"><div style="display:flex;align-items:center"><div class="pts-icon" style="background:'+bg+'">'+ic+'</div><div><div style="font-size:13px;font-weight:500;color:var(--text)">'+h.desc+'</div><div style="font-size:11px;color:var(--muted)">'+h.sub+'</div></div></div><div class="'+cl+'">'+(h.amount>0?'+':'')+h.amount+'</div></div>';}).join('')+'</div></div>';
-  el.innerHTML='<div class="s-hero"><div class="s-avatar">'+ini+'</div><div><div class="s-name">'+prof.name+'</div><div class="s-phone">'+prof.phone+'</div></div></div>'
+  /* build avatar — photo or initials */
+  var avatarInner = prof.avatar_url
+    ? '<img src="' + prof.avatar_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%">'
+    : ini;
+  var avatarEl = '<div class="s-avatar" id="s-avatar-btn" onclick="document.getElementById(\'avatar-file-input\').click()" style="cursor:pointer;position:relative">'
+    + avatarInner
+    + '<div style="position:absolute;bottom:0;right:0;width:20px;height:20px;background:var(--pink);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;border:2px solid var(--cream)">&#x270F;</div>'
+    + '</div>'
+    + '<input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="uploadAvatar(this)">';
+
+  el.innerHTML='<div class="s-hero">' + avatarEl + '<div><div class="s-name">'+prof.name+'</div><div class="s-phone">'+prof.phone+'</div></div></div>'
     +'<div style="padding:12px 16px 0">'+loyH
     +'<div class="stitle">'+t('profile')+'</div>'
     +'<div class="sgroup"><div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#FDF0F3">&#x1F464;</div><div><div class="srow-lbl">'+t('name')+'</div></div></div><input style="border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;font-size:13px;color:var(--text);background:var(--ibg);width:120px;outline:none" id="pn" value="'+prof.name+'"></div>'
@@ -2516,7 +2526,26 @@ function renderSettings(){
     +'<div style="height:16px"></div></div>';
 }
 function togPtsH(){var el=document.getElementById('pts-h-sec');if(el)el.style.display=el.style.display==='none'?'block':'none';}
-function savProf(){prof.name=document.getElementById('pn').value||prof.name;prof.phone=document.getElementById('pp').value||prof.phone;prof.email=document.getElementById('pe').value||prof.email;renderSettings();}
+function savProf() {
+  prof.name  = document.getElementById('pn').value || prof.name;
+  prof.phone = document.getElementById('pp').value || prof.phone;
+  prof.email = document.getElementById('pe').value || prof.email;
+  /* save to Supabase */
+  if (currentUser) {
+    sb.from('profiles').update({
+      name:       prof.name,
+      phone:      prof.phone,
+      email:      prof.email,
+      avatar_url: prof.avatar_url || null
+    }).eq('id', currentUser.id).then(function(res) {
+      if (res.error) { alert('Error guardando perfil.'); return; }
+      renderSettings();
+      renderUserPill();
+    });
+  } else {
+    renderSettings();
+  }
+}
 function togDark(el){cfg.dark=el.checked;document.body.classList.toggle('dark',el.checked);}
 function remPm(id){payMethods=payMethods.filter(function(p){return p.id!==id;});renderSettings();}
 function openPmMod(){pmType='ath';renderPmForm();document.getElementById('pm-overlay').classList.add('open');}
@@ -2777,13 +2806,16 @@ function handleAuthResult(res, name, phone) {
 
 /* ── Load role from DB ───────────────────────── */
 function loadUserRole(uid, displayName) {
-  sb.from('profiles').select('role, name').eq('id', uid).single().then(function(res) {
+  sb.from('profiles').select('*').eq('id', uid).single().then(function(res) {
     if (res.data) {
-      currentRole = res.data.role || 'customer';
-      prof.name = res.data.name || displayName;
+      currentRole      = res.data.role       || 'customer';
+      prof.name        = res.data.name       || displayName;
+      prof.email       = res.data.email      || '';
+      prof.phone       = res.data.phone      || '';
+      prof.avatar_url  = res.data.avatar_url || '';
     } else {
       currentRole = 'customer';
-      prof.name = displayName;
+      prof.name   = displayName;
     }
     onAuthSuccess();
   });
@@ -2809,15 +2841,61 @@ function renderUserPill() {
   var existing = document.getElementById('user-pill');
   if (existing) existing.remove();
   var initials = prof.name ? prof.name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2) : '?';
+  var avatarHtml = prof.avatar_url
+    ? '<div class="user-pill-avatar" style="padding:0;overflow:hidden"><img src="' + prof.avatar_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></div>'
+    : '<div class="user-pill-avatar">' + initials + '</div>';
   var pill = document.createElement('div');
   pill.className = 'user-pill';
   pill.id = 'user-pill';
-  pill.innerHTML = '<div class="user-pill-avatar">' + initials + '</div>'
+  pill.innerHTML = avatarHtml
     + '<div class="user-pill-name">' + prof.name + '</div>'
     + (currentRole === 'manager' ? '<div class="mgr-badge">MGR</div>' : '')
     + '<span style="font-size:10px;color:var(--muted);margin-left:2px">&#x25BC;</span>';
   pill.onclick = function() { goTo('settings'); };
   document.body.appendChild(pill);
+}
+
+/* ── Upload avatar to Supabase Storage ──────── */
+function uploadAvatar(input) {
+  var file = input.files[0];
+  if (!file || !currentUser) return;
+
+  /* compress before upload */
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      /* resize to max 400x400 */
+      var canvas = document.createElement('canvas');
+      var MAX = 400;
+      var w = img.width, h = img.height;
+      if (w > h) { if (w > MAX) { h = h * MAX / w; w = MAX; } }
+      else        { if (h > MAX) { w = w * MAX / h; h = MAX; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      canvas.toBlob(function(blob) {
+        var path = currentUser.id + '/avatar.jpg';
+        /* show loading state */
+        var avatarBtn = document.getElementById('s-avatar-btn');
+        if (avatarBtn) avatarBtn.style.opacity = '0.5';
+        sb.storage.from('avatars').upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
+          .then(function(res) {
+            if (res.error) { alert('Error subiendo foto: ' + res.error.message); if (avatarBtn) avatarBtn.style.opacity = '1'; return; }
+            /* get public URL */
+            var urlRes = sb.storage.from('avatars').getPublicUrl(path);
+            var publicUrl = urlRes.data.publicUrl + '?t=' + Date.now(); // cache bust
+            prof.avatar_url = publicUrl;
+            /* save url to profile */
+            sb.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
+            /* re-render */
+            renderSettings();
+            renderUserPill();
+          });
+      }, 'image/jpeg', 0.8);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 /* ── Sign out ────────────────────────────────── */
