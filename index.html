@@ -2822,6 +2822,7 @@ function loadUserRole(uid, displayName) {
       currentRole = 'customer';
       prof.name   = displayName;
     }
+    console.log('Role loaded:', currentRole);
     onAuthSuccess();
   });
 }
@@ -2829,9 +2830,7 @@ function loadUserRole(uid, displayName) {
 /* ── After successful login ──────────────────── */
 function onAuthSuccess() {
   document.getElementById('auth-screen').style.display = 'none';
-  /* show / hide manager tab based on role */
-  var mgrNav = document.getElementById('nav-manager');
-  if (mgrNav) mgrNav.style.display = currentRole === 'manager' ? '' : 'none';
+  applyRoleUI();
   renderUserPill();
   loadProductsFromDB();
   loadOrdersFromDB();
@@ -2839,6 +2838,19 @@ function onAuthSuccess() {
   applyTranslations();
   renderHome();
   updateCounts();
+}
+
+/* ── Apply UI changes based on role ─────────── */
+function applyRoleUI() {
+  var mgrNav = document.getElementById('nav-manager');
+  if (!mgrNav) return;
+  if (currentRole === 'manager') {
+    mgrNav.style.display = '';
+    mgrNav.style.visibility = 'visible';
+    mgrNav.style.opacity = '1';
+  } else {
+    mgrNav.style.display = 'none';
+  }
 }
 
 /* ── User pill (top right) ───────────────────── */
@@ -3106,7 +3118,7 @@ renderSettings = function() {
    K. INIT
    ══════════════════════════════════════════════ */
 
-/* Hide manager nav until role is confirmed */
+/* Manager nav starts hidden via JS — applyRoleUI() shows it if role=manager */
 (function() {
   var mgrNav = document.getElementById('nav-manager');
   if (mgrNav) mgrNav.style.display = 'none';
