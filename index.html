@@ -2628,30 +2628,31 @@ function switchAuthMethod(m) {
 function renderAuthForm() {
   var wrap = document.getElementById('auth-form-wrap');
   var isLogin = authTab === 'login';
-  var label = isLogin ? 'Iniciar sesión' : 'Crear cuenta';
-
-  var methodBtns = '<div class="auth-method">'
-    + '<button class="auth-method-btn' + (authMethod === 'email' ? ' active' : '') + '" id="am-email" onclick="switchAuthMethod(\'email\')">&#x2709; Email</button>'
-    + '<button class="auth-method-btn' + (authMethod === 'phone' ? ' active' : '') + '" id="am-phone" onclick="switchAuthMethod(\'phone\')">&#x1F4F1; Telefono</button>'
-    + '</div>';
-
+  var label = isLogin ? 'Iniciar sesion' : 'Crear cuenta';
   var fields = '';
-  if (authMethod === 'email') {
-    if (!isLogin) {
-      fields += '<div class="auth-fld"><label class="auth-lbl">Nombre</label><input class="auth-inp" id="auth-name" placeholder="Tu nombre"></div>';
+
+  if (isLogin) {
+    /* login: toggle between email or phone */
+    fields += '<div class="auth-method">'
+      + '<button class="auth-method-btn' + (authMethod === 'email' ? ' active' : '') + '" id="am-email" onclick="switchAuthMethod(\'email\')">&#x2709; Email</button>'
+      + '<button class="auth-method-btn' + (authMethod === 'phone' ? ' active' : '') + '" id="am-phone" onclick="switchAuthMethod(\'phone\')">&#x1F4F1; Telefono</button>'
+      + '</div>';
+    if (authMethod === 'email') {
+      fields += '<div class="auth-fld"><label class="auth-lbl">Correo electronico</label><input class="auth-inp" id="auth-email" type="email" placeholder="tu@email.com"></div>';
+      fields += '<div class="auth-fld"><label class="auth-lbl">Contrasena</label><input class="auth-inp" id="auth-pass" type="password" placeholder="Tu contrasena"></div>';
+    } else {
+      fields += '<div class="auth-fld"><label class="auth-lbl">Numero de telefono</label><input class="auth-inp" id="auth-phone" type="tel" placeholder="+1787XXXXXXX"></div>';
     }
-    fields += '<div class="auth-fld"><label class="auth-lbl">Correo electronico</label><input class="auth-inp" id="auth-email" type="email" placeholder="tu@email.com"></div>';
-    fields += '<div class="auth-fld"><label class="auth-lbl">Contrasena</label><input class="auth-inp" id="auth-pass" type="password" placeholder="Minimo 6 caracteres"></div>';
   } else {
-    if (!isLogin) {
-      fields += '<div class="auth-fld"><label class="auth-lbl">Nombre</label><input class="auth-inp" id="auth-name" placeholder="Tu nombre"></div>';
-    }
+    /* signup: always collect name + email + phone + password */
+    fields += '<div class="auth-fld"><label class="auth-lbl">Nombre completo</label><input class="auth-inp" id="auth-name" placeholder="Tu nombre completo"></div>';
+    fields += '<div class="auth-fld"><label class="auth-lbl">Correo electronico</label><input class="auth-inp" id="auth-email" type="email" placeholder="tu@email.com"></div>';
     fields += '<div class="auth-fld"><label class="auth-lbl">Numero de telefono</label><input class="auth-inp" id="auth-phone" type="tel" placeholder="+1787XXXXXXX"></div>';
+    fields += '<div class="auth-fld"><label class="auth-lbl">Contrasena</label><input class="auth-inp" id="auth-pass" type="password" placeholder="Minimo 6 caracteres"></div>';
+    fields += '<div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.6">&#x1F4F1; Tu numero se usara para actualizaciones de pedidos via WhatsApp.</div>';
   }
 
-  var btn = '<button class="auth-btn" id="auth-submit-btn" onclick="handleAuth()">' + label + '</button>';
-
-  wrap.innerHTML = methodBtns + fields + btn;
+  wrap.innerHTML = fields + '<button class="auth-btn" id="auth-submit-btn" onclick="handleAuth()">' + label + '</button>';
 }
 
 /* ── Handle auth submit ──────────────────────── */
@@ -2661,26 +2662,46 @@ function handleAuth() {
   btn.textContent = 'Un momento...';
   setAuthMsg('', '');
 
-  if (authMethod === 'email') {
-    var email = (document.getElementById('auth-email') || {}).value || '';
-    var pass  = (document.getElementById('auth-pass')  || {}).value || '';
-    var name  = (document.getElementById('auth-name')  || {}).value || '';
-    if (!email || !pass) { setAuthMsg('Por favor completa todos los campos.', 'err'); btn.disabled = false; btn.textContent = authTab === 'login' ? 'Iniciar sesion' : 'Crear cuenta'; return; }
-    if (authTab === 'login') {
-      sb.auth.signInWithPassword({ email: email, password: pass }).then(function(res) { handleAuthResult(res, name); });
+  var isLogin = authTab === 'login';
+
+  if (isLogin) {
+    /* LOGIN */
+    if (authMethod === 'email') {
+      var email = (document.getElementById('auth-email') || {}).value || '';
+      var pass  = (document.getElementById('auth-pass')  || {}).value || '';
+      if (!email || !pass) { setAuthMsg('Por favor completa todos los campos.', 'err'); resetBtn(btn); return; }
+      sb.auth.signInWithPassword({ email: email, password: pass }).then(function(res) { handleAuthResult(res, ''); });
     } else {
-      sb.auth.signUp({ email: email, password: pass, options: { data: { full_name: name } } }).then(function(res) { handleAuthResult(res, name); });
+      var phone = (document.getElementById('auth-phone') || {}).value || '';
+      if (!phone) { setAuthMsg('Por favor ingresa tu numero de telefono.', 'err'); resetBtn(btn); return; }
+      pendingPhone = phone;
+      sb.auth.signInWithOtp({ phone: phone }).then(function(res) {
+        if (res.error) { setAuthMsg(res.error.message, 'err'); resetBtn(btn); return; }
+        renderOtpForm(phone, '');
+      });
     }
   } else {
-    var phone = (document.getElementById('auth-phone') || {}).value || '';
+    /* SIGNUP — always email + phone + name + password */
     var name  = (document.getElementById('auth-name')  || {}).value || '';
-    if (!phone) { setAuthMsg('Por favor ingresa tu numero de telefono.', 'err'); btn.disabled = false; btn.textContent = authTab === 'login' ? 'Iniciar sesion' : 'Crear cuenta'; return; }
-    pendingPhone = phone;
-    sb.auth.signInWithOtp({ phone: phone }).then(function(res) {
-      if (res.error) { setAuthMsg(res.error.message, 'err'); btn.disabled = false; btn.textContent = 'Iniciar sesion'; return; }
-      renderOtpForm(phone, name);
-    });
+    var email = (document.getElementById('auth-email') || {}).value || '';
+    var phone = (document.getElementById('auth-phone') || {}).value || '';
+    var pass  = (document.getElementById('auth-pass')  || {}).value || '';
+    if (!name)  { setAuthMsg('Por favor ingresa tu nombre.',             'err'); resetBtn(btn); return; }
+    if (!email) { setAuthMsg('Por favor ingresa tu correo electronico.', 'err'); resetBtn(btn); return; }
+    if (!phone) { setAuthMsg('Por favor ingresa tu numero de telefono.', 'err'); resetBtn(btn); return; }
+    if (!pass || pass.length < 6) { setAuthMsg('La contrasena debe tener al menos 6 caracteres.', 'err'); resetBtn(btn); return; }
+    sb.auth.signUp({
+      email: email,
+      password: pass,
+      options: { data: { full_name: name, phone: phone } }
+    }).then(function(res) { handleAuthResult(res, name, phone); });
   }
+}
+
+function resetBtn(btn) {
+  if (!btn) return;
+  btn.disabled = false;
+  btn.textContent = authTab === 'login' ? 'Iniciar sesion' : 'Crear cuenta';
 }
 
 /* ── OTP verification form ───────────────────── */
@@ -2724,7 +2745,7 @@ function verifyOtp(phone, name) {
 }
 
 /* ── Handle auth result ──────────────────────── */
-function handleAuthResult(res, name) {
+function handleAuthResult(res, name, phone) {
   if (res.error) {
     setAuthMsg(res.error.message, 'err');
     var btn = document.getElementById('auth-submit-btn');
@@ -2733,13 +2754,23 @@ function handleAuthResult(res, name) {
   }
   var user = res.data.user;
   if (!user) {
-    setAuthMsg('Revisa tu correo para confirmar tu cuenta.', 'ok');
+    /* email confirmation pending - but we don't require it so this shouldn't happen */
+    setAuthMsg('Cuenta creada! Por favor inicia sesion.', 'ok');
+    switchAuthTab('login');
     return;
   }
   currentUser = user;
-  /* upsert profile */
-  var displayName = name || (user.user_metadata && user.user_metadata.full_name) || user.email || user.phone || 'Usuario';
-  sb.from('profiles').upsert({ id: user.id, name: displayName, email: user.email || '', phone: user.phone || '' }, { onConflict: 'id' }).then(function() {
+  /* build display name from args or metadata */
+  var meta = user.user_metadata || {};
+  var displayName = name || meta.full_name || user.email || user.phone || 'Usuario';
+  var displayPhone = phone || meta.phone || user.phone || '';
+  /* upsert profile with name + email + phone */
+  sb.from('profiles').upsert({
+    id: user.id,
+    name: displayName,
+    email: user.email || '',
+    phone: displayPhone
+  }, { onConflict: 'id' }).then(function() {
     loadUserRole(user.id, displayName);
   });
 }
