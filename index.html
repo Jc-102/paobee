@@ -2569,20 +2569,56 @@ function renderMgrTab(tab){
     var rows=DK.map(function(d){var s=SCHED[d];return '<div class="day-row"><div class="day-name">'+DT[d]+'</div><div class="day-times"><input type="time" class="time-inp" value="'+(s?s.open:'')+'" onchange="SCHED[\''+d+'\'].open=this.value" '+(s&&s.on?'':'disabled')+'><span style="font-size:12px;color:var(--muted)">'+t('to')+'</span><input type="time" class="time-inp" value="'+(s?s.close:'')+'" onchange="SCHED[\''+d+'\'].close=this.value" '+(s&&s.on?'':'disabled')+'></div><label class="tog-sw"><input type="checkbox" '+(s&&s.on?'checked':'')+' onchange="togDay(\''+d+'\',this)"><span class="tog-sl"></span></label></div>';}).join('');
     el.innerHTML='<div style="padding:0 16px 12px"><div class="sched-card"><h4>'+t('avail_days')+'</h4>'+rows+'<div class="adv-row"><span style="font-size:13px;font-weight:500;color:var(--text)">'+t('advance')+'</span><select class="adv-sel" onchange="advDays=parseInt(this.value)"><option value="0" '+(advDays===0?'selected':'')+'>'+t('same_day')+'</option><option value="1" '+(advDays===1?'selected':'')+'>'+t('one_day')+'</option><option value="2" '+(advDays===2?'selected':'')+'>'+t('two_days')+'</option><option value="3" '+(advDays===3?'selected':'')+'>'+t('three_days')+'</option></select></div></div></div>';
   } else {
-    var rev=orders.filter(function(o){return o.status!=='cancelled';}).reduce(function(s,o){return s+o.total;},0);
-    var tot=orders.filter(function(o){return o.status!=='cancelled';}).length;var avg=tot?rev/tot:0;
-    var earned=loyalty.history.filter(function(h){return h.type==='earn';}).reduce(function(s,h){return s+h.amount;},0);
-    var spent=Math.abs(loyalty.history.filter(function(h){return h.type==='spend';}).reduce(function(s,h){return s+h.amount;},0));
-    el.innerHTML='<div class="stats-grid"><div class="stat-card"><div class="stat-lbl">'+t('revenue')+'</div><div class="stat-val">$'+rev.toFixed(2)+'</div></div><div class="stat-card"><div class="stat-lbl">'+t('orders_tab')+'</div><div class="stat-val">'+tot+'</div></div><div class="stat-card"><div class="stat-lbl">'+t('avg_order')+'</div><div class="stat-val">$'+avg.toFixed(2)+'</div></div><div class="stat-card"><div class="stat-lbl">'+t('products')+'</div><div class="stat-val">'+products.length+'</div></div></div>'
-      +'<div class="chart-box"><div class="chart-title">Ingresos Diarios</div><div class="chart-sub">Ultimos 7 dias</div><canvas id="rC" height="160"></canvas></div>'
-      +'<div class="chart-box"><div class="chart-title">Pedidos por Dia</div><div class="chart-sub">Ultimos 7 dias</div><canvas id="oC" height="140"></canvas></div>'
-      +'<div class="chart-box"><div class="chart-title">Ingresos por Categoria</div><div class="chart-sub">Historial completo</div><canvas id="cC" height="180"></canvas></div>'
+    /* ── Analytics: filter by selected time range ── */
+    var chartRange = window._chartRange || '7d';
+    var now = Date.now();
+    var rangeMs = {
+      '24h': 24*3600*1000,
+      '7d':  7*24*3600*1000,
+      '30d': 30*24*3600*1000,
+      '365d':365*24*3600*1000,
+      'all': Infinity
+    }[chartRange];
+
+    /* filter orders: not cancelled + within time range */
+    var filteredOrders = orders.filter(function(o) {
+      if (o.status === 'cancelled') return false;
+      if (rangeMs === Infinity) return true;
+      var created = o.completedAt || o.created_at || 0;
+      if (!created) return true; /* include if no date */
+      return (now - created) <= rangeMs;
+    });
+
+    var rev = filteredOrders.reduce(function(s,o){return s+o.total;},0);
+    var tot = filteredOrders.length;
+    var avg = tot ? rev/tot : 0;
+
+    /* loyalty stats from all time */
+    var earned = loyalty.history.filter(function(h){return h.type==='earn';}).reduce(function(s,h){return s+h.amount;},0);
+    var spent  = Math.abs(loyalty.history.filter(function(h){return h.type==='spend';}).reduce(function(s,h){return s+h.amount;},0));
+
+    /* time range dropdown labels */
+    var rangeLabels = {'24h':'Ultimas 24 horas','7d':'Ultima semana','30d':'Ultimo mes','365d':'Ultimo ano','all':'Todo el tiempo'};
+    var rangeDropdown = '<select class="adv-sel" style="margin-bottom:14px;width:100%" onchange="window._chartRange=this.value;destroyCharts();renderMgrTab(\'analytics\');document.querySelectorAll(\'.mgr-tab\').forEach(function(tb,i){tb.classList.toggle(\'active\',i===3);})">'
+      + Object.entries(rangeLabels).map(function(e){return '<option value="'+e[0]+'"'+(chartRange===e[0]?' selected':'')+'>'+e[1]+'</option>';}).join('')
+      + '</select>';
+
+    el.innerHTML = '<div style="padding:0 16px 4px">'+rangeDropdown+'</div>'
+      +'<div class="stats-grid"><div class="stat-card"><div class="stat-lbl">'+t('revenue')+'</div><div class="stat-val">$'+rev.toFixed(2)+'</div></div>'
+      +'<div class="stat-card"><div class="stat-lbl">'+t('orders_tab')+'</div><div class="stat-val">'+tot+'</div></div>'
+      +'<div class="stat-card"><div class="stat-lbl">'+t('avg_order')+'</div><div class="stat-val">$'+avg.toFixed(2)+'</div></div>'
+      +'<div class="stat-card"><div class="stat-lbl">'+t('products')+'</div><div class="stat-val">'+products.length+'</div></div></div>'
+      +'<div class="chart-box"><div class="chart-title">Ingresos Diarios</div><div class="chart-sub">'+rangeLabels[chartRange]+'</div><canvas id="rC" height="160"></canvas></div>'
+      +'<div class="chart-box"><div class="chart-title">Pedidos por Dia</div><div class="chart-sub">'+rangeLabels[chartRange]+'</div><canvas id="oC" height="140"></canvas></div>'
+      +'<div class="chart-box"><div class="chart-title">Ingresos por Categoria</div><div class="chart-sub">Historial completo (sin cancelados)</div><canvas id="cC" height="180"></canvas></div>'
       +'<div style="padding:0 16px;margin-bottom:8px"><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px">&#x2B50; Analiticas de Puntos</div></div>'
-      +'<div class="pts-stats-grid"><div class="psg"><div class="psg-val">'+earned+'</div><div class="psg-lbl">En Circulacion</div></div><div class="psg"><div class="psg-val">'+spent+'</div><div class="psg-lbl">Canjeados</div></div><div class="psg"><div class="psg-val">$'+(spent/10).toFixed(2)+'</div><div class="psg-lbl">Valor Usado</div></div></div>'
-      +'<div class="chart-box"><div class="chart-title">Puntos Ganados vs Canjeados</div><div class="chart-sub">Ultimos 7 dias</div><canvas id="ptsChart" height="160"></canvas></div>'
+      +'<div class="pts-stats-grid"><div class="psg"><div class="psg-val">'+earned+'</div><div class="psg-lbl">En Circulacion</div></div>'
+      +'<div class="psg"><div class="psg-val">'+spent+'</div><div class="psg-lbl">Canjeados</div></div>'
+      +'<div class="psg"><div class="psg-val">$'+(spent/10).toFixed(2)+'</div><div class="psg-lbl">Valor Usado</div></div></div>'
+      +'<div class="chart-box"><div class="chart-title">Puntos Ganados vs Canjeados</div><div class="chart-sub">'+rangeLabels[chartRange]+'</div><canvas id="ptsChart" height="160"></canvas></div>'
       +'<div class="act-card"><div><div style="font-size:14px;font-weight:600;color:var(--text)">'+t('export_orders')+'</div><div style="font-size:12px;color:var(--muted);margin-top:1px">'+t('export_sub')+'</div></div><button class="act-btn" onclick="exportCSV()">'+t('export_btn')+'</button></div>'
       +'<div style="height:20px"></div>';
-    setTimeout(drawCharts,50);
+    setTimeout(function(){ drawChartsFromOrders(filteredOrders, chartRange); }, 50);
   }
 }
 /* ── manager actions ───────────────────────── */
@@ -2591,14 +2627,105 @@ function cancelOrd(id){if(!confirm(t('cancel_confirm')))return;var o=orders.find
 function togDay(day,el){if(SCHED[day])SCHED[day].on=el.checked;renderMgrTab('schedule');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===2);});}
 function setStock(id,stock){var p=products.find(function(x){return x.id===id;});if(p)p.stock=stock;renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
 /* ── analytics charts ──────────────────────── */
-function drawCharts(){
-  var days=['Lun','Mar','Mie','Jue','Vie','Sab','Dom'];var pk='#E8587A',pl='rgba(232,88,122,0.15)';
-  var rc=document.getElementById('rC');if(rc)rC=new Chart(rc,{type:'line',data:{labels:days,datasets:[{data:[0,0,0,0,0,11,4.5],borderColor:pk,backgroundColor:pl,fill:true,tension:0.4,pointBackgroundColor:pk,pointRadius:4}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:function(v){return '$'+v;},color:'#888',font:{size:11}},grid:{color:'#F0E8EC'}},x:{grid:{display:false},ticks:{color:'#888',font:{size:10}}}}}});
-  var oc=document.getElementById('oC');if(oc)oC=new Chart(oc,{type:'bar',data:{labels:days,datasets:[{data:[0,0,0,0,0,1,1],backgroundColor:pl,borderColor:pk,borderWidth:1.5,borderRadius:6}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1,color:'#888',font:{size:11}},grid:{color:'#F0E8EC'}},x:{grid:{display:false},ticks:{color:'#888',font:{size:10}}}}}});
-  var ct={};orders.filter(function(o){return o.status!=='cancelled';}).forEach(function(o){o.items.forEach(function(i){var p=products.find(function(x){return x.name===i.name;});if(p)ct[p.cat]=(ct[p.cat]||0)+p.price*i.qty;});});
-  var cc=document.getElementById('cC');if(cc&&Object.keys(ct).length)cC=new Chart(cc,{type:'doughnut',data:{labels:Object.keys(ct),datasets:[{data:Object.values(ct),backgroundColor:['#E8587A','#F9D4DF','#C03060','#F4A0B5','#D4699F'],borderWidth:2,borderColor:'#fff'}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#1a1a1a',font:{size:11},padding:12}}},cutout:'60%'}});
-  var pc=document.getElementById('ptsChart');if(pc)ptsC=new Chart(pc,{type:'bar',data:{labels:days,datasets:[{label:'Ganados',data:[0,12,0,8,0,6,4],backgroundColor:'rgba(232,88,122,0.7)',borderRadius:6},{label:'Canjeados',data:[0,0,50,0,0,0,0],backgroundColor:'rgba(232,88,122,0.2)',borderRadius:6}]},options:{plugins:{legend:{position:'bottom',labels:{color:'#888',font:{size:11},padding:12}}},scales:{y:{beginAtZero:true,grid:{color:'#F0E8EC'},ticks:{color:'#888',font:{size:11}}},x:{grid:{display:false},ticks:{color:'#888',font:{size:10}}}}}});
+/* ── destroyCharts helper ───────────────────── */
+function destroyCharts() {
+  if (rC)   { rC.destroy();   rC   = null; }
+  if (oC)   { oC.destroy();   oC   = null; }
+  if (cC)   { cC.destroy();   cC   = null; }
+  if (ptsC) { ptsC.destroy(); ptsC = null; }
 }
+
+/* ── drawChartsFromOrders (real data) ────────── */
+function drawChartsFromOrders(filteredOrders, range) {
+  var pk = '#E8587A', pl = 'rgba(232,88,122,0.15)';
+  var now = new Date();
+
+  /* build labels and buckets based on range */
+  var labels = [], revData = [], ordData = [];
+
+  if (range === '24h') {
+    /* last 24 hours by hour */
+    for (var h = 23; h >= 0; h--) {
+      var d = new Date(now); d.setHours(now.getHours() - h, 0, 0, 0);
+      labels.push(d.getHours() + ':00');
+      var rev = 0, cnt = 0;
+      filteredOrders.forEach(function(o) {
+        var t = new Date(o.completedAt || o.created_at || 0);
+        if (t.getHours() === d.getHours() && t.toDateString() === d.toDateString()) { rev += o.total; cnt++; }
+      });
+      revData.push(rev); ordData.push(cnt);
+    }
+  } else if (range === '7d' || range === '30d') {
+    /* last N days */
+    var days = range === '7d' ? 7 : 30;
+    var dayNames = ['Dom','Lun','Mar','Mie','Jue','Vie','Sab'];
+    for (var i = days - 1; i >= 0; i--) {
+      var d = new Date(now); d.setDate(now.getDate() - i); d.setHours(0,0,0,0);
+      labels.push(range === '7d' ? dayNames[d.getDay()] : (d.getMonth()+1)+'/'+d.getDate());
+      var rev = 0, cnt = 0;
+      filteredOrders.forEach(function(o) {
+        var t = new Date(o.completedAt || o.created_at || 0);
+        if (t.toDateString() === d.toDateString()) { rev += o.total; cnt++; }
+      });
+      revData.push(parseFloat(rev.toFixed(2))); ordData.push(cnt);
+    }
+  } else {
+    /* monthly for year or all time */
+    var months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+    var buckets = {};
+    filteredOrders.forEach(function(o) {
+      var d = new Date(o.completedAt || o.created_at || 0);
+      var key = d.getFullYear() + '-' + d.getMonth();
+      if (!buckets[key]) buckets[key] = { label: months[d.getMonth()] + (range==='all'?' '+d.getFullYear():''), rev: 0, cnt: 0 };
+      buckets[key].rev += o.total; buckets[key].cnt++;
+    });
+    var sorted = Object.keys(buckets).sort();
+    if (!sorted.length) { labels = months; revData = new Array(12).fill(0); ordData = new Array(12).fill(0); }
+    else { sorted.forEach(function(k){ labels.push(buckets[k].label); revData.push(parseFloat(buckets[k].rev.toFixed(2))); ordData.push(buckets[k].cnt); }); }
+  }
+
+  /* Revenue chart */
+  var rc = document.getElementById('rC');
+  if (rc) rC = new Chart(rc, { type:'line', data:{ labels:labels, datasets:[{ data:revData, borderColor:pk, backgroundColor:pl, fill:true, tension:0.4, pointBackgroundColor:pk, pointRadius:4 }]}, options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{callback:function(v){return '$'+v;},color:'#888',font:{size:11}},grid:{color:'#F0E8EC'}}, x:{grid:{display:false},ticks:{color:'#888',font:{size:10},maxTicksLimit:8}}}}});
+
+  /* Orders chart */
+  var oc = document.getElementById('oC');
+  if (oc) oC = new Chart(oc, { type:'bar', data:{ labels:labels, datasets:[{ data:ordData, backgroundColor:pl, borderColor:pk, borderWidth:1.5, borderRadius:6 }]}, options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{stepSize:1,color:'#888',font:{size:11}},grid:{color:'#F0E8EC'}}, x:{grid:{display:false},ticks:{color:'#888',font:{size:10},maxTicksLimit:8}}}}});
+
+  /* Category donut — from all filtered orders, no cancelled */
+  var ct = {};
+  filteredOrders.forEach(function(o) {
+    (o.items||[]).forEach(function(item) {
+      ct[item.name] = (ct[item.name]||0) + item.price * item.qty;
+      /* group by cat if available */
+      var p = products.find(function(x){return x.id===item.id||x.name===item.name;});
+      if (p) { ct[p.cat] = (ct[p.cat]||0) + item.price*item.qty; delete ct[item.name]; }
+    });
+  });
+  var cc = document.getElementById('cC');
+  if (cc) {
+    if (Object.keys(ct).length) {
+      cC = new Chart(cc, { type:'doughnut', data:{ labels:Object.keys(ct), datasets:[{ data:Object.values(ct), backgroundColor:['#E8587A','#F9D4DF','#C03060','#F4A0B5','#D4699F','#E8A0B0','#C06080'], borderWidth:2, borderColor:'#fff'}]}, options:{plugins:{legend:{position:'bottom',labels:{color:'var(--text)',font:{size:11},padding:12}}},cutout:'60%'}});
+    } else {
+      cc.parentElement.innerHTML += '<div style="text-align:center;color:var(--muted);font-size:13px;padding:20px">Sin ordenes en este periodo</div>';
+    }
+  }
+
+  /* Loyalty points chart */
+  var ptsBuckets = {}, ptsBucketsSpent = {};
+  labels.forEach(function(l){ ptsBuckets[l]=0; ptsBucketsSpent[l]=0; });
+  loyalty.history.forEach(function(h) {
+    /* map to nearest label — simplified */
+    var lbl = labels[labels.length-1] || '';
+    if (h.type==='earn') ptsBuckets[lbl] = (ptsBuckets[lbl]||0) + h.amount;
+    if (h.type==='spend') ptsBucketsSpent[lbl] = (ptsBucketsSpent[lbl]||0) + Math.abs(h.amount);
+  });
+  var pc = document.getElementById('ptsChart');
+  if (pc) ptsC = new Chart(pc, { type:'bar', data:{ labels:labels, datasets:[{ label:'Ganados', data:Object.values(ptsBuckets), backgroundColor:'rgba(232,88,122,0.7)', borderRadius:6},{ label:'Canjeados', data:Object.values(ptsBucketsSpent), backgroundColor:'rgba(232,88,122,0.2)', borderRadius:6}]}, options:{ plugins:{legend:{position:'bottom',labels:{color:'#888',font:{size:11},padding:12}}}, scales:{ y:{beginAtZero:true,grid:{color:'#F0E8EC'},ticks:{color:'#888',font:{size:11}}}, x:{grid:{display:false},ticks:{color:'#888',font:{size:10},maxTicksLimit:8}}}}});
+}
+
+/* keep old name as alias for compatibility */
+function drawCharts() { drawChartsFromOrders(orders.filter(function(o){return o.status!=='cancelled';}), window._chartRange||'7d'); }
 /* ── CSV export ────────────────────────────── */
 function exportCSV(){var headers=['Pedido','Nombre','Telefono','Email','Fecha','Programado','Hora','Entrega','Articulos','Total','Pago','Estado'];var rows=orders.map(function(o){return[o.num,o.name,o.phone,o.email,o.date,o.scheduledDate,o.scheduledTime,o.delivery,o.items.map(function(i){return i.qty+'x '+i.name;}).join(' | '),'$'+o.total.toFixed(2),o.payment,o.status];});var csv=[headers].concat(rows).map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(',');}).join('\n');var blob=new Blob([csv],{type:'text/csv'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='paobee_pedidos.csv';a.click();URL.revokeObjectURL(url);}
 
@@ -3054,11 +3181,20 @@ placeOrder = function() {
   var num=String(nextOrderNum).padStart(3,'0');nextOrderNum++;
   var newOrder={id:orders.length+1,num:num,name:name,phone:phone,email:(document.getElementById('co-email')||{}).value||'',address:(document.getElementById('co-addr')||{}).value||'',notes:(document.getElementById('co-notes')||{}).value||'',delivery:mode,total:total,status:'confirmed',date:'Hoy',scheduledDate:window._sd,scheduledTime:window._st,payment:window._pm||'cash',ptsEarned:pe,ptsUnlocked:false,completedAt:null,items:items};
   orders.unshift(newOrder);
-  loyalty.history.unshift({type:'pending',desc:'Pedido #'+num+' pendiente',sub:'Se desbloquea 72hrs despues de entrega',amount:pe});
+  /* NOTE: loyalty points are NOT added here.
+     They are added only when manager marks order as 'completed' via setStage().
+     This prevents abuse (cancelling after points are added). */
+  loyalty.history.unshift({
+    type:'pending',
+    desc:'Pedido #'+num+' pendiente',
+    sub:'Puntos se acreditan al completar el pedido',
+    amount:pe
+  });
   /* save to Supabase */
   saveOrderToDB(newOrder).then(function(res){
     if(res.data) newOrder.id = res.data.id;
   });
+  /* save loyalty history (pending entry only, points unchanged) */
   saveLoyaltyToDB();
   cart={};updateCounts();appliedPromo=null;redeemPts=false;
   document.getElementById('cart-title').textContent=t('order_placed');
@@ -3071,14 +3207,46 @@ var _origSetStage = setStage;
 setStage = function(id, stage) {
   _origSetStage(id, stage);
   updateOrderStatusDB(id, stage);
+
+  var o = orders.find(function(x){return x.id===id;});
+  if (!o) return;
+
   if (stage === 'completed') {
-    /* unlock loyalty points */
-    var o = orders.find(function(x){return x.id===id;});
-    if (o && !o.ptsUnlocked) {
+    /* set completedAt for charts */
+    o.completedAt = Date.now();
+
+    /* add loyalty points ONLY here, ONLY once */
+    if (!o.ptsUnlocked && o.ptsEarned > 0) {
       loyalty.points += o.ptsEarned;
-      loyalty.history.unshift({type:'earn',desc:'Pedido #'+o.num+' completado',sub:'Puntos desbloqueados',amount:o.ptsEarned});
+      /* replace the pending entry with an earn entry */
+      var pendingIdx = loyalty.history.findIndex(function(h) {
+        return h.type === 'pending' && h.desc.indexOf('#'+o.num) >= 0;
+      });
+      var earnEntry = {
+        type: 'earn',
+        desc: 'Pedido #'+o.num+' completado',
+        sub: '+'+o.ptsEarned+' pts acreditados',
+        amount: o.ptsEarned
+      };
+      if (pendingIdx >= 0) {
+        loyalty.history.splice(pendingIdx, 1, earnEntry);
+      } else {
+        loyalty.history.unshift(earnEntry);
+      }
       o.ptsUnlocked = true;
-      sb.from('orders').update({pts_unlocked: true}).eq('id', id);
+      /* save to DB */
+      sb.from('orders').update({ pts_unlocked: true, completed_at: o.completedAt }).eq('id', id);
+      saveLoyaltyToDB();
+    }
+  }
+
+  if (stage === 'cancelled') {
+    /* remove pending loyalty entry if order is cancelled */
+    var pendingIdx = loyalty.history.findIndex(function(h) {
+      return h.type === 'pending' && h.desc.indexOf('#'+o.num) >= 0;
+    });
+    if (pendingIdx >= 0) {
+      loyalty.history.splice(pendingIdx, 1);
       saveLoyaltyToDB();
     }
   }
