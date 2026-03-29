@@ -2580,12 +2580,14 @@ function renderMgrTab(tab){
       'all': Infinity
     }[chartRange];
 
-    /* filter orders: not cancelled + within time range */
+    /* filter orders: completed only + within time range
+       cancelled = never counted
+       confirmed/preparing/on_the_way = not yet counted (pending completion) */
     var filteredOrders = orders.filter(function(o) {
-      if (o.status === 'cancelled') return false;
+      if (o.status !== 'completed') return false;
       if (rangeMs === Infinity) return true;
-      var created = o.completedAt || o.created_at || 0;
-      if (!created) return true; /* include if no date */
+      var created = o.completedAt || 0;
+      if (!created) return false;
       return (now - created) <= rangeMs;
     });
 
@@ -2692,12 +2694,12 @@ function drawChartsFromOrders(filteredOrders, range) {
   var oc = document.getElementById('oC');
   if (oc) oC = new Chart(oc, { type:'bar', data:{ labels:labels, datasets:[{ data:ordData, backgroundColor:pl, borderColor:pk, borderWidth:1.5, borderRadius:6 }]}, options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true,ticks:{stepSize:1,color:'#888',font:{size:11}},grid:{color:'#F0E8EC'}}, x:{grid:{display:false},ticks:{color:'#888',font:{size:10},maxTicksLimit:8}}}}});
 
-  /* Category donut — from all filtered orders, no cancelled */
+  /* Category donut — COMPLETED orders only, no cancelled, no pending */
   var ct = {};
-  filteredOrders.forEach(function(o) {
+  filteredOrders.filter(function(o){ return o.status === 'completed'; }).forEach(function(o) {
     (o.items||[]).forEach(function(item) {
       ct[item.name] = (ct[item.name]||0) + item.price * item.qty;
-      /* group by cat if available */
+      /* group by category */
       var p = products.find(function(x){return x.id===item.id||x.name===item.name;});
       if (p) { ct[p.cat] = (ct[p.cat]||0) + item.price*item.qty; delete ct[item.name]; }
     });
