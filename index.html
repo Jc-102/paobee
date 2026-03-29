@@ -6,7 +6,10 @@
 <title>Paobee</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
+
 /* ============================================================
    PAOBEE — Bakery PWA  |  paobee.html
    ------------------------------------------------------------
@@ -2013,30 +2016,83 @@ to{transform:translateY(0);opacity:1}
 }
 .php-icon{font-size:30px}
 .php-text{font-size:12px;font-weight:500}
+
+/* ────────── AUTH SCREENS ──────────────────────────────────── */
+#auth-screen{position:fixed;inset:0;background:var(--cream);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;animation:fadeIn .3s ease}
+.auth-logo{font-family:'Playfair Display',serif;font-size:42px;color:var(--pink);margin-bottom:6px;text-align:center}
+.auth-tag{font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:40px;text-align:center}
+.auth-card{background:var(--card);border-radius:24px;border:1px solid var(--border);padding:28px 24px;width:100%;max-width:390px}
+.auth-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--text);margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--muted);margin-bottom:22px;line-height:1.5}
+.auth-tabs{display:flex;gap:0;margin-bottom:22px;background:var(--sbg);border-radius:12px;padding:4px}
+.auth-tab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-radius:9px;border:none;background:none;font-family:'DM Sans',sans-serif}
+.auth-tab.active{background:var(--card);color:var(--pink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.auth-method{display:flex;gap:8px;margin-bottom:18px}
+.auth-method-btn{flex:1;border:1.5px solid var(--border);border-radius:12px;padding:10px 6px;text-align:center;cursor:pointer;background:var(--card);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:var(--text)}
+.auth-method-btn.active{border-color:var(--pink);background:var(--pl);color:var(--pink)}
+.auth-fld{margin-bottom:14px}
+.auth-lbl{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:5px;display:block;text-transform:uppercase;letter-spacing:.4px}
+.auth-inp{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text);outline:none;background:var(--ibg)}
+.auth-inp:focus{border-color:var(--pink)}
+.auth-btn{background:var(--pink);color:#fff;border:none;border-radius:14px;width:100%;padding:15px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px}
+.auth-btn:disabled{opacity:.6;cursor:not-allowed}
+.auth-err{background:#FFF0F0;color:#C0392B;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:12px;line-height:1.5}
+.auth-ok{background:#E8F5E9;color:#2E7D32;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:12px;line-height:1.5}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:16px 0}
+.auth-divider-line{flex:1;height:1px;background:var(--border)}
+.auth-divider-txt{font-size:11px;color:var(--muted);font-weight:500}
+.auth-switch{text-align:center;margin-top:16px;font-size:13px;color:var(--muted)}
+.auth-switch span{color:var(--pink);cursor:pointer;font-weight:600}
+.auth-loading{display:flex;align-items:center;justify-content:center;gap:8px;padding:16px;color:var(--muted);font-size:13px}
+.otp-inputs{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
+.otp-inp{width:44px;height:52px;border:1.5px solid var(--border);border-radius:12px;text-align:center;font-size:20px;font-weight:700;color:var(--text);background:var(--ibg);font-family:'DM Sans',sans-serif;outline:none}
+.otp-inp:focus{border-color:var(--pink)}
+.user-pill{position:fixed;top:12px;right:16px;z-index:20;background:var(--card);border:1px solid var(--border);border-radius:50px;padding:6px 12px 6px 8px;display:flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.user-pill-avatar{width:26px;height:26px;border-radius:50%;background:var(--pink);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;font-family:'Playfair Display',serif}
+.user-pill-name{font-size:12px;font-weight:600;color:var(--text);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mgr-badge{background:var(--pink);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:50px;margin-left:2px}
 </style>
+</style>
+</head>
+<body>
+
+<!-- ══ AUTH SCREEN ══════════════════════════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-logo">Paobee</div>
+  <div class="auth-tag">Hecho con amor</div>
+  <div class="auth-card">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="atab-login" onclick="switchAuthTab('login')">Iniciar sesión</button>
+      <button class="auth-tab" id="atab-signup" onclick="switchAuthTab('signup')">Registrarse</button>
+    </div>
+    <div id="auth-msg"></div>
+    <div id="auth-form-wrap"></div>
+  </div>
+</div>
+
 </head>
 <body>
 <div id="splash"><div class="splash-logo">Paobee</div><div class="splash-tag">Hecho con amor</div><div class="splash-dots"><div class="splash-dot"></div><div class="splash-dot"></div><div class="splash-dot"></div></div></div>
 <div id="screen-home" class="screen active">
-  <div class="topbar"><span class="logo">Paobee</span><button class="cart-btn" onclick="goTo('cart')">🛒 <span id="cc-home" class="cc">0</span></button></div>
-  <div class="hero-wrap"><div class="hero-bg">🍰</div><div class="hero-content">
+  <div class="topbar"><span class="logo">Paobee</span><button class="cart-btn" onclick="goTo('cart')">&#x1F6D2; <span id="cc-home" class="cc">0</span></button></div>
+  <div class="hero-wrap"><div class="hero-bg">&#x1F370;</div><div class="hero-content">
     <div class="hero-tag" data-i18n="handcrafted"></div>
     <h1 class="hero-title"><span data-i18n="baked_fresh"></span> <em data-i18n="daily"></em></h1>
     <p class="hero-sub" data-i18n="hero_sub"></p>
     <div class="hero-btns"><button class="btn-pink" onclick="goTo('shop')" data-i18n="shop_now"></button><button class="btn-outline" onclick="document.getElementById('about-anchor').scrollIntoView({behavior:'smooth'})" data-i18n="our_story"></button></div>
   </div></div>
-  <div class="astrip"><div class="astat"><div class="astat-num">7+</div><div class="astat-lbl" data-i18n="flavors"></div></div><div class="astat"><div class="astat-num">100%</div><div class="astat-lbl" data-i18n="homemade"></div></div><div class="astat"><div class="astat-num">❤️</div><div class="astat-lbl" data-i18n="with_love"></div></div></div>
+  <div class="astrip"><div class="astat"><div class="astat-num">7+</div><div class="astat-lbl" data-i18n="flavors"></div></div><div class="astat"><div class="astat-num">100%</div><div class="astat-lbl" data-i18n="homemade"></div></div><div class="astat"><div class="astat-num">&#x2764;&#xFE0F;</div><div class="astat-lbl" data-i18n="with_love"></div></div></div>
   <div class="sec"><div class="sec-hdr"><div class="sec-title"><span data-i18n="our_cats"></span><em data-i18n="categories"></em></div></div><div class="cats" id="home-cats"></div></div>
   <div id="reorder-section" style="display:none"><div class="sec"><div class="sec-hdr"><div class="sec-title"><span data-i18n="order_again"></span><em data-i18n="again"></em></div></div></div><div id="reorder-list"></div></div>
   <div class="sec"><div class="sec-hdr"><div class="sec-title"><span data-i18n="our_favs"></span><em data-i18n="favorites"></em></div><span class="see-all" onclick="goTo('shop')" data-i18n="view_all"></span></div></div>
   <div class="pgrid" id="home-featured"></div>
   <div id="about-anchor" class="sec"><div class="sec-hdr"><div class="sec-title"><span data-i18n="story_lbl"></span><em data-i18n="story_em"></em></div></div></div>
-  <div class="about-card"><div class="about-img">🧁</div><div class="about-body"><h3 data-i18n="about_title"></h3><p data-i18n="about_p1"></p><p data-i18n="about_p2"></p><div class="about-tags"><span class="about-tag" data-i18n="made_to_order"></span><span class="about-tag" data-i18n="no_preservatives"></span><span class="about-tag" data-i18n="home_kitchen"></span><span class="about-tag">Puerto Rico 🇵🇷</span></div><div class="contact-row" style="margin-top:12px"><a class="cbtn wa" href="https://wa.me/17879699171" target="_blank">💬 WhatsApp</a><a class="cbtn ig" href="https://instagram.com/paobee_/" target="_blank">📸 @paobee</a></div></div></div>
+  <div class="about-card"><div class="about-img">&#x1F9C1;</div><div class="about-body"><h3 data-i18n="about_title"></h3><p data-i18n="about_p1"></p><p data-i18n="about_p2"></p><div class="about-tags"><span class="about-tag" data-i18n="made_to_order"></span><span class="about-tag" data-i18n="no_preservatives"></span><span class="about-tag" data-i18n="home_kitchen"></span><span class="about-tag">Puerto Rico &#x1F1F5;&#x1F1F7;</span></div><div class="contact-row" style="margin-top:12px"><a class="cbtn wa" href="https://wa.me/17875550001" target="_blank">&#x1F4AC; WhatsApp</a><a class="cbtn ig" href="https://instagram.com/paobee" target="_blank">&#x1F4F8; @paobee</a></div></div></div>
   <div style="height:8px"></div>
 </div>
 <div id="screen-shop" class="screen">
-  <div class="topbar"><span class="logo" data-i18n="shop_title"></span><button class="cart-btn" onclick="goTo('cart')">🛒 <span id="cc-shop" class="cc">0</span></button></div>
-  <div class="search-bar"><div class="search-wrap"><span class="search-ico">🔍</span><input class="search-inp" id="search-input" data-i18n-ph="search_ph" oninput="renderShop()"></div></div>
+  <div class="topbar"><span class="logo" data-i18n="shop_title"></span><button class="cart-btn" onclick="goTo('cart')">&#x1F6D2; <span id="cc-shop" class="cc">0</span></button></div>
+  <div class="search-bar"><div class="search-wrap"><span class="search-ico">&#x1F50D;</span><input class="search-inp" id="search-input" data-i18n-ph="search_ph" oninput="renderShop()"></div></div>
   <div class="cats" id="shop-cats" style="padding:0 16px 8px;"></div>
   <div class="pgrid" id="shop-products" style="margin-top:8px;"></div>
 </div>
@@ -2060,26 +2116,26 @@ to{transform:translateY(0);opacity:1}
   <div id="mgr-content"></div>
 </div>
 <nav class="bnav">
-  <div class="nav-item active" id="nav-home" onclick="goTo('home')"><div class="nav-icon">🏠</div><div class="nav-lbl" data-i18n="home"></div><div class="nav-dot"></div></div>
-  <div class="nav-item" id="nav-shop" onclick="goTo('shop')"><div class="nav-icon">🧁</div><div class="nav-lbl" data-i18n="shop"></div><div class="nav-dot"></div></div>
-  <div class="nav-item" id="nav-cart" onclick="goTo('cart')"><div class="nav-icon">🛒</div><div class="nav-lbl" data-i18n="cart"></div><div class="nav-dot"></div></div>
-  <div class="nav-item" id="nav-track" onclick="goTo('track')"><div class="nav-icon">📦</div><div class="nav-lbl" data-i18n="orders"></div><div class="nav-dot"></div><div class="nav-badge" id="track-badge">!</div></div>
-  <div class="nav-item" id="nav-settings" onclick="goTo('settings')"><div class="nav-icon">⚙️</div><div class="nav-lbl" data-i18n="settings"></div><div class="nav-dot"></div></div>
-  <div class="nav-item" id="nav-manager" onclick="goTo('manager')"><div class="nav-icon">👩‍🍳</div><div class="nav-lbl" data-i18n="manage"></div><div class="nav-dot"></div></div>
+  <div class="nav-item active" id="nav-home" onclick="goTo('home')"><div class="nav-icon">&#x1F3E0;</div><div class="nav-lbl" data-i18n="home"></div><div class="nav-dot"></div></div>
+  <div class="nav-item" id="nav-shop" onclick="goTo('shop')"><div class="nav-icon">&#x1F9C1;</div><div class="nav-lbl" data-i18n="shop"></div><div class="nav-dot"></div></div>
+  <div class="nav-item" id="nav-cart" onclick="goTo('cart')"><div class="nav-icon">&#x1F6D2;</div><div class="nav-lbl" data-i18n="cart"></div><div class="nav-dot"></div></div>
+  <div class="nav-item" id="nav-track" onclick="goTo('track')"><div class="nav-icon">&#x1F4E6;</div><div class="nav-lbl" data-i18n="orders"></div><div class="nav-dot"></div><div class="nav-badge" id="track-badge">!</div></div>
+  <div class="nav-item" id="nav-settings" onclick="goTo('settings')"><div class="nav-icon">&#x2699;&#xFE0F;</div><div class="nav-lbl" data-i18n="settings"></div><div class="nav-dot"></div></div>
+  <div class="nav-item" id="nav-manager" onclick="goTo('manager')"><div class="nav-icon">&#x1F469;&#x200D;&#x1F373;</div><div class="nav-lbl" data-i18n="manage"></div><div class="nav-dot"></div></div>
 </nav>
-<a class="wa-btn" href="https://wa.me/17875550001" target="_blank">💬</a>
+<a class="wa-btn" href="https://wa.me/17875550001" target="_blank">&#x1F4AC;</a>
 <div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="modal"><button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">✕</button><span class="modal-handle"></span><div class="modal-img" id="modal-img"></div><div class="modal-cat" id="modal-cat"></div><div class="modal-name" id="modal-name"></div><div class="modal-rating" id="modal-rating"></div><div class="modal-desc" id="modal-desc"></div><div class="allergen-box" id="modal-abox"><div class="allergen-title" data-i18n="contains"></div><div class="allergen-tags" id="modal-allergens"></div></div><div class="modal-bottom"><div class="modal-price" id="modal-price"></div><button class="modal-add-btn" id="modal-add-btn"></button></div></div>
+  <div class="modal"><button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">&#x2715;</button><span class="modal-handle"></span><div class="modal-img" id="modal-img"></div><div class="modal-cat" id="modal-cat"></div><div class="modal-name" id="modal-name"></div><div class="modal-rating" id="modal-rating"></div><div class="modal-desc" id="modal-desc"></div><div class="allergen-box" id="modal-abox"><div class="allergen-title" data-i18n="contains"></div><div class="allergen-tags" id="modal-allergens"></div></div><div class="modal-bottom"><div class="modal-price" id="modal-price"></div><button class="modal-add-btn" id="modal-add-btn"></button></div></div>
 </div>
 <div class="modal-overlay" id="edit-overlay" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="edit-modal"><button class="modal-close" onclick="document.getElementById('edit-overlay').classList.remove('open')">✕</button><span class="modal-handle"></span>
+  <div class="edit-modal"><button class="modal-close" onclick="document.getElementById('edit-overlay').classList.remove('open')">&#x2715;</button><span class="modal-handle"></span>
   <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:16px;" data-i18n="edit_product"></div>
   <div class="ef"><label class="elbl" data-i18n="name_lbl"></label><input class="einp" id="edit-name"></div>
   <div class="efr"><div class="ef"><label class="elbl" data-i18n="category"></label><select class="einp" id="edit-cat"><option>Cupcakes</option><option>Cookies</option><option>Brownies</option><option>Tres Leches</option><option>Donuts</option><option>Churros</option><option>Sweets</option></select></div><div class="ef"><label class="elbl" data-i18n="price"></label><input class="einp" id="edit-price" type="number" step="0.01"></div></div>
   <div class="ef"><label class="elbl" data-i18n="description"></label><textarea class="einp" id="edit-desc-i" rows="2" style="resize:none"></textarea></div>
   <div class="ef"><label class="elbl" data-i18n="allergens"></label><input class="einp" id="edit-allergens" placeholder="gluten, lacteos, huevos"></div>
   <div class="ef"><label class="elbl" data-i18n="photo"></label>
-    <div class="photo-sec"><div class="ppl" id="edit-preview"><div class="php"><div class="php-icon">📷</div><div class="php-text" data-i18n="no_photo"></div></div></div>
+    <div class="photo-sec"><div class="ppl" id="edit-preview"><div class="php"><div class="php-icon">&#x1F4F7;</div><div class="php-text" data-i18n="no_photo"></div></div></div>
     <div class="photo-acts"><label class="photo-btn pink" style="cursor:pointer"><span data-i18n="upload"></span><input type="file" accept="image/*" style="display:none" onchange="handlePhoto(this,'edit-preview','edit-photo-data')"></label><label class="photo-btn" style="cursor:pointer"><span data-i18n="camera"></span><input type="file" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this,'edit-preview','edit-photo-data')"></label></div>
     <div class="url-div"><div class="url-line"></div><div class="url-txt" data-i18n="or_url"></div><div class="url-line"></div></div>
     <div class="url-row-f"><input class="url-inp" id="edit-url" placeholder="https://..."><button class="url-apply" onclick="applyUrl('edit-url','edit-preview','edit-photo-data')" data-i18n="apply_btn"></button></div></div>
@@ -2088,14 +2144,14 @@ to{transform:translateY(0);opacity:1}
   <button class="esave" onclick="saveEdit()" data-i18n="save_changes"></button></div>
 </div>
 <div class="modal-overlay" id="add-overlay" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="edit-modal"><button class="modal-close" onclick="document.getElementById('add-overlay').classList.remove('open')">✕</button><span class="modal-handle"></span>
+  <div class="edit-modal"><button class="modal-close" onclick="document.getElementById('add-overlay').classList.remove('open')">&#x2715;</button><span class="modal-handle"></span>
   <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:16px;" data-i18n="add_product_title"></div>
   <div class="ef"><label class="elbl" data-i18n="name_lbl"></label><input class="einp" id="add-name" placeholder="Ej. Red Velvet Cupcake"></div>
   <div class="efr"><div class="ef"><label class="elbl" data-i18n="category"></label><select class="einp" id="add-cat"><option>Cupcakes</option><option>Cookies</option><option>Brownies</option><option>Tres Leches</option><option>Donuts</option><option>Churros</option><option>Sweets</option></select></div><div class="ef"><label class="elbl" data-i18n="price"></label><input class="einp" id="add-price" type="number" step="0.01" placeholder="0.00"></div></div>
   <div class="ef"><label class="elbl" data-i18n="description"></label><textarea class="einp" id="add-desc" rows="2" style="resize:none" placeholder="Describe tu postre..."></textarea></div>
   <div class="ef"><label class="elbl" data-i18n="allergens"></label><input class="einp" id="add-allergens" placeholder="gluten, lacteos, huevos"></div>
   <div class="ef"><label class="elbl" data-i18n="photo"></label>
-    <div class="photo-sec"><div class="ppl" id="add-preview"><div class="php"><div class="php-icon">📷</div><div class="php-text" data-i18n="no_photo"></div></div></div>
+    <div class="photo-sec"><div class="ppl" id="add-preview"><div class="php"><div class="php-icon">&#x1F4F7;</div><div class="php-text" data-i18n="no_photo"></div></div></div>
     <div class="photo-acts"><label class="photo-btn pink" style="cursor:pointer"><span data-i18n="upload"></span><input type="file" accept="image/*" style="display:none" onchange="handlePhoto(this,'add-preview','add-photo-data')"></label><label class="photo-btn" style="cursor:pointer"><span data-i18n="camera"></span><input type="file" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this,'add-preview','add-photo-data')"></label></div>
     <div class="url-div"><div class="url-line"></div><div class="url-txt" data-i18n="or_url"></div><div class="url-line"></div></div>
     <div class="url-row-f"><input class="url-inp" id="add-url" placeholder="https://..."><button class="url-apply" onclick="applyUrl('add-url','add-preview','add-photo-data')" data-i18n="apply_btn"></button></div></div>
@@ -2104,13 +2160,45 @@ to{transform:translateY(0);opacity:1}
   <button class="esave" onclick="saveNewProduct()" data-i18n="add_product"></button></div>
 </div>
 <div class="modal-overlay" id="pm-overlay" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="edit-modal"><button class="modal-close" onclick="document.getElementById('pm-overlay').classList.remove('open')">✕</button><span class="modal-handle"></span>
+  <div class="edit-modal"><button class="modal-close" onclick="document.getElementById('pm-overlay').classList.remove('open')">&#x2715;</button><span class="modal-handle"></span>
   <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--text);margin-bottom:16px;" data-i18n="add_pm_modal"></div>
-  <div class="pm-type-row"><button class="pm-type-btn active" id="pmt-ath" onclick="selPmType('ath')">📱 ATH Movil</button><button class="pm-type-btn" id="pmt-pp" onclick="selPmType('pp')">💙 PayPal</button><button class="pm-type-btn" id="pmt-stripe" onclick="selPmType('stripe')">💳 Card</button></div>
+  <div class="pm-type-row"><button class="pm-type-btn active" id="pmt-ath" onclick="selPmType('ath')">&#x1F4F1; ATH Movil</button><button class="pm-type-btn" id="pmt-pp" onclick="selPmType('pp')">&#x1F499; PayPal</button><button class="pm-type-btn" id="pmt-stripe" onclick="selPmType('stripe')">&#x1F4B3; Card</button></div>
   <div id="pm-form"></div>
   <button class="esave" onclick="savePm()" data-i18n="save_btn"></button></div>
 </div>
 <script>
+/* ============================================================
+   PAOBEE — JavaScript
+   ------------------------------------------------------------
+   SECTIONS:
+   A. Supabase Init
+   B. Language & Translations
+   C. Auth (login, signup, roles)
+   D. Data & State
+   E. Helpers & Navigation
+   F. Render – Home, Shop, Cart, Checkout
+   G. Render – Order Tracking
+   H. Render – Settings
+   I. Render – Manager Dashboard
+   J. Product Editor
+   K. Init
+   ============================================================ */
+
+/* ══════════════════════════════════════════════
+   A. SUPABASE
+   ══════════════════════════════════════════════ */
+var SUPA_URL = 'https://ddkqzjbqkxdiiapzrkro.supabase.co';
+var SUPA_KEY = 'sb_publishable_iR0KgJnBN7kMQ_NCYXjbEw_MhPdLe57';
+var sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+/* current session */
+var currentUser = null;
+var currentRole = 'customer'; // 'customer' | 'manager'
+
+/* ══════════════════════════════════════════════
+   B. LANGUAGE & TRANSLATIONS
+   ══════════════════════════════════════════════ */
+
 /* ============================================================
    PAOBEE — JavaScript
    ------------------------------------------------------------
@@ -2161,26 +2249,26 @@ applyTranslations();
 /* ══════════════════════════════════════════════
    DATA  – categories, stages, schedule, products, orders, loyalty
    ══════════════════════════════════════════════ */
-var CE={Cupcakes:'🧁',Cookies:'🍪',Brownies:'🟫','Tres Leches':'🎂',Donuts:'🍩',Churros:'🥢',Sweets:'🍬'};
+var CE={Cupcakes:'&#x1F9C1;',Cookies:'&#x1F36A;',Brownies:'&#x1F7EB;','Tres Leches':'&#x1F382;',Donuts:'&#x1F369;',Churros:'&#x1F962;',Sweets:'&#x1F36C;'};
 var STAGES=['confirmed','preparing','on_the_way','completed'];
-var SICONS={confirmed:'✅',preparing:'🔥',on_the_way:'🛵',completed:'🎉'};
+var SICONS={confirmed:'&#x2705;',preparing:'&#x1F525;',on_the_way:'&#x1F6F5;',completed:'&#x1F389;'};
 var PROMOS={PAOBEE10:{pct:10,label:'10% off'},SWEET5:{flat:5,label:'$5 off'}};
 var SCHED={Mon:{on:true,open:'09:00',close:'18:00'},Tue:{on:true,open:'09:00',close:'18:00'},Wed:{on:false,open:'09:00',close:'18:00'},Thu:{on:true,open:'09:00',close:'18:00'},Fri:{on:true,open:'09:00',close:'20:00'},Sat:{on:true,open:'10:00',close:'20:00'},Sun:{on:false,open:'10:00',close:'16:00'}};
 var advDays=2;
 /* ── PRODUCTS ──────────────────────────────── */
 var products=[
-  {id:1,name:'Strawberry Dream Cupcake',cat:'Cupcakes',desc:'Cupcake de vainilla con frosting de fresa.',price:4.50,icon:'🧁',photo:'',featured:true,allergens:['gluten','lacteos','huevos'],stock:'in',ratings:[5,5,4,5,5,4,5],avgRating:4.9},
-  {id:2,name:'Chocolate Chip Cookies',cat:'Cookies',desc:'Galletas clasicas con chips de chocolate premium.',price:3.00,icon:'🍪',photo:'',featured:true,allergens:['gluten','lacteos','huevos'],stock:'out',ratings:[4,4,5,4,4],avgRating:4.2},
-  {id:3,name:'Fudgy Brownies',cat:'Brownies',desc:'Brownies ricos de chocolate con azucar glass.',price:4.00,icon:'🟫',photo:'',featured:true,allergens:['gluten','lacteos','huevos'],stock:'in',ratings:[5,4,5],avgRating:4.7},
-  {id:4,name:'Classic Tres Leches',cat:'Tres Leches',desc:'Pastel empapado en tres leches con crema batida.',price:6.50,icon:'🎂',photo:'',featured:true,allergens:['gluten','lacteos','huevos'],stock:'in',ratings:[5,5,5,4],avgRating:4.8},
-  {id:5,name:'Glazed Sprinkle Donuts',cat:'Donuts',desc:'Donuts esponjosos con glaseado y sprinkles.',price:3.50,icon:'🍩',photo:'',featured:false,allergens:['gluten','lacteos','huevos'],stock:'low',ratings:[],avgRating:0},
-  {id:6,name:'Cinnamon Sugar Churros',cat:'Churros',desc:'Churros crujientes con azucar de canela.',price:5.00,icon:'🥢',photo:'',featured:false,allergens:['gluten'],stock:'in',ratings:[4,5],avgRating:4.5},
-  {id:7,name:'Assorted Sweet Treats',cat:'Sweets',desc:'Mezcla de dulces y caramelos artesanales.',price:7.00,icon:'🍬',photo:'',featured:false,allergens:[],stock:'in',ratings:[],avgRating:0}
+  {id:1,name:'Strawberry Dream Cupcake',cat:'Cupcakes',desc:'Cupcake de vainilla con frosting de fresa.',price:4.50,icon:'&#x1F9C1;',photo:'',featured:true,allergens:['gluten','lacteos','huevos'],stock:'in',ratings:[5,5,4,5,5,4,5],avgRating:4.9},
+  {id:2,name:'Chocolate Chip Cookies',cat:'Cookies',desc:'Galletas clasicas con chips de chocolate premium.',price:3.00,icon:'&#x1F36A;',photo:'',featured:true,allergens:['gluten','lacteos','huevos'],stock:'out',ratings:[4,4,5,4,4],avgRating:4.2},
+  {id:3,name:'Fudgy Brownies',cat:'Brownies',desc:'Brownies ricos de chocolate con azucar glass.',price:4.00,icon:'&#x1F7EB;',photo:'',featured:true,allergens:['gluten','lacteos','huevos'],stock:'in',ratings:[5,4,5],avgRating:4.7},
+  {id:4,name:'Classic Tres Leches',cat:'Tres Leches',desc:'Pastel empapado en tres leches con crema batida.',price:6.50,icon:'&#x1F382;',photo:'',featured:true,allergens:['gluten','lacteos','huevos'],stock:'in',ratings:[5,5,5,4],avgRating:4.8},
+  {id:5,name:'Glazed Sprinkle Donuts',cat:'Donuts',desc:'Donuts esponjosos con glaseado y sprinkles.',price:3.50,icon:'&#x1F369;',photo:'',featured:false,allergens:['gluten','lacteos','huevos'],stock:'low',ratings:[],avgRating:0},
+  {id:6,name:'Cinnamon Sugar Churros',cat:'Churros',desc:'Churros crujientes con azucar de canela.',price:5.00,icon:'&#x1F962;',photo:'',featured:false,allergens:['gluten'],stock:'in',ratings:[4,5],avgRating:4.5},
+  {id:7,name:'Assorted Sweet Treats',cat:'Sweets',desc:'Mezcla de dulces y caramelos artesanales.',price:7.00,icon:'&#x1F36C;',photo:'',featured:false,allergens:[],stock:'in',ratings:[],avgRating:0}
 ];
 /* ── ORDERS (seed data) ────────────────────── */
 var orders=[
-  {id:1,num:'001',name:'Jan',phone:'787-555-0001',email:'',address:'',notes:'',delivery:'pickup',total:4.50,status:'preparing',date:'25 Mar',scheduledDate:'27 Mar',scheduledTime:'2:00 PM',payment:'cash',ptsEarned:4,ptsUnlocked:false,completedAt:null,items:[{id:1,name:'Strawberry Dream Cupcake',qty:1,price:4.50,icon:'🧁',photo:'',rated:false}]},
-  {id:2,num:'002',name:'Jan',phone:'787-555-0001',email:'',address:'456 Ocean Ave',notes:'Sin nueces',delivery:'delivery',total:11.00,status:'completed',date:'20 Mar',scheduledDate:'20 Mar',scheduledTime:'4:00 PM',payment:'athmovil',ptsEarned:11,ptsUnlocked:true,completedAt:Date.now()-25*3600*1000,items:[{id:2,name:'Chocolate Chip Cookies',qty:2,price:3.00,icon:'🍪',photo:'',rated:false},{id:3,name:'Fudgy Brownies',qty:1,price:4.00,icon:'🟫',photo:'',rated:true}]}
+  {id:1,num:'001',name:'Jan',phone:'787-555-0001',email:'',address:'',notes:'',delivery:'pickup',total:4.50,status:'preparing',date:'25 Mar',scheduledDate:'27 Mar',scheduledTime:'2:00 PM',payment:'cash',ptsEarned:4,ptsUnlocked:false,completedAt:null,items:[{id:1,name:'Strawberry Dream Cupcake',qty:1,price:4.50,icon:'&#x1F9C1;',photo:'',rated:false}]},
+  {id:2,num:'002',name:'Jan',phone:'787-555-0001',email:'',address:'456 Ocean Ave',notes:'Sin nueces',delivery:'delivery',total:11.00,status:'completed',date:'20 Mar',scheduledDate:'20 Mar',scheduledTime:'4:00 PM',payment:'athmovil',ptsEarned:11,ptsUnlocked:true,completedAt:Date.now()-25*3600*1000,items:[{id:2,name:'Chocolate Chip Cookies',qty:2,price:3.00,icon:'&#x1F36A;',photo:'',rated:false},{id:3,name:'Fudgy Brownies',qty:1,price:4.00,icon:'&#x1F7EB;',photo:'',rated:true}]}
 ];
 /* ── LOYALTY ACCOUNT ───────────────────────── */
 var loyalty={points:120,history:[{type:'earn',desc:'Pedido #001 completado',sub:'20 Mar - Desbloqueado 72hrs despues',amount:6},{type:'spend',desc:'Canjeado al pagar',sub:'15 Mar - 50 pts = $5.00 off',amount:-50},{type:'earn',desc:'Pedido #002 completado',sub:'10 Mar',amount:11},{type:'pending',desc:'Pedido #003 pendiente',sub:'Se desbloquea 72hrs despues de entrega',amount:4}]};
@@ -2204,7 +2292,7 @@ var rC=null,oC=null,cC=null,ptsC=null;
 function handlePhoto(input,prevId,dataId){var file=input.files[0];if(!file)return;var r=new FileReader();r.onload=function(e){document.getElementById(dataId).value=e.target.result;showPP(prevId,e.target.result);};r.readAsDataURL(file);}
 function applyUrl(urlId,prevId,dataId){var url=document.getElementById(urlId).value.trim();if(!url)return;document.getElementById(dataId).value=url;showPP(prevId,url);}
 function showPP(prevId,src){document.getElementById(prevId).innerHTML='<img src="'+src+'" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML=\'<div class=php><div class=php-icon>ERROR</div></div>\'">'+'<button class="pclr" onclick="clearPP(\''+prevId+'\')">X</button>';}
-function clearPP(prevId){var di=prevId.replace('-preview','-photo-data');var ui=prevId.replace('-preview','-url');if(document.getElementById(di))document.getElementById(di).value='';if(document.getElementById(ui))document.getElementById(ui).value='';document.getElementById(prevId).innerHTML='<div class="php"><div class="php-icon">📷</div><div class="php-text">'+t('no_photo')+'</div></div>';}
+function clearPP(prevId){var di=prevId.replace('-preview','-photo-data');var ui=prevId.replace('-preview','-url');if(document.getElementById(di))document.getElementById(di).value='';if(document.getElementById(ui))document.getElementById(ui).value='';document.getElementById(prevId).innerHTML='<div class="php"><div class="php-icon">&#x1F4F7;</div><div class="php-text">'+t('no_photo')+'</div></div>';}
 
 
 /* ══════════════════════════════════════════════
@@ -2241,7 +2329,7 @@ function openProduct(id){
   document.getElementById('modal-name').textContent=p.name;
   document.getElementById('modal-desc').textContent=p.desc;
   document.getElementById('modal-price').textContent='$'+p.price.toFixed(2);
-  document.getElementById('modal-rating').innerHTML=p.ratings.length?'⭐ '+p.avgRating.toFixed(1)+' ('+p.ratings.length+')':'';
+  document.getElementById('modal-rating').innerHTML=p.ratings.length?'&#x2B50; '+p.avgRating.toFixed(1)+' ('+p.ratings.length+')':'';
   var ab=document.getElementById('modal-abox');var at=document.getElementById('modal-allergens');
   if(p.allergens&&p.allergens.length){ab.style.display='block';at.innerHTML=p.allergens.map(function(a){return '<span class="allergen-tag">'+a+'</span>';}).join('');}else ab.style.display='none';
   var btn=document.getElementById('modal-add-btn');
@@ -2260,7 +2348,7 @@ function renderCard(p){
     +'<div class="pcard-img">'+iH+(so?'<div class="sold-overlay"><div class="sold-badge">'+t('sold_out')+'</div></div>':'')+(low?'<div class="low-badge">'+t('low_stock')+'</div>':'')+'</div>'
     +'<div class="pcard-body">'+(p.featured?'<div class="feat-badge">Destacado</div>':'')
     +'<div class="pcard-cat">'+p.cat+'</div><div class="pcard-name">'+p.name+'</div>'
-    +(p.ratings.length?'<span class="star-mini">⭐ '+p.avgRating.toFixed(1)+' ('+p.ratings.length+')</span>':'')
+    +(p.ratings.length?'<span class="star-mini">&#x2B50; '+p.avgRating.toFixed(1)+' ('+p.ratings.length+')</span>':'')
     +'<div class="pcard-desc">'+p.desc+'</div>'
     +'<div class="pcard-row"><div class="pcard-price" style="'+(so?'color:var(--muted)':'')+'">$'+p.price.toFixed(2)+'</div>'
     +'<button class="add-btn" '+(so?'disabled':'')+' onclick="event.stopPropagation();addToCart('+p.id+',this)">+</button></div></div></div>';
@@ -2293,7 +2381,7 @@ function renderCart(mode){
   if(mode==='checkout'){title.textContent=t('checkout');renderCheckout(el);return;}
   title.textContent=t('my_cart');
   var entries=Object.entries(cart).filter(function(e){return e[1]>0;});
-  if(!entries.length){el.innerHTML='<div class="cart-empty"><div class="cart-empty-icon">🛒</div><h3>'+t('my_cart')+'</h3><p>'+t('no_active_sub')+'</p><button class="btn-pink" onclick="goTo(\'shop\')">'+t('browse_shop')+'</button></div>';return;}
+  if(!entries.length){el.innerHTML='<div class="cart-empty"><div class="cart-empty-icon">&#x1F6D2;</div><h3>'+t('my_cart')+'</h3><p>'+t('no_active_sub')+'</p><button class="btn-pink" onclick="goTo(\'shop\')">'+t('browse_shop')+'</button></div>';return;}
   var items=entries.map(function(e){var id=e[0],qty=e[1];var p=products.find(function(x){return x.id==id;});if(!p)return '';var iH=p.photo?'<img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover">':'<span style="font-size:24px">'+p.icon+'</span>';return '<div class="cart-item"><div class="ci-img">'+iH+'</div><div style="flex:1"><div style="font-weight:600;font-size:14px;color:var(--text)">'+p.name+'</div><div style="font-size:13px;color:var(--pink)">$'+p.price.toFixed(2)+' c/u</div></div><div class="qty-ctrl"><button class="qty-btn" onclick="changeQty('+id+',-1)">-</button><span class="qty-num">'+qty+'</span><button class="qty-btn" onclick="changeQty('+id+',1)">+</button></div></div>';}).join('');
   var sub=cartTotal();
   el.innerHTML='<div class="cart-items">'+items+'</div><div style="padding:0 16px 16px"><div class="sum-card"><div class="sum-row"><span style="color:var(--muted)">'+t('subtotal')+'</span><span>$'+sub.toFixed(2)+'</span></div><div class="sum-row total"><span>'+t('total')+'</span><span style="color:var(--pink)">$'+sub.toFixed(2)+'</span></div></div><button class="place-btn" onclick="renderCart(\'checkout\')">Continuar</button></div>';
@@ -2317,17 +2405,17 @@ function renderCheckout(el){
   var ts='<div class="tslots" id="tslots-w">'+fs.map(function(x,i){return '<div class="tslot'+(i===0?' active':'')+'" onclick="selTime(this,\''+x+'\')">'+x+'</div>';}).join('')+'</div>';
   var ir=Object.entries(cart).filter(function(e){return e[1]>0;}).map(function(e){var p=products.find(function(x){return x.id==e[0];});return p?'<div class="sum-row"><span>'+e[1]+'x '+p.name+'</span><span>$'+(p.price*e[1]).toFixed(2)+'</span></div>':'';}).join('');
   var pok=loyalty.points>=50;
-  var lrb='<div class="lrb"><div class="lrb-top"><div class="lrb-title">⭐ '+t('use_pts')+'</div><div class="lrb-pts">'+loyalty.points+' '+t('pts_available')+'</div></div>'+(pok?'<div style="display:flex;align-items:center;gap:8px;margin-top:6px"><span style="font-size:13px;color:var(--text)">'+loyalty.points+' pts = $'+Math.floor(loyalty.points/10)+' off</span><label class="tog-sw"><input type="checkbox" id="pts-tog" onchange="togPts(this)"><span class="tog-sl"></span></label></div>':'<div style="font-size:12px;color:var(--muted);margin-top:4px">'+t('pts_min')+'</div>')+'<div id="pts-note" style="display:none;font-size:12px;color:var(--pink);margin-top:6px">-$'+Math.floor(loyalty.points/10).toFixed(2)+' '+t('pts_note_applied')+'</div></div>';
-  var spm=payMethods.length?payMethods.map(function(pm){var ic=pm.type==='ath'?'📱':'💙';var lb=pm.type==='ath'?'ATH Movil':'PayPal';return '<div class="pay-opt" id="spm-'+pm.id+'" onclick="selSPm('+pm.id+',\''+pm.type+'\')"><div style="font-size:20px;width:32px;text-align:center">'+ic+'</div><div><div class="pay-opt-lbl">'+lb+'</div><div class="pay-opt-sub">'+pm.username+'</div></div></div>';}).join(''):'';
+  var lrb='<div class="lrb"><div class="lrb-top"><div class="lrb-title">&#x2B50; '+t('use_pts')+'</div><div class="lrb-pts">'+loyalty.points+' '+t('pts_available')+'</div></div>'+(pok?'<div style="display:flex;align-items:center;gap:8px;margin-top:6px"><span style="font-size:13px;color:var(--text)">'+loyalty.points+' pts = $'+Math.floor(loyalty.points/10)+' off</span><label class="tog-sw"><input type="checkbox" id="pts-tog" onchange="togPts(this)"><span class="tog-sl"></span></label></div>':'<div style="font-size:12px;color:var(--muted);margin-top:4px">'+t('pts_min')+'</div>')+'<div id="pts-note" style="display:none;font-size:12px;color:var(--pink);margin-top:6px">-$'+Math.floor(loyalty.points/10).toFixed(2)+' '+t('pts_note_applied')+'</div></div>';
+  var spm=payMethods.length?payMethods.map(function(pm){var ic=pm.type==='ath'?'&#x1F4F1;':'&#x1F499;';var lb=pm.type==='ath'?'ATH Movil':'PayPal';return '<div class="pay-opt" id="spm-'+pm.id+'" onclick="selSPm('+pm.id+',\''+pm.type+'\')"><div style="font-size:20px;width:32px;text-align:center">'+ic+'</div><div><div class="pay-opt-lbl">'+lb+'</div><div class="pay-opt-sub">'+pm.username+'</div></div></div>';}).join(''):'';
   el.innerHTML='<div class="co-section">'
-    +'<div class="co-card"><h3>'+t('pickup')+' / '+t('delivery')+'?</h3><div class="del-opts"><div class="del-opt active" id="opt-pu" onclick="selDel(\'pickup\')"><div class="del-opt-icon">🏠</div><div class="del-opt-lbl">'+t('pickup')+'</div><div class="del-opt-sub">'+t('free')+'</div></div><div class="del-opt" id="opt-de" onclick="selDel(\'delivery\')"><div class="del-opt-icon">🛵</div><div class="del-opt-lbl">'+t('delivery')+'</div><div class="del-opt-sub">+$1.50</div></div></div></div>'
+    +'<div class="co-card"><h3>'+t('pickup')+' / '+t('delivery')+'?</h3><div class="del-opts"><div class="del-opt active" id="opt-pu" onclick="selDel(\'pickup\')"><div class="del-opt-icon">&#x1F3E0;</div><div class="del-opt-lbl">'+t('pickup')+'</div><div class="del-opt-sub">'+t('free')+'</div></div><div class="del-opt" id="opt-de" onclick="selDel(\'delivery\')"><div class="del-opt-icon">&#x1F6F5;</div><div class="del-opt-lbl">'+t('delivery')+'</div><div class="del-opt-sub">+$1.50</div></div></div></div>'
     +'<div class="co-card"><h3>'+t('schedule_title')+'</h3><div class="date-slots">'+ds+'</div>'+ts+'</div>'
-    +'<div class="co-card" id="addr-c" style="display:none"><h3>📍 '+t('delivery')+'</h3><div class="fld"><input class="finp" id="co-addr" placeholder="'+t('address_ph')+'"></div></div>'
+    +'<div class="co-card" id="addr-c" style="display:none"><h3>&#x1F4CD; '+t('delivery')+'</h3><div class="fld"><input class="finp" id="co-addr" placeholder="'+t('address_ph')+'"></div></div>'
     +'<div class="co-card"><h3>'+t('your_info')+'</h3><div class="fld"><label class="flbl">'+t('name')+'</label><input class="finp" id="co-name" value="'+prof.name+'"></div><div class="frow"><div class="fld"><label class="flbl">'+t('phone')+'</label><input class="finp" id="co-phone" value="'+prof.phone+'"></div><div class="fld"><label class="flbl">'+t('email')+'</label><input class="finp" id="co-email" value="'+prof.email+'"></div></div><div class="fld"><label class="flbl">Notas</label><textarea class="finp" id="co-notes" rows="2" style="resize:none" placeholder="'+t('notes_ph')+'"></textarea></div></div>'
-    +'<div class="co-card"><h3>'+t('payment_lbl')+'</h3>'+spm+'<div class="pay-opts"><div class="pay-opt active" id="pay-cash" onclick="selPay(\'cash\')"><div style="font-size:20px;width:32px;text-align:center">💵</div><div><div class="pay-opt-lbl">'+t('cash')+'</div><div class="pay-opt-sub">'+t('cash_sub')+'</div></div></div><div class="pay-opt" id="pay-ath" onclick="selPay(\'ath\')"><div style="font-size:20px;width:32px;text-align:center">📱</div><div><div class="pay-opt-lbl">'+t('ath')+'</div><div class="pay-opt-sub">'+t('ath_sub')+'</div></div></div><div class="pay-opt" id="pay-pp" onclick="selPay(\'pp\')"><div style="font-size:20px;width:32px;text-align:center">💙</div><div><div class="pay-opt-lbl">'+t('paypal')+'</div><div class="pay-opt-sub">'+t('paypal_sub')+'</div></div></div><div class="pay-opt" id="pay-stripe" onclick="selPay(\'stripe\')"><div style="font-size:20px;width:32px;text-align:center">💳</div><div><div class="pay-opt-lbl">'+t('stripe')+'</div><div class="pay-opt-sub">'+t('stripe_sub')+'</div></div></div></div><div class="pay-note" id="pay-note">'+t('cash_sub')+'.</div></div>'
+    +'<div class="co-card"><h3>'+t('payment_lbl')+'</h3>'+spm+'<div class="pay-opts"><div class="pay-opt active" id="pay-cash" onclick="selPay(\'cash\')"><div style="font-size:20px;width:32px;text-align:center">&#x1F4B5;</div><div><div class="pay-opt-lbl">'+t('cash')+'</div><div class="pay-opt-sub">'+t('cash_sub')+'</div></div></div><div class="pay-opt" id="pay-ath" onclick="selPay(\'ath\')"><div style="font-size:20px;width:32px;text-align:center">&#x1F4F1;</div><div><div class="pay-opt-lbl">'+t('ath')+'</div><div class="pay-opt-sub">'+t('ath_sub')+'</div></div></div><div class="pay-opt" id="pay-pp" onclick="selPay(\'pp\')"><div style="font-size:20px;width:32px;text-align:center">&#x1F499;</div><div><div class="pay-opt-lbl">'+t('paypal')+'</div><div class="pay-opt-sub">'+t('paypal_sub')+'</div></div></div><div class="pay-opt" id="pay-stripe" onclick="selPay(\'stripe\')"><div style="font-size:20px;width:32px;text-align:center">&#x1F4B3;</div><div><div class="pay-opt-lbl">'+t('stripe')+'</div><div class="pay-opt-sub">'+t('stripe_sub')+'</div></div></div></div><div class="pay-note" id="pay-note">'+t('cash_sub')+'.</div></div>'
     +lrb
     +'<div class="co-card"><h3>'+t('promo_code')+'</h3><div class="promo-row"><input class="promo-inp" id="promo-inp" placeholder="'+t('promo_ph')+'"><button class="promo-btn" onclick="applyPromo()">'+t('apply_btn')+'</button></div><div id="promo-msg"></div></div>'
-    +'<div class="sum-card"><h3 style="font-family:\'Playfair Display\',serif;font-size:16px;margin-bottom:12px">'+t('order_summary')+'</h3>'+ir+'<div class="sum-row"><span style="color:var(--muted)">'+t('subtotal')+'</span><span>$'+sub.toFixed(2)+'</span></div><div class="sum-row"><span style="color:var(--muted)">'+t('delivery_fee')+'</span><span id="del-fee">$0.00</span></div><div class="sum-row" id="promo-row" style="display:none"><span style="color:#2E7D32">Promo</span><span id="promo-disc" style="color:#2E7D32"></span></div><div class="sum-row" id="pts-row" style="display:none"><span style="color:var(--pink)">⭐ Puntos</span><span id="pts-disc" style="color:var(--pink)"></span></div><div class="sum-row total"><span>'+t('total')+'</span><span style="color:var(--pink)" id="total-d">$'+sub.toFixed(2)+'</span></div></div>'
+    +'<div class="sum-card"><h3 style="font-family:\'Playfair Display\',serif;font-size:16px;margin-bottom:12px">'+t('order_summary')+'</h3>'+ir+'<div class="sum-row"><span style="color:var(--muted)">'+t('subtotal')+'</span><span>$'+sub.toFixed(2)+'</span></div><div class="sum-row"><span style="color:var(--muted)">'+t('delivery_fee')+'</span><span id="del-fee">$0.00</span></div><div class="sum-row" id="promo-row" style="display:none"><span style="color:#2E7D32">Promo</span><span id="promo-disc" style="color:#2E7D32"></span></div><div class="sum-row" id="pts-row" style="display:none"><span style="color:var(--pink)">&#x2B50; Puntos</span><span id="pts-disc" style="color:var(--pink)"></span></div><div class="sum-row total"><span>'+t('total')+'</span><span style="color:var(--pink)" id="total-d">$'+sub.toFixed(2)+'</span></div></div>'
     +'<button class="place-btn" onclick="placeOrder()">'+t('place_order')+'</button><div style="height:8px"></div><button onclick="renderCart(\'cart\')" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;width:100%;text-align:center;padding:8px;font-family:\'DM Sans\',sans-serif">'+t('back_to_cart')+'</button></div>';
 }
 function selDate(el,ds,o,c){document.querySelectorAll('.dslot').forEach(function(d){d.classList.remove('active');});el.classList.add('active');window._sd=ds;var sl=getTSlots(o,c);var w=document.getElementById('tslots-w');if(w){w.innerHTML=sl.map(function(x,i){return '<div class="tslot'+(i===0?' active':'')+'" onclick="selTime(this,\''+x+'\')">'+x+'</div>';}).join('');if(sl[0])window._st=sl[0];}}
@@ -2348,13 +2436,13 @@ function placeOrder(){
   var pd=0;if(redeemPts&&loyalty.points>=50){pd=Math.floor(loyalty.points/10);loyalty.points-=pd*10;loyalty.history.unshift({type:'spend',desc:'Canjeado al pagar',sub:pd*10+' pts = $'+pd+' off',amount:-(pd*10)});}
   var total=Math.max(0,cartTotal()+del-disc-pd);var pe=Math.floor(total);
   var entries=Object.entries(cart).filter(function(e){return e[1]>0;});
-  var items=entries.map(function(e){var p=products.find(function(x){return x.id==e[0];});return{id:parseInt(e[0]),name:p?p.name:'',qty:e[1],price:p?p.price:0,icon:p?p.icon:'🍰',photo:p?p.photo:'',rated:false};});
+  var items=entries.map(function(e){var p=products.find(function(x){return x.id==e[0];});return{id:parseInt(e[0]),name:p?p.name:'',qty:e[1],price:p?p.price:0,icon:p?p.icon:'&#x1F370;',photo:p?p.photo:'',rated:false};});
   var num=String(nextOrderNum).padStart(3,'0');nextOrderNum++;
   orders.unshift({id:orders.length+1,num:num,name:name,phone:phone,email:(document.getElementById('co-email')||{}).value||'',address:(document.getElementById('co-addr')||{}).value||'',notes:(document.getElementById('co-notes')||{}).value||'',delivery:mode,total:total,status:'confirmed',date:'Hoy',scheduledDate:window._sd,scheduledTime:window._st,payment:window._pm||'cash',ptsEarned:pe,ptsUnlocked:false,completedAt:null,items:items});
   loyalty.history.unshift({type:'pending',desc:'Pedido #'+num+' pendiente',sub:'Se desbloquea 72hrs despues de entrega',amount:pe});
   cart={};updateCounts();appliedPromo=null;redeemPts=false;
   document.getElementById('cart-title').textContent=t('order_placed');
-  document.getElementById('cart-content').innerHTML='<div class="success-screen"><div class="success-icon">🎉</div><h2>'+t('order_placed')+'</h2><p>Gracias '+name+'!<br>'+window._sd+' a las '+window._st+'<br>⭐ +'+pe+' pts ganados!</p><div class="order-pill">Pedido #'+num+'</div><br><button class="btn-pink" onclick="goTo(\'track\')">'+t('track_order')+'</button><br><br><button onclick="goTo(\'home\')" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">'+t('back_home')+'</button></div>';
+  document.getElementById('cart-content').innerHTML='<div class="success-screen"><div class="success-icon">&#x1F389;</div><h2>'+t('order_placed')+'</h2><p>Gracias '+name+'!<br>'+window._sd+' a las '+window._st+'<br>&#x2B50; +'+pe+' pts ganados!</p><div class="order-pill">Pedido #'+num+'</div><br><button class="btn-pink" onclick="goTo(\'track\')">'+t('track_order')+'</button><br><br><button onclick="goTo(\'home\')" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">'+t('back_home')+'</button></div>';
   document.getElementById('track-badge').classList.add('show');
 }
 
@@ -2365,33 +2453,33 @@ function switchTab(tab){document.getElementById('tab-active').classList.toggle('
 function renderTrackActive(){
   var el=document.getElementById('tab-active-content');
   var active=orders.find(function(o){return o.status!=='completed'&&o.status!=='cancelled';});
-  if(!active){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📦</div><h3>'+t('no_active')+'</h3><p>'+t('no_active_sub')+'</p></div>';return;}
+  if(!active){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">&#x1F4E6;</div><h3>'+t('no_active')+'</h3><p>'+t('no_active_sub')+'</p></div>';return;}
   var si=STAGES.indexOf(active.status);var pct=si<=0?0:(si/(STAGES.length-1))*100;
   var dots=STAGES.map(function(s,i){var dn=i<si,ac=i===si;return '<div class="prog-step"><div class="prog-dot '+(dn?'done':ac?'act':'')+'">'+( dn?'OK':(i+1))+'</div></div>';}).join('');
   var labs=STAGES.map(function(s,i){var ac=i===si;return '<div class="prog-lbl '+(ac?'act':'')+'">'+t(s)+'</div>';}).join('');
   var iH=active.items.map(function(item){return '<div class="oi-row"><div class="oi-img">'+(item.photo?'<img src="'+item.photo+'" style="width:100%;height:100%;object-fit:cover">':'<span>'+item.icon+'</span>')+'</div><div class="oi-name">'+item.name+'</div><div class="oi-qty">x'+item.qty+'</div><div class="oi-price">$'+(item.price*item.qty).toFixed(2)+'</div></div>';}).join('');
-  el.innerHTML='<div class="aoc"><div class="aoc-hdr"><div class="aoc-num">Pedido #'+active.num+'</div><div class="aoc-name">'+active.name+'</div><div class="aoc-meta"><span>'+(active.delivery==='delivery'?'🛵 '+t('delivery'):'🏠 '+t('pickup'))+'</span><span>📅 '+active.scheduledDate+'</span><span>🕐 '+active.scheduledTime+'</span></div></div>'
+  el.innerHTML='<div class="aoc"><div class="aoc-hdr"><div class="aoc-num">Pedido #'+active.num+'</div><div class="aoc-name">'+active.name+'</div><div class="aoc-meta"><span>'+(active.delivery==='delivery'?'&#x1F6F5; '+t('delivery'):'&#x1F3E0; '+t('pickup'))+'</span><span>&#x1F4C5; '+active.scheduledDate+'</span><span>&#x1F550; '+active.scheduledTime+'</span></div></div>'
     +'<div class="prog-sec"><div class="prog-track"><div class="prog-bg"></div><div class="prog-fill" style="width:'+pct+'%"></div>'+dots+'</div><div class="prog-labels">'+labs+'</div></div>'
     +'<div class="status-msg"><div class="status-msg-icon">'+SICONS[active.status]+'</div><div class="status-msg-txt">'+t(active.status)+'</div></div>'
     +'<div class="ois"><div class="oi-title">'+t('your_items')+'</div>'+iH+'</div>'
     +'<div class="ot"><div style="display:flex;justify-content:space-between;font-weight:700;font-size:15px;color:var(--text)"><span>'+t('total')+'</span><span style="color:var(--pink)">$'+active.total.toFixed(2)+'</span></div></div>'
-    +(active.notes?'<div style="margin:0 20px 14px;background:var(--sbg);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--muted)">📝 '+active.notes+'</div>':'')
+    +(active.notes?'<div style="margin:0 20px 14px;background:var(--sbg);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--muted)">&#x1F4DD; '+active.notes+'</div>':'')
     +'</div>';
 }
 function renderTrackHistory(){
   var el=document.getElementById('tab-history-content');
   var hist=orders.filter(function(o){return o.status==='completed'||o.status==='cancelled';});
-  if(!hist.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">🕐</div><h3>'+t('no_history')+'</h3><p>'+t('no_history_sub')+'</p></div>';return;}
+  if(!hist.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">&#x1F550;</div><h3>'+t('no_history')+'</h3><p>'+t('no_history_sub')+'</p></div>';return;}
   el.innerHTML=hist.map(function(o){
-    var fi=o.items[0];var iH=fi&&fi.photo?'<img src="'+fi.photo+'" style="width:100%;height:100%;object-fit:cover">':'<span style="font-size:18px">'+(fi?fi.icon:'🍰')+'</span>';
+    var fi=o.items[0];var iH=fi&&fi.photo?'<img src="'+fi.photo+'" style="width:100%;height:100%;object-fit:cover">':'<span style="font-size:18px">'+(fi?fi.icon:'&#x1F370;')+'</span>';
     var sum=o.items.map(function(i){return i.qty+'x '+i.name;}).join(', ');var exp=expandedH[o.num];
     var now=Date.now();var hrs=(now-(o.completedAt||0))/3600000;
     var canRate=o.status==='completed'&&o.completedAt&&hrs>=24&&o.items.some(function(i){return !i.rated;});
     var ptsReady=o.status==='completed'&&o.completedAt&&hrs>=72&&!o.ptsUnlocked;
-    var badges=(canRate?'<span class="ptsb">⭐ Calificar</span>':'')+(ptsReady?'<span class="ptsb" style="background:#E8F5E9;color:#2E7D32">+'+o.ptsEarned+' pts</span>':'');
-    var rp=canRate?o.items.filter(function(i){return !i.rated;}).map(function(item){return '<div class="rating-prompt"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">'+t('rate_order')+': '+item.name+'</div><div style="font-size:12px;color:var(--muted);margin-bottom:4px">'+t('rate_sub')+'</div><div class="star-picker" id="sp-'+o.num+'-'+item.id+'"><span class="star-pick" onclick="pickStar(\''+o.num+'\','+item.id+',1)">⭐</span><span class="star-pick" onclick="pickStar(\''+o.num+'\','+item.id+',2)">⭐</span><span class="star-pick" onclick="pickStar(\''+o.num+'\','+item.id+',3)">⭐</span><span class="star-pick" onclick="pickStar(\''+o.num+'\','+item.id+',4)">⭐</span><span class="star-pick" onclick="pickStar(\''+o.num+'\','+item.id+',5)">⭐</span></div><button class="rate-submit" onclick="submitRating(\''+o.num+'\','+item.id+')">'+t('submit_btn')+'</button><button class="rate-skip" onclick="skipRating(\''+o.num+'\','+item.id+')">'+t('skip_btn')+'</button></div>';}).join(''):'';
-    var ex=exp?'<div class="hcard-exp">'+rp+o.items.map(function(i){return '<div class="hcard-ei"><span>'+i.qty+'x '+i.name+(i.rated?' ⭐':'')+'</span><span style="color:var(--pink)">$'+(i.price*i.qty).toFixed(2)+'</span></div>';}).join('')+'<div style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px;display:flex;justify-content:space-between;font-weight:700;font-size:13px;color:var(--text)"><span>'+t('total')+'</span><span style="color:var(--pink)">$'+o.total.toFixed(2)+'</span></div>'+(o.ptsEarned?'<div style="margin-top:6px;font-size:12px;color:'+(o.ptsUnlocked?'#2E7D32':'var(--muted)')+'">⭐ '+(o.ptsUnlocked?'+'+o.ptsEarned+' '+t('pts_unlock'):'Puntos disponibles 72hrs despues')+'</div>':'')+'<div style="margin-top:10px"><button style="width:100%;background:var(--pink);color:#fff;border:none;border-radius:10px;padding:10px;font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:600;cursor:pointer">'+t('reorder')+'</button></div></div>':'';
-    return '<div class="hcard"><div class="hcard-h" onclick="togH(\''+o.num+'\')">'+'<div class="hcard-img">'+iH+'</div><div style="flex:1"><div class="hcard-top"><span class="hcard-num">Pedido #'+o.num+'</span><span class="hcard-price">$'+o.total.toFixed(2)+'</span></div><div class="hcard-items">'+sum+'</div><div class="hcard-meta"><span class="hcard-date">'+o.scheduledDate+'</span><span class="spill s-'+o.status+'">'+o.status+'</span>'+badges+'</div></div><div style="color:var(--muted);font-size:16px;margin-left:4px">'+(exp?'▲':'▼')+'</div></div>'+ex+'</div>';
+    var badges=(canRate?'<span class="ptsb">&#x2B50; Calificar</span>':'')+(ptsReady?'<span class="ptsb" style="background:#E8F5E9;color:#2E7D32">+'+o.ptsEarned+' pts</span>':'');
+    var rp=canRate?o.items.filter(function(i){return !i.rated;}).map(function(item){return '<div class="rating-prompt"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">'+t('rate_order')+': '+item.name+'</div><div style="font-size:12px;color:var(--muted);margin-bottom:4px">'+t('rate_sub')+'</div><div class="star-picker" id="sp-'+o.num+'-'+item.id+'"><span class="star-pick" onclick="pickStar(\''+o.num+'\','+item.id+',1)">&#x2B50;</span><span class="star-pick" onclick="pickStar(\''+o.num+'\','+item.id+',2)">&#x2B50;</span><span class="star-pick" onclick="pickStar(\''+o.num+'\','+item.id+',3)">&#x2B50;</span><span class="star-pick" onclick="pickStar(\''+o.num+'\','+item.id+',4)">&#x2B50;</span><span class="star-pick" onclick="pickStar(\''+o.num+'\','+item.id+',5)">&#x2B50;</span></div><button class="rate-submit" onclick="submitRating(\''+o.num+'\','+item.id+')">'+t('submit_btn')+'</button><button class="rate-skip" onclick="skipRating(\''+o.num+'\','+item.id+')">'+t('skip_btn')+'</button></div>';}).join(''):'';
+    var ex=exp?'<div class="hcard-exp">'+rp+o.items.map(function(i){return '<div class="hcard-ei"><span>'+i.qty+'x '+i.name+(i.rated?' &#x2B50;':'')+'</span><span style="color:var(--pink)">$'+(i.price*i.qty).toFixed(2)+'</span></div>';}).join('')+'<div style="border-top:1px solid var(--border);margin-top:6px;padding-top:8px;display:flex;justify-content:space-between;font-weight:700;font-size:13px;color:var(--text)"><span>'+t('total')+'</span><span style="color:var(--pink)">$'+o.total.toFixed(2)+'</span></div>'+(o.ptsEarned?'<div style="margin-top:6px;font-size:12px;color:'+(o.ptsUnlocked?'#2E7D32':'var(--muted)')+'">&#x2B50; '+(o.ptsUnlocked?'+'+o.ptsEarned+' '+t('pts_unlock'):'Puntos disponibles 72hrs despues')+'</div>':'')+'<div style="margin-top:10px"><button style="width:100%;background:var(--pink);color:#fff;border:none;border-radius:10px;padding:10px;font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:600;cursor:pointer">'+t('reorder')+'</button></div></div>':'';
+    return '<div class="hcard"><div class="hcard-h" onclick="togH(\''+o.num+'\')">'+'<div class="hcard-img">'+iH+'</div><div style="flex:1"><div class="hcard-top"><span class="hcard-num">Pedido #'+o.num+'</span><span class="hcard-price">$'+o.total.toFixed(2)+'</span></div><div class="hcard-items">'+sum+'</div><div class="hcard-meta"><span class="hcard-date">'+o.scheduledDate+'</span><span class="spill s-'+o.status+'">'+o.status+'</span>'+badges+'</div></div><div style="color:var(--muted);font-size:16px;margin-left:4px">'+(exp?'&#x25B2;':'&#x25BC;')+'</div></div>'+ex+'</div>';
   }).join('');
 }
 function togH(num){expandedH[num]=!expandedH[num];renderTrackHistory();}
@@ -2406,23 +2494,23 @@ function renderSettings(){
   var el=document.getElementById('settings-content');
   var ini=prof.name?prof.name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2):'?';
   var pct=Math.min(100,(loyalty.points%50)/50*100);
-  var pmC=payMethods.map(function(pm){var ic=pm.type==='ath'?'📱':'💙';var bg=pm.type==='ath'?'#0057FF22':'#00317822';var lb=pm.type==='ath'?'ATH Movil':'PayPal';return '<div class="pm-card"><div class="pm-icon" style="background:'+bg+'">'+ic+'</div><div><div class="pm-label">'+lb+'</div><div class="pm-sub">'+pm.username+'</div></div><button class="pm-rem" onclick="remPm('+pm.id+')">🗑</button></div>';}).join('');
-  var loyH='<div class="stitle">⭐ '+t('loyalty_pts')+'</div>'
-    +'<div class="loyalty-card"><div class="loy-tag">'+t('paobee_rewards')+'</div><div class="loy-pts">'+loyalty.points+' pts</div><div class="loy-sub">= $'+Math.floor(loyalty.points/10).toFixed(2)+' canjeables</div><div class="loy-bg"><div class="loy-fill" style="width:'+pct+'%"></div></div><div class="loy-hint">'+(loyalty.points>=50?'Listo para canjear! 🎉':'Necesitas '+(50-(loyalty.points%50))+' pts mas')+'</div><div class="loy-acts"><div class="loy-btn" onclick="togPtsH()">'+t('pts_history')+'</div>'+(loyalty.points>=50?'<div class="loy-btn red" onclick="goTo(\'shop\')">'+t('redeem')+'</div>':'')+'</div></div>'
+  var pmC=payMethods.map(function(pm){var ic=pm.type==='ath'?'&#x1F4F1;':'&#x1F499;';var bg=pm.type==='ath'?'#0057FF22':'#00317822';var lb=pm.type==='ath'?'ATH Movil':'PayPal';return '<div class="pm-card"><div class="pm-icon" style="background:'+bg+'">'+ic+'</div><div><div class="pm-label">'+lb+'</div><div class="pm-sub">'+pm.username+'</div></div><button class="pm-rem" onclick="remPm('+pm.id+')">&#x1F5D1;</button></div>';}).join('');
+  var loyH='<div class="stitle">&#x2B50; '+t('loyalty_pts')+'</div>'
+    +'<div class="loyalty-card"><div class="loy-tag">'+t('paobee_rewards')+'</div><div class="loy-pts">'+loyalty.points+' pts</div><div class="loy-sub">= $'+Math.floor(loyalty.points/10).toFixed(2)+' canjeables</div><div class="loy-bg"><div class="loy-fill" style="width:'+pct+'%"></div></div><div class="loy-hint">'+(loyalty.points>=50?'Listo para canjear! &#x1F389;':'Necesitas '+(50-(loyalty.points%50))+' pts mas')+'</div><div class="loy-acts"><div class="loy-btn" onclick="togPtsH()">'+t('pts_history')+'</div>'+(loyalty.points>=50?'<div class="loy-btn red" onclick="goTo(\'shop\')">'+t('redeem')+'</div>':'')+'</div></div>'
     +'<div id="pts-h-sec" style="display:none;margin:0 16px 14px"><div class="pts-hcard"><div style="padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">'+t('pts_history')+'</div>'
-    +loyalty.history.map(function(h){var bg=h.type==='earn'?'#E8F5E9':h.type==='spend'?'#FDF0F3':'#FFF8E1';var ic=h.type==='earn'?'🎉':h.type==='spend'?'🛍️':'⏳';var cl=h.type==='earn'?'pts-earn':h.type==='spend'?'pts-spend':'pts-pend';return '<div class="pts-row"><div style="display:flex;align-items:center"><div class="pts-icon" style="background:'+bg+'">'+ic+'</div><div><div style="font-size:13px;font-weight:500;color:var(--text)">'+h.desc+'</div><div style="font-size:11px;color:var(--muted)">'+h.sub+'</div></div></div><div class="'+cl+'">'+(h.amount>0?'+':'')+h.amount+'</div></div>';}).join('')+'</div></div>';
+    +loyalty.history.map(function(h){var bg=h.type==='earn'?'#E8F5E9':h.type==='spend'?'#FDF0F3':'#FFF8E1';var ic=h.type==='earn'?'&#x1F389;':h.type==='spend'?'&#x1F6CD;&#xFE0F;':'&#x23F3;';var cl=h.type==='earn'?'pts-earn':h.type==='spend'?'pts-spend':'pts-pend';return '<div class="pts-row"><div style="display:flex;align-items:center"><div class="pts-icon" style="background:'+bg+'">'+ic+'</div><div><div style="font-size:13px;font-weight:500;color:var(--text)">'+h.desc+'</div><div style="font-size:11px;color:var(--muted)">'+h.sub+'</div></div></div><div class="'+cl+'">'+(h.amount>0?'+':'')+h.amount+'</div></div>';}).join('')+'</div></div>';
   el.innerHTML='<div class="s-hero"><div class="s-avatar">'+ini+'</div><div><div class="s-name">'+prof.name+'</div><div class="s-phone">'+prof.phone+'</div></div></div>'
     +'<div style="padding:12px 16px 0">'+loyH
     +'<div class="stitle">'+t('profile')+'</div>'
-    +'<div class="sgroup"><div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#FDF0F3">👤</div><div><div class="srow-lbl">'+t('name')+'</div></div></div><input style="border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;font-size:13px;color:var(--text);background:var(--ibg);width:120px;outline:none" id="pn" value="'+prof.name+'"></div>'
-    +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#E3F2FD">📞</div><div><div class="srow-lbl">'+t('phone')+'</div></div></div><input style="border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;font-size:13px;color:var(--text);background:var(--ibg);width:120px;outline:none" id="pp" value="'+prof.phone+'"></div>'
-    +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#E8F5E9">📧</div><div><div class="srow-lbl">'+t('email')+'</div></div></div><input style="border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;font-size:13px;color:var(--text);background:var(--ibg);width:120px;outline:none" id="pe" value="'+prof.email+'"></div>'
+    +'<div class="sgroup"><div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#FDF0F3">&#x1F464;</div><div><div class="srow-lbl">'+t('name')+'</div></div></div><input style="border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;font-size:13px;color:var(--text);background:var(--ibg);width:120px;outline:none" id="pn" value="'+prof.name+'"></div>'
+    +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#E3F2FD">&#x1F4DE;</div><div><div class="srow-lbl">'+t('phone')+'</div></div></div><input style="border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;font-size:13px;color:var(--text);background:var(--ibg);width:120px;outline:none" id="pp" value="'+prof.phone+'"></div>'
+    +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#E8F5E9">&#x1F4E7;</div><div><div class="srow-lbl">'+t('email')+'</div></div></div><input style="border:1.5px solid var(--border);border-radius:10px;padding:6px 10px;font-size:13px;color:var(--text);background:var(--ibg);width:120px;outline:none" id="pe" value="'+prof.email+'"></div>'
     +'<div class="srow" style="justify-content:flex-end"><button onclick="savProf()" style="background:var(--pink);color:#fff;border:none;border-radius:10px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer">'+t('save')+'</button></div></div>'
     +'<div class="stitle">Preferencias</div>'
-    +'<div class="sgroup"><div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#F3E5F5">🌙</div><div><div class="srow-lbl">'+t('dark_mode')+'</div></div></div><label class="tog-sw"><input type="checkbox" '+(cfg.dark?'checked':'')+' onchange="togDark(this)"><span class="tog-sl"></span></label></div>'
-    +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#FFF8E1">🔔</div><div><div class="srow-lbl">'+t('order_updates')+'</div></div></div><label class="tog-sw"><input type="checkbox" '+(cfg.notifOrders?'checked':'')+' onchange="cfg.notifOrders=this.checked"><span class="tog-sl"></span></label></div>'
-    +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#FDF0F3">🎁</div><div><div class="srow-lbl">'+t('promotions')+'</div></div></div><label class="tog-sw"><input type="checkbox" '+(cfg.notifPromos?'checked':'')+' onchange="cfg.notifPromos=this.checked"><span class="tog-sl"></span></label></div>'
-    +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#E3F2FD">🌐</div><div><div class="srow-lbl">'+t('language')+'</div></div></div><select class="lang-sel" onchange="setLang(this.value)"><option value="es" '+(lang==='es'?'selected':'')+'>Español</option><option value="en" '+(lang==='en'?'selected':'')+'>English</option></select></div></div>'
+    +'<div class="sgroup"><div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#F3E5F5">&#x1F319;</div><div><div class="srow-lbl">'+t('dark_mode')+'</div></div></div><label class="tog-sw"><input type="checkbox" '+(cfg.dark?'checked':'')+' onchange="togDark(this)"><span class="tog-sl"></span></label></div>'
+    +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#FFF8E1">&#x1F514;</div><div><div class="srow-lbl">'+t('order_updates')+'</div></div></div><label class="tog-sw"><input type="checkbox" '+(cfg.notifOrders?'checked':'')+' onchange="cfg.notifOrders=this.checked"><span class="tog-sl"></span></label></div>'
+    +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#FDF0F3">&#x1F381;</div><div><div class="srow-lbl">'+t('promotions')+'</div></div></div><label class="tog-sw"><input type="checkbox" '+(cfg.notifPromos?'checked':'')+' onchange="cfg.notifPromos=this.checked"><span class="tog-sl"></span></label></div>'
+    +'<div class="srow"><div class="srow-left"><div class="srow-icon" style="background:#E3F2FD">&#x1F310;</div><div><div class="srow-lbl">'+t('language')+'</div></div></div><select class="lang-sel" onchange="setLang(this.value)"><option value="es" '+(lang==='es'?'selected':'')+'>Español</option><option value="en" '+(lang==='en'?'selected':'')+'>English</option></select></div></div>'
     +'<div class="stitle">'+t('payment_methods')+'</div>'+pmC
     +'<button class="add-pm-btn" onclick="openPmMod()">'+t('add_pm')+'</button>'
     +'<div style="height:16px"></div></div>';
@@ -2451,11 +2539,11 @@ function renderMgrTab(tab){
     var oh=orders.filter(function(o){return o.status!=='completed'&&o.status!=='cancelled';}).map(function(o){
       var si=STAGES.indexOf(o.status);
       var sbH=STAGES.map(function(s,i){var past=i<si,ac=i===si;return '<button class="stage-btn '+(past?'past':ac?'active':'')+'" onclick="setStage('+o.id+',\''+s+'\')"><span class="stage-icon-s">'+SICONS[s]+'</span>'+t(s)+'</button>';}).join('');
-      return '<div class="ocm"><div class="oct"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:11px;font-weight:600;color:var(--pink);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">#'+o.num+'</div><div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px">'+o.name+'</div><div style="font-size:12px;color:var(--muted)">'+o.phone+' · '+(o.delivery==='delivery'?'🛵':'🏠')+' · 📅 '+o.scheduledDate+' '+o.scheduledTime+'</div><div style="font-size:12px;color:var(--muted);margin-top:3px">'+o.items.map(function(i){return i.qty+'x '+i.name;}).join(', ')+'</div>'+(o.notes?'<div style="font-size:12px;color:var(--pink);margin-top:2px">📝 '+o.notes+'</div>':'')+'</div><div style="text-align:right"><div style="font-size:16px;font-weight:700;color:var(--pink)">$'+o.total.toFixed(2)+'</div><div style="font-size:11px;color:var(--muted)">'+o.payment+'</div></div></div></div><div class="stage-sec"><div class="stage-lbl">'+t('update_status')+'</div><div class="stages">'+sbH+'</div><button class="cancel-btn" onclick="cancelOrd('+o.id+')">'+t('cancel_order')+'</button></div></div>';
+      return '<div class="ocm"><div class="oct"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:11px;font-weight:600;color:var(--pink);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">#'+o.num+'</div><div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px">'+o.name+'</div><div style="font-size:12px;color:var(--muted)">'+o.phone+' · '+(o.delivery==='delivery'?'&#x1F6F5;':'&#x1F3E0;')+' · &#x1F4C5; '+o.scheduledDate+' '+o.scheduledTime+'</div><div style="font-size:12px;color:var(--muted);margin-top:3px">'+o.items.map(function(i){return i.qty+'x '+i.name;}).join(', ')+'</div>'+(o.notes?'<div style="font-size:12px;color:var(--pink);margin-top:2px">&#x1F4DD; '+o.notes+'</div>':'')+'</div><div style="text-align:right"><div style="font-size:16px;font-weight:700;color:var(--pink)">$'+o.total.toFixed(2)+'</div><div style="font-size:11px;color:var(--muted)">'+o.payment+'</div></div></div></div><div class="stage-sec"><div class="stage-lbl">'+t('update_status')+'</div><div class="stages">'+sbH+'</div><button class="cancel-btn" onclick="cancelOrd('+o.id+')">'+t('cancel_order')+'</button></div></div>';
     }).join('');
     el.innerHTML='<div style="padding:0 16px 12px"><div style="display:flex;gap:5px;flex-wrap:wrap">'+sh+'</div></div>'+oh;
   } else if(tab==='products'){
-    var ph=products.map(function(p){var iH=p.photo?'<img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover">':'<span style="font-size:20px">'+p.icon+'</span>';var skH='<div class="stk-btns"><button class="stk-btn'+(p.stock==='in'?' stk-in':'')+'" onclick="setStock('+p.id+',\'in\')">'+t('in_lbl')+'</button><button class="stk-btn'+(p.stock==='low'?' stk-low':'')+'" onclick="setStock('+p.id+',\'low\')">'+t('low_lbl')+'</button><button class="stk-btn'+(p.stock==='out'?' stk-out':'')+'" onclick="setStock('+p.id+',\'out\')">'+t('out_lbl')+'</button></div>';return '<div class="pad-card"><div class="pad-img">'+iH+'</div><div style="flex:1"><div style="font-weight:600;font-size:14px;color:var(--text)">'+p.name+'</div><div style="font-size:12px;color:var(--muted)">'+p.cat+(p.featured?' · Destacado':'')+(p.ratings.length?' · ⭐'+p.avgRating.toFixed(1):'')+'</div>'+(p.allergens&&p.allergens.length?'<div style="font-size:11px;color:var(--muted)">⚠️ '+p.allergens.join(', ')+'</div>':'')+'<div class="pad-acts"><button class="pad-edit" onclick="openEdit('+p.id+')">✏️</button><button class="pad-del" onclick="delProd('+p.id+')">🗑</button></div>'+skH+'</div><div style="font-size:14px;font-weight:600;color:var(--pink)">$'+p.price.toFixed(2)+'</div></div>';}).join('');
+    var ph=products.map(function(p){var iH=p.photo?'<img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover">':'<span style="font-size:20px">'+p.icon+'</span>';var skH='<div class="stk-btns"><button class="stk-btn'+(p.stock==='in'?' stk-in':'')+'" onclick="setStock('+p.id+',\'in\')">'+t('in_lbl')+'</button><button class="stk-btn'+(p.stock==='low'?' stk-low':'')+'" onclick="setStock('+p.id+',\'low\')">'+t('low_lbl')+'</button><button class="stk-btn'+(p.stock==='out'?' stk-out':'')+'" onclick="setStock('+p.id+',\'out\')">'+t('out_lbl')+'</button></div>';return '<div class="pad-card"><div class="pad-img">'+iH+'</div><div style="flex:1"><div style="font-weight:600;font-size:14px;color:var(--text)">'+p.name+'</div><div style="font-size:12px;color:var(--muted)">'+p.cat+(p.featured?' · Destacado':'')+(p.ratings.length?' · &#x2B50;'+p.avgRating.toFixed(1):'')+'</div>'+(p.allergens&&p.allergens.length?'<div style="font-size:11px;color:var(--muted)">&#x26A0;&#xFE0F; '+p.allergens.join(', ')+'</div>':'')+'<div class="pad-acts"><button class="pad-edit" onclick="openEdit('+p.id+')">&#x270F;&#xFE0F;</button><button class="pad-del" onclick="delProd('+p.id+')">&#x1F5D1;</button></div>'+skH+'</div><div style="font-size:14px;font-weight:600;color:var(--pink)">$'+p.price.toFixed(2)+'</div></div>';}).join('');
     el.innerHTML='<button class="add-prod-btn" onclick="openAddMod()">'+t('add_product')+'</button>'+ph;
   } else if(tab==='schedule'){
     var DK=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -2471,7 +2559,7 @@ function renderMgrTab(tab){
       +'<div class="chart-box"><div class="chart-title">Ingresos Diarios</div><div class="chart-sub">Ultimos 7 dias</div><canvas id="rC" height="160"></canvas></div>'
       +'<div class="chart-box"><div class="chart-title">Pedidos por Dia</div><div class="chart-sub">Ultimos 7 dias</div><canvas id="oC" height="140"></canvas></div>'
       +'<div class="chart-box"><div class="chart-title">Ingresos por Categoria</div><div class="chart-sub">Historial completo</div><canvas id="cC" height="180"></canvas></div>'
-      +'<div style="padding:0 16px;margin-bottom:8px"><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px">⭐ Analiticas de Puntos</div></div>'
+      +'<div style="padding:0 16px;margin-bottom:8px"><div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:10px">&#x2B50; Analiticas de Puntos</div></div>'
       +'<div class="pts-stats-grid"><div class="psg"><div class="psg-val">'+earned+'</div><div class="psg-lbl">En Circulacion</div></div><div class="psg"><div class="psg-val">'+spent+'</div><div class="psg-lbl">Canjeados</div></div><div class="psg"><div class="psg-val">$'+(spent/10).toFixed(2)+'</div><div class="psg-lbl">Valor Usado</div></div></div>'
       +'<div class="chart-box"><div class="chart-title">Puntos Ganados vs Canjeados</div><div class="chart-sub">Ultimos 7 dias</div><canvas id="ptsChart" height="160"></canvas></div>'
       +'<div class="act-card"><div><div style="font-size:14px;font-weight:600;color:var(--text)">'+t('export_orders')+'</div><div style="font-size:12px;color:var(--muted);margin-top:1px">'+t('export_sub')+'</div></div><button class="act-btn" onclick="exportCSV()">'+t('export_btn')+'</button></div>'
@@ -2503,12 +2591,440 @@ function openEdit(id){var p=products.find(function(x){return x.id===id;});if(!p)
 function saveEdit(){var p=products.find(function(x){return x.id===editingId;});if(!p)return;p.name=document.getElementById('edit-name').value||p.name;p.cat=document.getElementById('edit-cat').value;p.price=parseFloat(document.getElementById('edit-price').value)||p.price;p.desc=document.getElementById('edit-desc-i').value||p.desc;p.photo=document.getElementById('edit-photo-data').value||'';p.featured=document.getElementById('edit-featured').checked;p.allergens=document.getElementById('edit-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean);p.icon=CE[p.cat]||p.icon;document.getElementById('edit-overlay').classList.remove('open');renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
 function delProd(id){if(!confirm(t('del_confirm')))return;products=products.filter(function(p){return p.id!==id;});delete cart[id];updateCounts();renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
 function openAddMod(){clearPP('add-preview');['add-name','add-price','add-desc','add-allergens'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});document.getElementById('add-featured').checked=false;document.getElementById('add-overlay').classList.add('open');}
-function saveNewProduct(){var name=document.getElementById('add-name').value.trim();var price=parseFloat(document.getElementById('add-price').value);if(!name||!price){alert('Por favor ingresa nombre y precio.');return;}var cat=document.getElementById('add-cat').value;products.push({id:nextId++,name:name,cat:cat,desc:document.getElementById('add-desc').value||'Un delicioso postre.',price:price,icon:CE[cat]||'🍰',photo:document.getElementById('add-photo-data').value||'',featured:document.getElementById('add-featured').checked,allergens:document.getElementById('add-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean),stock:'in',ratings:[],avgRating:0});document.getElementById('add-overlay').classList.remove('open');renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
+function saveNewProduct(){var name=document.getElementById('add-name').value.trim();var price=parseFloat(document.getElementById('add-price').value);if(!name||!price){alert('Por favor ingresa nombre y precio.');return;}var cat=document.getElementById('add-cat').value;products.push({id:nextId++,name:name,cat:cat,desc:document.getElementById('add-desc').value||'Un delicioso postre.',price:price,icon:CE[cat]||'&#x1F370;',photo:document.getElementById('add-photo-data').value||'',featured:document.getElementById('add-featured').checked,allergens:document.getElementById('add-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean),stock:'in',ratings:[],avgRating:0});document.getElementById('add-overlay').classList.remove('open');renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
 
 /* ══════════════════════════════════════════════
    INIT – runs on page load
    ══════════════════════════════════════════════ */
 applyTranslations();renderHome();updateCounts();renderPmForm();
+
+
+/* ══════════════════════════════════════════════
+   C. AUTH FUNCTIONS
+   ══════════════════════════════════════════════ */
+
+var authTab = 'login';    // 'login' | 'signup'
+var authMethod = 'email'; // 'email' | 'phone'
+var pendingPhone = '';
+
+/* ── Switch login / signup tab ───────────────── */
+function switchAuthTab(tab) {
+  authTab = tab;
+  document.getElementById('atab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('atab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('auth-msg').innerHTML = '';
+  renderAuthForm();
+}
+
+/* ── Switch email / phone method ─────────────── */
+function switchAuthMethod(m) {
+  authMethod = m;
+  document.getElementById('am-email').classList.toggle('active', m === 'email');
+  document.getElementById('am-phone').classList.toggle('active', m === 'phone');
+  renderAuthForm();
+}
+
+/* ── Draw the auth form ──────────────────────── */
+function renderAuthForm() {
+  var wrap = document.getElementById('auth-form-wrap');
+  var isLogin = authTab === 'login';
+  var label = isLogin ? 'Iniciar sesión' : 'Crear cuenta';
+
+  var methodBtns = '<div class="auth-method">'
+    + '<button class="auth-method-btn' + (authMethod === 'email' ? ' active' : '') + '" id="am-email" onclick="switchAuthMethod(\'email\')">&#x2709; Email</button>'
+    + '<button class="auth-method-btn' + (authMethod === 'phone' ? ' active' : '') + '" id="am-phone" onclick="switchAuthMethod(\'phone\')">&#x1F4F1; Telefono</button>'
+    + '</div>';
+
+  var fields = '';
+  if (authMethod === 'email') {
+    if (!isLogin) {
+      fields += '<div class="auth-fld"><label class="auth-lbl">Nombre</label><input class="auth-inp" id="auth-name" placeholder="Tu nombre"></div>';
+    }
+    fields += '<div class="auth-fld"><label class="auth-lbl">Correo electronico</label><input class="auth-inp" id="auth-email" type="email" placeholder="tu@email.com"></div>';
+    fields += '<div class="auth-fld"><label class="auth-lbl">Contrasena</label><input class="auth-inp" id="auth-pass" type="password" placeholder="Minimo 6 caracteres"></div>';
+  } else {
+    if (!isLogin) {
+      fields += '<div class="auth-fld"><label class="auth-lbl">Nombre</label><input class="auth-inp" id="auth-name" placeholder="Tu nombre"></div>';
+    }
+    fields += '<div class="auth-fld"><label class="auth-lbl">Numero de telefono</label><input class="auth-inp" id="auth-phone" type="tel" placeholder="+1787XXXXXXX"></div>';
+  }
+
+  var btn = '<button class="auth-btn" id="auth-submit-btn" onclick="handleAuth()">' + label + '</button>';
+
+  wrap.innerHTML = methodBtns + fields + btn;
+}
+
+/* ── Handle auth submit ──────────────────────── */
+function handleAuth() {
+  var btn = document.getElementById('auth-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Un momento...';
+  setAuthMsg('', '');
+
+  if (authMethod === 'email') {
+    var email = (document.getElementById('auth-email') || {}).value || '';
+    var pass  = (document.getElementById('auth-pass')  || {}).value || '';
+    var name  = (document.getElementById('auth-name')  || {}).value || '';
+    if (!email || !pass) { setAuthMsg('Por favor completa todos los campos.', 'err'); btn.disabled = false; btn.textContent = authTab === 'login' ? 'Iniciar sesion' : 'Crear cuenta'; return; }
+    if (authTab === 'login') {
+      sb.auth.signInWithPassword({ email: email, password: pass }).then(function(res) { handleAuthResult(res, name); });
+    } else {
+      sb.auth.signUp({ email: email, password: pass, options: { data: { full_name: name } } }).then(function(res) { handleAuthResult(res, name); });
+    }
+  } else {
+    var phone = (document.getElementById('auth-phone') || {}).value || '';
+    var name  = (document.getElementById('auth-name')  || {}).value || '';
+    if (!phone) { setAuthMsg('Por favor ingresa tu numero de telefono.', 'err'); btn.disabled = false; btn.textContent = authTab === 'login' ? 'Iniciar sesion' : 'Crear cuenta'; return; }
+    pendingPhone = phone;
+    sb.auth.signInWithOtp({ phone: phone }).then(function(res) {
+      if (res.error) { setAuthMsg(res.error.message, 'err'); btn.disabled = false; btn.textContent = 'Iniciar sesion'; return; }
+      renderOtpForm(phone, name);
+    });
+  }
+}
+
+/* ── OTP verification form ───────────────────── */
+function renderOtpForm(phone, name) {
+  var wrap = document.getElementById('auth-form-wrap');
+  wrap.innerHTML = '<div style="text-align:center;margin-bottom:16px">'
+    + '<div style="font-size:32px;margin-bottom:8px">&#x1F4F1;</div>'
+    + '<div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">Codigo enviado a</div>'
+    + '<div style="font-size:13px;color:var(--muted)">' + phone + '</div>'
+    + '</div>'
+    + '<div class="otp-inputs">'
+    + '<input class="otp-inp" id="otp0" maxlength="1" oninput="otpNext(this,1)" onkeydown="otpBack(event,this,null)">'
+    + '<input class="otp-inp" id="otp1" maxlength="1" oninput="otpNext(this,2)" onkeydown="otpBack(event,this,0)">'
+    + '<input class="otp-inp" id="otp2" maxlength="1" oninput="otpNext(this,3)" onkeydown="otpBack(event,this,1)">'
+    + '<input class="otp-inp" id="otp3" maxlength="1" oninput="otpNext(this,4)" onkeydown="otpBack(event,this,2)">'
+    + '<input class="otp-inp" id="otp4" maxlength="1" oninput="otpNext(this,5)" onkeydown="otpBack(event,this,3)">'
+    + '<input class="otp-inp" id="otp5" maxlength="1" oninput="otpNext(this,null)" onkeydown="otpBack(event,this,4)">'
+    + '</div>'
+    + '<button class="auth-btn" onclick="verifyOtp(\'' + phone + '\',\'' + name + '\')">Verificar codigo</button>'
+    + '<div style="text-align:center;margin-top:14px"><span style="font-size:13px;color:var(--pink);cursor:pointer;font-weight:600" onclick="renderAuthForm()">Cambiar numero</span></div>';
+  document.getElementById('otp0').focus();
+}
+
+function otpNext(el, nextIdx) {
+  if (el.value && nextIdx !== null) {
+    var next = document.getElementById('otp' + nextIdx);
+    if (next) next.focus();
+  }
+}
+function otpBack(e, el, prevIdx) {
+  if (e.key === 'Backspace' && !el.value && prevIdx !== null) {
+    var prev = document.getElementById('otp' + prevIdx);
+    if (prev) { prev.value = ''; prev.focus(); }
+  }
+}
+
+function verifyOtp(phone, name) {
+  var code = [0,1,2,3,4,5].map(function(i) { var el = document.getElementById('otp'+i); return el ? el.value : ''; }).join('');
+  if (code.length < 6) { setAuthMsg('Ingresa los 6 digitos.', 'err'); return; }
+  sb.auth.verifyOtp({ phone: phone, token: code, type: 'sms' }).then(function(res) { handleAuthResult(res, name); });
+}
+
+/* ── Handle auth result ──────────────────────── */
+function handleAuthResult(res, name) {
+  if (res.error) {
+    setAuthMsg(res.error.message, 'err');
+    var btn = document.getElementById('auth-submit-btn');
+    if (btn) { btn.disabled = false; btn.textContent = authTab === 'login' ? 'Iniciar sesion' : 'Crear cuenta'; }
+    return;
+  }
+  var user = res.data.user;
+  if (!user) {
+    setAuthMsg('Revisa tu correo para confirmar tu cuenta.', 'ok');
+    return;
+  }
+  currentUser = user;
+  /* upsert profile */
+  var displayName = name || (user.user_metadata && user.user_metadata.full_name) || user.email || user.phone || 'Usuario';
+  sb.from('profiles').upsert({ id: user.id, name: displayName, email: user.email || '', phone: user.phone || '' }, { onConflict: 'id' }).then(function() {
+    loadUserRole(user.id, displayName);
+  });
+}
+
+/* ── Load role from DB ───────────────────────── */
+function loadUserRole(uid, displayName) {
+  sb.from('profiles').select('role, name').eq('id', uid).single().then(function(res) {
+    if (res.data) {
+      currentRole = res.data.role || 'customer';
+      prof.name = res.data.name || displayName;
+    } else {
+      currentRole = 'customer';
+      prof.name = displayName;
+    }
+    onAuthSuccess();
+  });
+}
+
+/* ── After successful login ──────────────────── */
+function onAuthSuccess() {
+  document.getElementById('auth-screen').style.display = 'none';
+  /* show / hide manager tab based on role */
+  var mgrNav = document.getElementById('nav-manager');
+  if (mgrNav) mgrNav.style.display = currentRole === 'manager' ? '' : 'none';
+  renderUserPill();
+  loadProductsFromDB();
+  loadOrdersFromDB();
+  loadLoyaltyFromDB();
+  applyTranslations();
+  renderHome();
+  updateCounts();
+}
+
+/* ── User pill (top right) ───────────────────── */
+function renderUserPill() {
+  var existing = document.getElementById('user-pill');
+  if (existing) existing.remove();
+  var initials = prof.name ? prof.name.split(' ').map(function(w){return w[0];}).join('').toUpperCase().slice(0,2) : '?';
+  var pill = document.createElement('div');
+  pill.className = 'user-pill';
+  pill.id = 'user-pill';
+  pill.innerHTML = '<div class="user-pill-avatar">' + initials + '</div>'
+    + '<div class="user-pill-name">' + prof.name + '</div>'
+    + (currentRole === 'manager' ? '<div class="mgr-badge">MGR</div>' : '')
+    + '<span style="font-size:10px;color:var(--muted);margin-left:2px">&#x25BC;</span>';
+  pill.onclick = function() { goTo('settings'); };
+  document.body.appendChild(pill);
+}
+
+/* ── Sign out ────────────────────────────────── */
+function signOut() {
+  sb.auth.signOut().then(function() {
+    currentUser = null; currentRole = 'customer';
+    var pill = document.getElementById('user-pill'); if (pill) pill.remove();
+    document.getElementById('auth-screen').style.display = 'flex';
+    switchAuthTab('login');
+    renderAuthForm();
+  });
+}
+
+/* ── Auth message helper ─────────────────────── */
+function setAuthMsg(msg, type) {
+  var el = document.getElementById('auth-msg');
+  if (!el) return;
+  el.innerHTML = msg ? '<div class="auth-' + (type === 'err' ? 'err' : 'ok') + '">' + msg + '</div>' : '';
+}
+
+/* ══════════════════════════════════════════════
+   D. SUPABASE DATA LOADERS
+   ══════════════════════════════════════════════ */
+
+function loadProductsFromDB() {
+  sb.from('products').select('*').order('id').then(function(res) {
+    if (res.data && res.data.length) {
+      products = res.data.map(function(p) {
+        return {
+          id: p.id, name: p.name, cat: p.cat, desc: p.description,
+          price: parseFloat(p.price), icon: p.icon || '&#x1F370;',
+          photo: p.photo || '', featured: p.featured,
+          allergens: p.allergens || [], stock: p.stock,
+          ratings: p.ratings || [], avgRating: parseFloat(p.avg_rating) || 0
+        };
+      });
+      if (document.getElementById('screen-home').classList.contains('active')) renderHome();
+      if (document.getElementById('screen-shop').classList.contains('active')) renderShop();
+    }
+  });
+}
+
+function loadOrdersFromDB() {
+  if (!currentUser) return;
+  var query = currentRole === 'manager'
+    ? sb.from('orders').select('*').order('id', { ascending: false })
+    : sb.from('orders').select('*').eq('user_id', currentUser.id).order('id', { ascending: false });
+  query.then(function(res) {
+    if (res.data) {
+      orders = res.data.map(function(o) {
+        return {
+          id: o.id, num: o.num, name: o.customer_name, phone: o.phone,
+          email: o.email, address: o.address, notes: o.notes,
+          delivery: o.delivery, total: parseFloat(o.total),
+          status: o.status, date: o.scheduled_date,
+          scheduledDate: o.scheduled_date, scheduledTime: o.scheduled_time,
+          payment: o.payment, ptsEarned: o.pts_earned,
+          ptsUnlocked: o.pts_unlocked, completedAt: o.completed_at,
+          items: o.items || []
+        };
+      });
+      var tb = document.getElementById('track-badge');
+      var active = orders.find(function(o){return o.status!=='completed'&&o.status!=='cancelled';});
+      if (tb) tb.classList.toggle('show', !!active);
+    }
+  });
+}
+
+function loadLoyaltyFromDB() {
+  if (!currentUser) return;
+  sb.from('loyalty').select('*').eq('user_id', currentUser.id).single().then(function(res) {
+    if (res.data) {
+      loyalty.points = res.data.points || 0;
+      loyalty.history = res.data.history || [];
+    }
+  });
+}
+
+/* ── Save order to DB ────────────────────────── */
+function saveOrderToDB(order) {
+  return sb.from('orders').insert({
+    num: order.num, user_id: currentUser ? currentUser.id : null,
+    customer_name: order.name, phone: order.phone, email: order.email,
+    address: order.address, notes: order.notes, delivery: order.delivery,
+    total: order.total, status: order.status, payment: order.payment,
+    scheduled_date: order.scheduledDate, scheduled_time: order.scheduledTime,
+    pts_earned: order.ptsEarned, pts_unlocked: false,
+    completed_at: null, items: order.items
+  }).select().single();
+}
+
+/* ── Update order status in DB ───────────────── */
+function updateOrderStatusDB(id, status) {
+  var update = { status: status };
+  if (status === 'completed') update.completed_at = Date.now();
+  sb.from('orders').update(update).eq('id', id);
+}
+
+/* ── Save product to DB ──────────────────────── */
+function saveProductToDB(p) {
+  return sb.from('products').upsert({
+    id: p.id > 1000 ? undefined : p.id,
+    name: p.name, cat: p.cat, description: p.desc,
+    price: p.price, icon: p.icon, photo: p.photo,
+    featured: p.featured, stock: p.stock,
+    allergens: p.allergens, avg_rating: p.avgRating, ratings: p.ratings
+  }).select().single();
+}
+
+/* ── Update loyalty in DB ────────────────────── */
+function saveLoyaltyToDB() {
+  if (!currentUser) return;
+  sb.from('loyalty').upsert({ user_id: currentUser.id, points: loyalty.points, history: loyalty.history }, { onConflict: 'user_id' });
+}
+
+/* ══════════════════════════════════════════════
+   E. OVERRIDE placeOrder to save to DB
+   ══════════════════════════════════════════════ */
+var _origPlaceOrder = placeOrder;
+placeOrder = function() {
+  /* run the original logic to build the order object */
+  var name=(document.getElementById('co-name')||{}).value||'';
+  var phone=(document.getElementById('co-phone')||{}).value||'';
+  if(!name||!phone){alert('Por favor ingresa tu nombre y telefono.');return;}
+  if(!window._sd){alert('Por favor selecciona una fecha.');return;}
+  var mode=window._dm||'pickup';var del=mode==='delivery'?1.50:0;
+  var disc=0;if(appliedPromo){if(appliedPromo.pct)disc=cartTotal()*appliedPromo.pct/100;if(appliedPromo.flat)disc=Math.min(appliedPromo.flat,cartTotal());}
+  var pd=0;if(redeemPts&&loyalty.points>=50){pd=Math.floor(loyalty.points/10);loyalty.points-=pd*10;}
+  var total=Math.max(0,cartTotal()+del-disc-pd);var pe=Math.floor(total);
+  var entries=Object.entries(cart).filter(function(e){return e[1]>0;});
+  var items=entries.map(function(e){var p=products.find(function(x){return x.id==e[0];});return{id:parseInt(e[0]),name:p?p.name:'',qty:e[1],price:p?p.price:0,icon:p?p.icon:'&#x1F370;',photo:p?p.photo:'',rated:false};});
+  var num=String(nextOrderNum).padStart(3,'0');nextOrderNum++;
+  var newOrder={id:orders.length+1,num:num,name:name,phone:phone,email:(document.getElementById('co-email')||{}).value||'',address:(document.getElementById('co-addr')||{}).value||'',notes:(document.getElementById('co-notes')||{}).value||'',delivery:mode,total:total,status:'confirmed',date:'Hoy',scheduledDate:window._sd,scheduledTime:window._st,payment:window._pm||'cash',ptsEarned:pe,ptsUnlocked:false,completedAt:null,items:items};
+  orders.unshift(newOrder);
+  loyalty.history.unshift({type:'pending',desc:'Pedido #'+num+' pendiente',sub:'Se desbloquea 72hrs despues de entrega',amount:pe});
+  /* save to Supabase */
+  saveOrderToDB(newOrder).then(function(res){
+    if(res.data) newOrder.id = res.data.id;
+  });
+  saveLoyaltyToDB();
+  cart={};updateCounts();appliedPromo=null;redeemPts=false;
+  document.getElementById('cart-title').textContent=t('order_placed');
+  document.getElementById('cart-content').innerHTML='<div class="success-screen"><div class="success-icon">&#x1F389;</div><h2>'+t('order_placed')+'</h2><p>Gracias '+name+'!<br>'+window._sd+' a las '+window._st+'<br>&#x2B50; +'+pe+' pts ganados!</p><div class="order-pill">Pedido #'+num+'</div><br><button class="btn-pink" onclick="goTo(\'track\')">'+t('track_order')+'</button><br><br><button onclick="goTo(\'home\')" style="background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;font-family:\'DM Sans\',sans-serif">'+t('back_home')+'</button></div>';
+  document.getElementById('track-badge').classList.add('show');
+};
+
+/* ── Override setStage to save to DB ─────────── */
+var _origSetStage = setStage;
+setStage = function(id, stage) {
+  _origSetStage(id, stage);
+  updateOrderStatusDB(id, stage);
+  if (stage === 'completed') {
+    /* unlock loyalty points */
+    var o = orders.find(function(x){return x.id===id;});
+    if (o && !o.ptsUnlocked) {
+      loyalty.points += o.ptsEarned;
+      loyalty.history.unshift({type:'earn',desc:'Pedido #'+o.num+' completado',sub:'Puntos desbloqueados',amount:o.ptsEarned});
+      o.ptsUnlocked = true;
+      sb.from('orders').update({pts_unlocked: true}).eq('id', id);
+      saveLoyaltyToDB();
+    }
+  }
+};
+
+/* ── Override saveNewProduct to save to DB ────── */
+var _origSaveNew = saveNewProduct;
+saveNewProduct = function() {
+  var name=document.getElementById('add-name').value.trim();
+  var price=parseFloat(document.getElementById('add-price').value);
+  if(!name||!price){alert('Por favor ingresa nombre y precio.');return;}
+  var cat=document.getElementById('add-cat').value;
+  var newP={id:nextId++,name:name,cat:cat,desc:document.getElementById('add-desc').value||'Un delicioso postre.',price:price,icon:CE[cat]||'&#x1F370;',photo:document.getElementById('add-photo-data').value||'',featured:document.getElementById('add-featured').checked,allergens:document.getElementById('add-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean),stock:'in',ratings:[],avgRating:0};
+  products.push(newP);
+  saveProductToDB(newP).then(function(res){if(res.data)newP.id=res.data.id;});
+  document.getElementById('add-overlay').classList.remove('open');
+  renderMgrTab('products');
+  document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});
+};
+
+/* ── Override saveEdit to save to DB ─────────── */
+var _origSaveEdit = saveEdit;
+saveEdit = function() {
+  _origSaveEdit();
+  var p = products.find(function(x){return x.id===editingId;});
+  if (p) saveProductToDB(p);
+};
+
+/* ── Settings sign out button ────────────────── */
+var _origRenderSettings = renderSettings;
+renderSettings = function() {
+  _origRenderSettings();
+  /* inject sign out button at bottom of settings */
+  var el = document.getElementById('settings-content');
+  if (el) {
+    var signOutDiv = document.createElement('div');
+    signOutDiv.style.cssText = 'padding:0 16px 32px;';
+    signOutDiv.innerHTML = '<button onclick="signOut()" style="width:100%;border:1.5px solid #C0392B;background:none;color:#C0392B;border-radius:14px;padding:14px;font-family:\'DM Sans\',sans-serif;font-size:14px;font-weight:600;cursor:pointer">Cerrar sesion</button>';
+    el.appendChild(signOutDiv);
+  }
+};
+
+/* ══════════════════════════════════════════════
+   K. INIT
+   ══════════════════════════════════════════════ */
+
+/* Hide manager nav until role is confirmed */
+(function() {
+  var mgrNav = document.getElementById('nav-manager');
+  if (mgrNav) mgrNav.style.display = 'none';
+})();
+
+/* Render auth form immediately */
+renderAuthForm();
+
+/* Listen for existing session (user already logged in) */
+sb.auth.getSession().then(function(res) {
+  var session = res.data && res.data.session;
+  if (session && session.user) {
+    currentUser = session.user;
+    var meta = session.user.user_metadata || {};
+    var displayName = meta.full_name || session.user.email || session.user.phone || 'Usuario';
+    prof.name = displayName;
+    loadUserRole(session.user.id, displayName);
+  } else {
+    /* no session — show auth screen */
+    document.getElementById('auth-screen').style.display = 'flex';
+  }
+});
+
+/* Listen for auth state changes (login/logout) */
+sb.auth.onAuthStateChange(function(event, session) {
+  if (event === 'SIGNED_OUT') {
+    document.getElementById('auth-screen').style.display = 'flex';
+  }
+});
+
+applyTranslations();
+renderPmForm();
 
 </script>
 </body>
