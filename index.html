@@ -3123,6 +3123,7 @@ function renderManager(){renderMgrTab('orders');document.querySelectorAll('.mgr-
 function mgrTab(btn,tab){document.querySelectorAll('.mgr-tab').forEach(function(tb){tb.classList.remove('active');});btn.classList.add('active');if(rC){rC.destroy();rC=null;}if(oC){oC.destroy();oC=null;}if(cC){cC.destroy();cC=null;}if(ptsC){ptsC.destroy();ptsC=null;}renderMgrTab(tab);}
 function renderMgrTab(tab){
   var el=document.getElementById('mgr-content');
+  if (!el) { console && console.warn && console.warn('mgr-content not found for tab: ' + tab); return; }
   if(tab==='orders'){
     var cnts={confirmed:0,preparing:0,on_the_way:0,completed:0,cancelled:0};orders.forEach(function(o){cnts[o.status]=(cnts[o.status]||0)+1;});
     var fills={confirmed:'#D1ECF1',preparing:'#FFE8CC',on_the_way:'#E3F2FD',completed:'#E8F5E9',cancelled:'#F8D7DA'};
@@ -3509,7 +3510,14 @@ function handleAuth() {
       var email = (document.getElementById('auth-email') || {}).value || '';
       var pass  = (document.getElementById('auth-pass')  || {}).value || '';
       if (!email || !pass) { setAuthMsg('Por favor completa todos los campos.', 'err'); resetBtn(btn); return; }
-      sb.auth.signInWithPassword({ email: email, password: pass }).then(function(res) { handleAuthResult(res, ''); });
+      sb.auth.signInWithPassword({ email: email, password: pass }).then(function(res) {
+        if (res.error) {
+          setAuthMsg('Error: ' + res.error.message, 'err');
+          resetBtn(btn);
+          return;
+        }
+        handleAuthResult(res, '');
+      });
     } else {
       var phone = (document.getElementById('auth-phone') || {}).value || '';
       if (!phone) { setAuthMsg('Por favor ingresa tu numero de telefono.', 'err'); resetBtn(btn); return; }
@@ -3618,6 +3626,10 @@ function handleAuthResult(res, name, phone, bdayMonth, bdayDay) {
   prof.birthday_month  = displayBdayMonth;
   prof.birthday_day    = displayBdayDay;
 
+  /* load role immediately - don't block on profile upsert */
+  loadUserRole(user.id, displayName);
+
+  /* upsert profile in background */
   sb.from('profiles').upsert({
     id:             user.id,
     name:           displayName,
@@ -3626,7 +3638,9 @@ function handleAuthResult(res, name, phone, bdayMonth, bdayDay) {
     birthday_month: displayBdayMonth || null,
     birthday_day:   displayBdayDay   || null
   }, { onConflict: 'id' }).then(function(res) {
-    loadUserRole(user.id, displayName);
+    if (res.error) {
+      setAuthMsg('Error de perfil: ' + res.error.message, 'err');
+    }
   });
 }
 
