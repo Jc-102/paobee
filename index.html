@@ -2422,6 +2422,13 @@ to{transform:translateY(0);opacity:1}
   <div class="mgr-tabs"><button class="mgr-tab active" onclick="mgrTab(this,'orders')" data-i18n="orders_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'products')" data-i18n="products_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'categories')">&#x1F3F7; Categorias</button><button class="mgr-tab" onclick="mgrTab(this,'schedule')" data-i18n="schedule_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'analytics')" data-i18n="analytics_tab"></button></div>
   <div id="mgr-content"></div>
 </div>
+<!-- ══ CATEGORY MODAL ════════════════════════════════════════ -->
+<div class="modal-overlay" id="cat-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="edit-modal" id="cat-modal-wrap">
+    <!-- built dynamically -->
+  </div>
+</div>
+
 <nav class="bnav">
   <div class="nav-item active" id="nav-home" onclick="goTo('home')"><div class="nav-icon">&#x1F3E0;</div><div class="nav-lbl" data-i18n="home"></div><div class="nav-dot"></div></div>
   <div class="nav-item" id="nav-shop" onclick="goTo('shop')"><div class="nav-icon">&#x1F9C1;</div><div class="nav-lbl" data-i18n="shop"></div><div class="nav-dot"></div></div>
@@ -2466,13 +2473,6 @@ to{transform:translateY(0);opacity:1}
   <div class="feat-row" onclick="document.getElementById('add-featured').checked=!document.getElementById('add-featured').checked"><input type="checkbox" id="add-featured"><label data-i18n="featured"></label><span data-i18n="home_page"></span></div>
   <button class="esave" onclick="saveNewProduct()" data-i18n="add_product"></button></div>
 </div>
-<!-- ══ CATEGORY MODAL ════════════════════════════════════════ -->
-<div class="modal-overlay" id="cat-overlay" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="edit-modal" id="cat-modal-wrap">
-    <!-- built dynamically -->
-  </div>
-</div>
-
 <div class="modal-overlay" id="pm-overlay" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="edit-modal"><button class="modal-close" onclick="document.getElementById('pm-overlay').classList.remove('open')">&#x2715;</button><span class="modal-handle"></span>
   <div style="font-family:Georgia,serif;font-size:20px;color:var(--text);margin-bottom:16px;" data-i18n="add_pm_modal"></div>
@@ -4333,32 +4333,42 @@ function dtGoToCheckout() {
 function dtRenderFeatured() {
   var el = document.getElementById('dt-featured');
   if (!el) return;
+  el.innerHTML = '';
   var featured = products.filter(function(p){ return p.featured; });
-  el.innerHTML = featured.length
-    ? featured.map(dtRenderCard).join('')
-    : '<div style="color:var(--muted);font-size:14px">Sin productos aun.</div>';
+  if (!featured.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:14px">Sin productos aun.</div>';
+    return;
+  }
+  featured.forEach(function(p){ el.appendChild(dtRenderCard(p)); });
 }
 
 function dtRenderShop() {
   var catsEl = document.getElementById('dt-cats');
   var gridEl = document.getElementById('dt-shop-grid');
   if (!catsEl || !gridEl) return;
+
+  /* render category pills */
+  catsEl.innerHTML = '';
   var cats = ['All'].concat(Object.keys(CE));
-  catsEl.innerHTML = cats.map(function(c) {
-    var isActive = dtActiveCat===c;
-    var el = document.createElement('div');
-    el.className = 'dt-cat' + (isActive ? ' active' : '');
-    el.textContent = (CE[c] ? CE[c]+' ' : '') + c;
-    el.onclick = function(){ dtActiveCat=c; dtRenderShop(); };
-    return el.outerHTML;
-  }).join('');
+  cats.forEach(function(c) {
+    var pill = document.createElement('div');
+    pill.className = 'dt-cat' + (dtActiveCat===c ? ' active' : '');
+    pill.textContent = (CE[c] ? CE[c]+' ' : '') + c;
+    pill.onclick = (function(cat){ return function(){ dtActiveCat=cat; dtRenderShop(); }; })(c);
+    catsEl.appendChild(pill);
+  });
+
+  /* render product grid */
+  gridEl.innerHTML = '';
   var q = (document.getElementById('dt-search')||{}).value||'';
   var filtered = products.filter(function(p) {
     return (dtActiveCat==='All'||p.cat===dtActiveCat) && (!q||p.name.toLowerCase().includes(q.toLowerCase()));
   });
-  gridEl.innerHTML = filtered.length
-    ? filtered.map(dtRenderCard).join('')
-    : '<div style="color:var(--muted);font-size:14px;padding:20px 0">Sin productos en esta categoria.</div>';
+  if (!filtered.length) {
+    gridEl.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:20px 0">Sin productos en esta categoria.</div>';
+    return;
+  }
+  filtered.forEach(function(p){ gridEl.appendChild(dtRenderCard(p)); });
 }
 
 function dtRenderCard(p) {
@@ -4390,7 +4400,7 @@ function dtRenderCard(p) {
       dtAddToCart(p.id, addBtn);
     };
   }
-  return card.outerHTML;
+  return card; /* return DOM element, not outerHTML */
 }
 
 function dtAddToCart(id, btn) {
