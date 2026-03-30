@@ -2554,8 +2554,6 @@ function applyTranslations(){
   document.querySelectorAll('[data-i18n-ph]').forEach(function(el){el.placeholder=t(el.getAttribute('data-i18n-ph'));});
 }
 /* ── setLang(newLang) ──────────────────────── */
-function setLang(nl){
-  lang=nl;
 /* ══════════════════════════════════════════════
    CATEGORY MANAGEMENT
    ══════════════════════════════════════════════ */
@@ -2707,14 +2705,11 @@ function loadCatsFromDB() {
   });
 }
 
-/* ══════════════════════════════════════════════
-   INIT – runs on page load
-   ══════════════════════════════════════════════ */
-applyTranslations();
+function setLang(nl){
+  lang=nl;applyTranslations();
   var a=document.querySelector('.screen.active');
   if(a){var id=a.id;if(id==='screen-home')renderHome();else if(id==='screen-shop')renderShop();else if(id==='screen-track'){renderTrackActive();renderTrackHistory();}else if(id==='screen-settings')renderSettings();else if(id==='screen-manager')renderManager();}
 }
-
 /* ══════════════════════════════════════════════
    DATA  – categories, stages, schedule, products, orders, loyalty
    ══════════════════════════════════════════════ */
