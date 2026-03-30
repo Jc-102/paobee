@@ -2606,6 +2606,11 @@ function openCatModal(titleText, nameVal, currentEmoji, onSave) {
   emojiField.innerHTML = '<label class="elbl">Emoji</label>';
   emojiField.appendChild(buildEmojiPicker('cat-modal-emoji', currentEmoji));
   wrap.appendChild(emojiField);
+  /* hidden original name for edit */
+  var origInput = document.createElement('input');
+  origInput.type = 'hidden'; origInput.id = 'cat-modal-original';
+  origInput.value = nameVal || '';
+  wrap.appendChild(origInput);
   /* save button */
   var saveBtn = document.createElement('button'); saveBtn.className = 'esave';
   saveBtn.textContent = 'Guardar';
@@ -2615,31 +2620,19 @@ function openCatModal(titleText, nameVal, currentEmoji, onSave) {
 }
 
 function openAddCat() {
-  openCatModal('Nueva Categoria', '', null, function() {
-    var name  = (document.getElementById('cat-modal-name')  || {}).value || '';
-    var emoji = (document.getElementById('cat-modal-emoji') || {}).value || '&#x1F370;';
-    if (!name.trim()) { alert('Por favor ingresa un nombre.'); return; }
-    if (CE[name]) { alert('Esta categoria ya existe.'); return; }
-    CE[name] = emoji;
-    saveCatsToDB();
-    document.getElementById('cat-overlay').classList.remove('open');
-    renderMgrTab('categories');
-    document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
-    updateCatDropdowns();
-  });
+  openCatModal('Nueva Categoria', '', null, saveNewCat);
 }
 
 function saveNewCat() {
-  var name  = (document.getElementById('new-cat-name') || {}).value || '';
-  var emoji = (document.getElementById('new-cat-emoji') || {}).value || '&#x1F370;';
+  var name  = (document.getElementById('cat-modal-name')  || {}).value || '';
+  var emoji = (document.getElementById('cat-modal-emoji') || {}).value || '&#x1F370;';
   if (!name.trim()) { alert('Por favor ingresa un nombre.'); return; }
   if (CE[name]) { alert('Esta categoria ya existe.'); return; }
   CE[name] = emoji;
   saveCatsToDB();
-  document.getElementById('add-overlay').classList.remove('open');
+  document.getElementById('cat-overlay').classList.remove('open');
   renderMgrTab('categories');
   document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
-  /* update all category dropdowns */
   updateCatDropdowns();
 }
 
@@ -3423,6 +3416,11 @@ function openCatModal(titleText, nameVal, currentEmoji, onSave) {
   emojiField.innerHTML = '<label class="elbl">Emoji</label>';
   emojiField.appendChild(buildEmojiPicker('cat-modal-emoji', currentEmoji));
   wrap.appendChild(emojiField);
+  /* hidden original name for edit */
+  var origInput = document.createElement('input');
+  origInput.type = 'hidden'; origInput.id = 'cat-modal-original';
+  origInput.value = nameVal || '';
+  wrap.appendChild(origInput);
   /* save button */
   var saveBtn = document.createElement('button'); saveBtn.className = 'esave';
   saveBtn.textContent = 'Guardar';
@@ -3432,31 +3430,19 @@ function openCatModal(titleText, nameVal, currentEmoji, onSave) {
 }
 
 function openAddCat() {
-  openCatModal('Nueva Categoria', '', null, function() {
-    var name  = (document.getElementById('cat-modal-name')  || {}).value || '';
-    var emoji = (document.getElementById('cat-modal-emoji') || {}).value || '&#x1F370;';
-    if (!name.trim()) { alert('Por favor ingresa un nombre.'); return; }
-    if (CE[name]) { alert('Esta categoria ya existe.'); return; }
-    CE[name] = emoji;
-    saveCatsToDB();
-    document.getElementById('cat-overlay').classList.remove('open');
-    renderMgrTab('categories');
-    document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
-    updateCatDropdowns();
-  });
+  openCatModal('Nueva Categoria', '', null, saveNewCat);
 }
 
 function saveNewCat() {
-  var name  = (document.getElementById('new-cat-name') || {}).value || '';
-  var emoji = (document.getElementById('new-cat-emoji') || {}).value || '&#x1F370;';
+  var name  = (document.getElementById('cat-modal-name')  || {}).value || '';
+  var emoji = (document.getElementById('cat-modal-emoji') || {}).value || '&#x1F370;';
   if (!name.trim()) { alert('Por favor ingresa un nombre.'); return; }
   if (CE[name]) { alert('Esta categoria ya existe.'); return; }
   CE[name] = emoji;
   saveCatsToDB();
-  document.getElementById('add-overlay').classList.remove('open');
+  document.getElementById('cat-overlay').classList.remove('open');
   renderMgrTab('categories');
   document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
-  /* update all category dropdowns */
   updateCatDropdowns();
 }
 
@@ -3492,18 +3478,17 @@ function openEditCat(name, emoji) {
 }
 
 function saveEditCat() {
-  var oldName = (document.getElementById('edit-cat-original') || {}).value || '';
-  var newName = (document.getElementById('edit-cat-name')     || {}).value || '';
-  var emoji   = (document.getElementById('edit-cat-emoji')    || {}).value || '&#x1F370;';
+  var oldName = (document.getElementById('cat-modal-original') || {}).value || '';
+  var newName = (document.getElementById('cat-modal-name')     || {}).value || '';
+  var emoji   = (document.getElementById('cat-modal-emoji')    || {}).value || '&#x1F370;';
   if (!newName.trim()) { alert('Por favor ingresa un nombre.'); return; }
   if (newName !== oldName) {
-    /* rename: update all products that used old category */
-    products.forEach(function(p){ if (p.cat === oldName) { p.cat = newName; saveProductToDB(p); } });
+    products.forEach(function(p){ if (p.cat===oldName){ p.cat=newName; saveProductToDB(p); } });
     delete CE[oldName];
   }
   CE[newName] = emoji;
   saveCatsToDB();
-  document.getElementById('edit-overlay').classList.remove('open');
+  document.getElementById('cat-overlay').classList.remove('open');
   renderMgrTab('categories');
   document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
   updateCatDropdowns();
