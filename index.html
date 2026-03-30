@@ -2006,7 +2006,7 @@ to{transform:translateY(0);opacity:1}
   position:relative;
   overflow:hidden
 }
-.ppl img{width:100%;height:100%;object-fit:cover}
+
 .php{
   display:flex;
   flex-direction:column;
@@ -2749,51 +2749,50 @@ function showPP(prevId, src) {
   var container = document.getElementById(prevId);
   container.style.position = 'relative';
   container.innerHTML = '';
-  /* px offset from center of container, scale multiplier */
   panState[prevId] = { x:0, y:0, scale:1, dragging:false, startX:0, startY:0, startPanX:0, startPanY:0 };
 
   var img = document.createElement('img');
   img.src = src;
-  /*
-   * Key fix: anchor the image at the CENTER of the container, not top-left.
-   * translate(-50%,-50%) puts the img's own top-left at center, then our
-   * JS translate(s.x, s.y) pans it and scale() zooms around that center.
-   * This makes the canvas snapshot trivially correct.
-   */
-  img.style.cssText = 'position:absolute;left:50%;top:50%;transform-origin:0 0;cursor:grab;user-select:none;-webkit-user-select:none;max-width:none;';
+  img.style.cssText = 'position:absolute;cursor:grab;user-select:none;-webkit-user-select:none;transform-origin:center center;';
   img.onerror = function(){ container.innerHTML = '<div class="php"><div class="php-icon">&#x1F4F7;</div></div>'; };
 
-  function renderedSize() {
-    /* actual pixel size of the image as rendered (before our JS transform) */
-    var cw = container.offsetWidth;
-    var nat = img.naturalWidth || 1;
-    var rw = cw;          /* image fills container width at scale=1 */
-    var rh = (img.naturalHeight / nat) * cw;
-    return { w: rw, h: rh };
+  /*
+   * "cover" baseline: compute the size and offset that makes the image
+   * fill the container exactly the same way object-fit:cover would.
+   * This is our scale=1, x=0, y=0 reference point.
+   */
+  function coverBase() {
+    var cw = container.offsetWidth, ch = container.offsetHeight;
+    var nw = img.naturalWidth  || cw;
+    var nh = img.naturalHeight || ch;
+    var scale = Math.max(cw / nw, ch / nh); /* cover scale */
+    var bw = nw * scale, bh = nh * scale;
+    return { scale: scale, w: bw, h: bh, cw: cw, ch: ch, nw: nw, nh: nh };
   }
 
   function applyT() {
-    var s = panState[prevId];
-    var r = renderedSize();
-    /*
-     * CSS origin is (left:50%, top:50%) = container center.
-     * translate(-r.w/2, -r.h/2) centers the image at scale 1.
-     * Then s.x / s.y pan, s.scale zooms around that same origin.
-     */
-    img.style.width = renderedSize().w + 'px'; /* explicit px so scale works cleanly */
-    img.style.transform =
-      'translate(calc(-50% + '+s.x+'px), calc(-50% + '+s.y+'px)) scale('+s.scale+')';
+    var s  = panState[prevId];
+    var b  = coverBase();
+    var totalScale = b.scale * s.scale;
+    var w = b.nw * totalScale, h = b.nh * totalScale;
+    /* center the image in the container, then apply pan */
+    var left = (b.cw - w) / 2 + s.x;
+    var top  = (b.ch - h) / 2 + s.y;
+    img.style.width  = w + 'px';
+    img.style.height = h + 'px';
+    img.style.left   = left + 'px';
+    img.style.top    = top  + 'px';
+    img.style.transform = ''; /* no CSS transform — position via left/top */
   }
 
   function clamp() {
     var s = panState[prevId];
-    var cw = container.offsetWidth, ch = container.offsetHeight;
-    var r  = renderedSize();
-    /* scaled rendered size */
-    var sw = r.w * s.scale, sh = r.h * s.scale;
-    /* maximum pan so image never shows gap inside the container */
-    var maxX = Math.max(0, (sw - cw) / 2);
-    var maxY = Math.max(0, (sh - ch) / 2);
+    var b = coverBase();
+    var totalScale = b.scale * s.scale;
+    var w = b.nw * totalScale, h = b.nh * totalScale;
+    /* don't allow panning to reveal empty space */
+    var maxX = Math.max(0, (w - b.cw) / 2);
+    var maxY = Math.max(0, (h - b.ch) / 2);
     s.x = Math.max(-maxX, Math.min(maxX, s.x));
     s.y = Math.max(-maxY, Math.min(maxY, s.y));
   }
@@ -2809,7 +2808,7 @@ function showPP(prevId, src) {
   img.addEventListener('touchmove',  function(e){ onMove(e.touches[0].clientX,e.touches[0].clientY); e.preventDefault(); },{passive:false});
   img.addEventListener('touchend',   onUp);
 
-  img.onload = function() { applyT(); }; /* set width after natural dims known */
+  img.onload = function() { applyT(); };
   container.appendChild(img);
 
   /* hint — fades after 2s */
@@ -2841,42 +2840,26 @@ function showPP(prevId, src) {
   container.appendChild(clr);
 
   /*
-   * Snapshot: draw exactly what is visible in the container onto a canvas.
-   *
-   * The visible region in image-space is determined by inverting the CSS
-   * transform we applied:
-   *   rendered image size at scale 1 = (rw, rh)
-   *   after scale s.scale            = (rw*sc, rh*sc)
-   *   image center sits at container center + (s.x, s.y)
-   *
-   * So the top-left corner of the container maps to image pixel:
-   *   srcX = (naturalWidth  / rw) * ( (rw*sc - cw)/2 - s.x ) / sc * (1/sc) ... simplified:
-   *
-   * Let's think in natural-image coordinates:
-   *   factor = naturalWidth / (rw * sc)   (natural px per rendered-scaled px)
-   *   visibleLeft in natural px = factor * ( (rw*sc - cw)/2 - s.x )
-   *   visibleTop  in natural px = (naturalHeight/(rh*sc)) * ( (rh*sc - ch)/2 - s.y )
-   *   visibleW    in natural px = factor * cw
-   *   visibleH    in natural px = (naturalHeight/(rh*sc)) * ch
+   * Snapshot: draw exactly the visible rectangle of the container.
+   * The image is positioned via left/top/width/height (no CSS transform),
+   * so we just read those values off the element directly.
    */
   container._getSnapshot = function() {
-    var s  = panState[prevId];
     var cw = container.offsetWidth, ch = container.offsetHeight;
-    var r  = renderedSize();         /* rendered w/h at scale=1 */
-    var sc = s.scale;
-    var nw = img.naturalWidth,  nh = img.naturalHeight;
+    var iLeft = parseFloat(img.style.left)  || 0;
+    var iTop  = parseFloat(img.style.top)   || 0;
+    var iW    = parseFloat(img.style.width)  || img.offsetWidth;
+    var iH    = parseFloat(img.style.height) || img.offsetHeight;
 
-    /* how many natural px correspond to 1 rendered-scaled px */
-    var fx = nw / (r.w * sc);
-    var fy = nh / (r.h * sc);
+    /* what portion of the natural image maps to the container's visible area */
+    var scaleX = img.naturalWidth  / iW;
+    var scaleY = img.naturalHeight / iH;
 
-    /* top-left of the visible window in natural image coordinates */
-    var srcX = fx * ((r.w * sc - cw) / 2 - s.x);
-    var srcY = fy * ((r.h * sc - ch) / 2 - s.y);
-    var srcW = fx * cw;
-    var srcH = fy * ch;
+    var srcX = (-iLeft) * scaleX;
+    var srcY = (-iTop)  * scaleY;
+    var srcW = cw * scaleX;
+    var srcH = ch * scaleY;
 
-    /* output canvas at 2× for retina */
     var canvas = document.createElement('canvas');
     canvas.width  = cw * 2;
     canvas.height = ch * 2;
