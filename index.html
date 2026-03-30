@@ -2188,7 +2188,7 @@ to{transform:translateY(0);opacity:1}
   #dt-mgr-content { flex:1; padding:32px 48px; min-width:0; }
 
   /* ── Auth on desktop ──────────────────────────── */
-  #auth-screen { align-items:center; justify-content:center; }
+  #auth-screen { align-items:center; justify-content:center; animation:none !important; }
   #auth-screen .auth-card { max-width:420px; }
 
   /* ── User pill repositioned ───────────────────── */
@@ -2848,13 +2848,17 @@ function goTo(s){
 /* ── Show auth wall with back button ─────────── */
 function showAuthWall() {
   var backBtn = document.getElementById('auth-back-btn');
-  if (backBtn) backBtn.style.display = 'block';
-  document.getElementById('auth-screen').style.display = 'flex';
+  if (backBtn) backBtn.style.display = IS_DESKTOP ? 'none' : 'block';
+  var authScr = document.getElementById('auth-screen');
+  if (authScr) {
+    authScr.style.cssText = 'display:flex !important;';
+  }
 }
 
 /* ── Close auth wall (go back to browsing) ────── */
 function closeAuthWall() {
-  document.getElementById('auth-screen').style.display = 'none';
+  var authScr = document.getElementById('auth-screen');
+  if (authScr) authScr.style.cssText = 'display:none !important;';
   var backBtn = document.getElementById('auth-back-btn');
   if (backBtn) backBtn.style.display = 'none';
 }
@@ -3134,6 +3138,8 @@ function renderMgrTab(tab){
     var ph=products.map(function(p){var iH=p.photo?'<img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover">':'<span style="font-size:20px">'+p.icon+'</span>';var skH='<div class="stk-btns"><button class="stk-btn'+(p.stock==='in'?' stk-in':'')+'" onclick="setStock('+p.id+',\'in\')">'+t('in_lbl')+'</button><button class="stk-btn'+(p.stock==='low'?' stk-low':'')+'" onclick="setStock('+p.id+',\'low\')">'+t('low_lbl')+'</button><button class="stk-btn'+(p.stock==='out'?' stk-out':'')+'" onclick="setStock('+p.id+',\'out\')">'+t('out_lbl')+'</button></div>';return '<div class="pad-card"><div class="pad-img">'+iH+'</div><div style="flex:1"><div style="font-weight:600;font-size:14px;color:var(--text)">'+p.name+'</div><div style="font-size:12px;color:var(--muted)">'+p.cat+(p.featured?' · Destacado':'')+(p.ratings.length?' · &#x2B50;'+p.avgRating.toFixed(1):'')+'</div>'+(p.allergens&&p.allergens.length?'<div style="font-size:11px;color:var(--muted)">&#x26A0;&#xFE0F; '+p.allergens.join(', ')+'</div>':'')+'<div class="pad-acts"><button class="pad-edit" onclick="openEdit('+p.id+')">&#x270F;&#xFE0F;</button><button class="pad-del" onclick="delProd('+p.id+')">&#x1F5D1;</button></div>'+skH+'</div><div style="font-size:14px;font-weight:600;color:var(--pink)">$'+p.price.toFixed(2)+'</div></div>';}).join('');
     el.innerHTML='<button class="add-prod-btn" onclick="openAddMod()">'+t('add_product')+'</button>'+ph;
   } else if(tab==='categories'){
+    /* if CE is empty (DB not loaded yet), use defaults */
+    if (!Object.keys(CE).length) CE = Object.assign({}, CE_DEFAULT);
     var addBtn = document.createElement('button');
     addBtn.className = 'add-prod-btn';
     addBtn.textContent = '+ Anadir Categoria';
@@ -3645,7 +3651,8 @@ function loadUserRole(uid, displayName) {
 
 /* ── After successful login ──────────────────── */
 function onAuthSuccess() {
-  document.getElementById('auth-screen').style.display = 'none';
+  var authScr = document.getElementById('auth-screen');
+  if (authScr) authScr.style.cssText = 'display:none !important;';
   var backBtn = document.getElementById('auth-back-btn');
   if (backBtn) backBtn.style.display = 'none';
   applyRoleUI();
@@ -4070,6 +4077,9 @@ function initDesktop() {
     if (dtLayout) dtLayout.style.display = 'flex';
     if (mobileNav) mobileNav.style.display = 'none';
     mobileScreens.forEach(function(s){ s.style.display='none'; });
+    /* hide auth-screen on desktop - it will be shown via showAuthWall() when needed */
+    var authScr = document.getElementById('auth-screen');
+    if (authScr) authScr.style.display = 'none';
     var splash = document.getElementById('splash');
     if (splash) { splash.style.animationDuration='0.1s'; splash.style.animationDelay='1s'; }
     dtRenderNav();
