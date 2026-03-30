@@ -4505,11 +4505,17 @@ function dtMgrTab(btn, tab) {
   if (cC){cC.destroy();cC=null;} if(ptsC){ptsC.destroy();ptsC=null;}
   var el = document.getElementById('dt-mgr-content');
   if (!el) return;
+
+  /* Render directly into dt-mgr-content by temporarily swapping IDs
+     so renderMgrTab writes straight into the desktop element.
+     This preserves all DOM event listeners (no innerHTML copy). */
   var orig = document.getElementById('mgr-content');
   if (orig) {
+    orig.id = 'mgr-content-hidden'; /* hide original */
+    el.id = 'mgr-content';          /* give desktop el the expected id */
     renderMgrTab(tab);
-    el.innerHTML = orig.innerHTML;
-    orig.innerHTML = '';
+    el.id = 'dt-mgr-content';       /* restore ids */
+    orig.id = 'mgr-content';
   }
 }
 
