@@ -2466,6 +2466,13 @@ to{transform:translateY(0);opacity:1}
   <div class="feat-row" onclick="document.getElementById('add-featured').checked=!document.getElementById('add-featured').checked"><input type="checkbox" id="add-featured"><label data-i18n="featured"></label><span data-i18n="home_page"></span></div>
   <button class="esave" onclick="saveNewProduct()" data-i18n="add_product"></button></div>
 </div>
+<!-- ══ CATEGORY MODAL ════════════════════════════════════════ -->
+<div class="modal-overlay" id="cat-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="edit-modal" id="cat-modal-wrap">
+    <!-- built dynamically -->
+  </div>
+</div>
+
 <div class="modal-overlay" id="pm-overlay" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="edit-modal"><button class="modal-close" onclick="document.getElementById('pm-overlay').classList.remove('open')">&#x2715;</button><span class="modal-handle"></span>
   <div style="font-family:Georgia,serif;font-size:20px;color:var(--text);margin-bottom:16px;" data-i18n="add_pm_modal"></div>
@@ -2573,32 +2580,53 @@ function buildEmojiPicker(inputId, currentEmoji) {
   return wrap;
 }
 
-function openAddCat() {
-  var overlay = document.getElementById('add-overlay');
-  var wrap = overlay.querySelector('.edit-modal');
-  /* clear and build with DOM */
+function openCatModal(titleText, nameVal, currentEmoji, onSave) {
+  var overlay = document.getElementById('cat-overlay');
+  var wrap    = document.getElementById('cat-modal-wrap');
   wrap.innerHTML = '';
+  /* close button */
   var closeBtn = document.createElement('button');
   closeBtn.className = 'modal-close'; closeBtn.innerHTML = '&#x2715;';
   closeBtn.onclick = function(){ overlay.classList.remove('open'); };
   wrap.appendChild(closeBtn);
+  /* handle */
   var handle = document.createElement('span'); handle.className = 'modal-handle';
   wrap.appendChild(handle);
+  /* title */
   var title = document.createElement('div');
   title.style.cssText = 'font-size:20px;font-weight:600;color:var(--text);margin-bottom:16px';
-  title.textContent = 'Nueva Categoria';
+  title.textContent = titleText;
   wrap.appendChild(title);
+  /* name field */
   var nameField = document.createElement('div'); nameField.className = 'ef';
-  nameField.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="new-cat-name" placeholder="Ej. Macarons">';
+  nameField.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="cat-modal-name" placeholder="Ej. Macarons" value="'+(nameVal||'')+'">';
   wrap.appendChild(nameField);
+  /* emoji picker */
   var emojiField = document.createElement('div'); emojiField.className = 'ef';
   emojiField.innerHTML = '<label class="elbl">Emoji</label>';
-  emojiField.appendChild(buildEmojiPicker('new-cat-emoji'));
+  emojiField.appendChild(buildEmojiPicker('cat-modal-emoji', currentEmoji));
   wrap.appendChild(emojiField);
+  /* save button */
   var saveBtn = document.createElement('button'); saveBtn.className = 'esave';
-  saveBtn.textContent = 'Guardar Categoria'; saveBtn.onclick = saveNewCat;
+  saveBtn.textContent = 'Guardar';
+  saveBtn.onclick = function() { onSave(); };
   wrap.appendChild(saveBtn);
   overlay.classList.add('open');
+}
+
+function openAddCat() {
+  openCatModal('Nueva Categoria', '', null, function() {
+    var name  = (document.getElementById('cat-modal-name')  || {}).value || '';
+    var emoji = (document.getElementById('cat-modal-emoji') || {}).value || '&#x1F370;';
+    if (!name.trim()) { alert('Por favor ingresa un nombre.'); return; }
+    if (CE[name]) { alert('Esta categoria ya existe.'); return; }
+    CE[name] = emoji;
+    saveCatsToDB();
+    document.getElementById('cat-overlay').classList.remove('open');
+    renderMgrTab('categories');
+    document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
+    updateCatDropdowns();
+  });
 }
 
 function saveNewCat() {
@@ -2616,54 +2644,22 @@ function saveNewCat() {
 }
 
 function openEditCat(name, emoji) {
-  var overlay = document.getElementById('edit-overlay');
-  var wrap = overlay.querySelector('.edit-modal');
-  wrap.innerHTML = '';
-  var closeBtn = document.createElement('button');
-  closeBtn.className = 'modal-close'; closeBtn.innerHTML = '&#x2715;';
-  closeBtn.onclick = function(){ overlay.classList.remove('open'); };
-  wrap.appendChild(closeBtn);
-  var handle = document.createElement('span'); handle.className = 'modal-handle';
-  wrap.appendChild(handle);
-  var title = document.createElement('div');
-  title.style.cssText = 'font-size:20px;font-weight:600;color:var(--text);margin-bottom:16px';
-  title.textContent = 'Editar Categoria';
-  wrap.appendChild(title);
-  var nameField = document.createElement('div'); nameField.className = 'ef';
-  nameField.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="edit-cat-name" value="'+name+'">';
-  wrap.appendChild(nameField);
-  var emojiField = document.createElement('div'); emojiField.className = 'ef';
-  emojiField.innerHTML = '<label class="elbl">Emoji</label>';
-  var picker = buildEmojiPicker('edit-cat-emoji', emoji);
-  emojiField.appendChild(picker);
-  wrap.appendChild(emojiField);
-  var orig = document.createElement('input');
-  orig.type='hidden'; orig.id='edit-cat-original'; orig.value=name;
-  wrap.appendChild(orig);
-  var saveBtn = document.createElement('button'); saveBtn.className = 'esave';
-  saveBtn.textContent = 'Guardar Cambios'; saveBtn.onclick = saveEditCat;
-  wrap.appendChild(saveBtn);
-  overlay.classList.add('open');
+  openCatModal('Editar Categoria', name, emoji, function() {
+    var newName  = (document.getElementById('cat-modal-name')  || {}).value || '';
+    var newEmoji = (document.getElementById('cat-modal-emoji') || {}).value || '&#x1F370;';
+    if (!newName.trim()) { alert('Por favor ingresa un nombre.'); return; }
+    if (newName !== name) {
+      products.forEach(function(p){ if (p.cat===name){ p.cat=newName; saveProductToDB(p); } });
+      delete CE[name];
+    }
+    CE[newName] = newEmoji;
+    saveCatsToDB();
+    document.getElementById('cat-overlay').classList.remove('open');
+    renderMgrTab('categories');
+    document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
+    updateCatDropdowns();
+  });
 }
-
-function saveEditCat() {
-  var oldName = (document.getElementById('edit-cat-original') || {}).value || '';
-  var newName = (document.getElementById('edit-cat-name')     || {}).value || '';
-  var emoji   = (document.getElementById('edit-cat-emoji')    || {}).value || '&#x1F370;';
-  if (!newName.trim()) { alert('Por favor ingresa un nombre.'); return; }
-  if (newName !== oldName) {
-    /* rename: update all products that used old category */
-    products.forEach(function(p){ if (p.cat === oldName) { p.cat = newName; saveProductToDB(p); } });
-    delete CE[oldName];
-  }
-  CE[newName] = emoji;
-  saveCatsToDB();
-  document.getElementById('edit-overlay').classList.remove('open');
-  renderMgrTab('categories');
-  document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
-  updateCatDropdowns();
-}
-
 function deleteCat(name) {
   var count = products.filter(function(p){ return p.cat===name; }).length;
   var msg = count > 0
@@ -3401,32 +3397,53 @@ function selectCatEmoji(el, em, inputId) {
   if (inp) inp.value = em;
 }
 
-function openAddCat() {
-  var overlay = document.getElementById('add-overlay');
-  var wrap = overlay.querySelector('.edit-modal');
-  /* clear and build with DOM */
+function openCatModal(titleText, nameVal, currentEmoji, onSave) {
+  var overlay = document.getElementById('cat-overlay');
+  var wrap    = document.getElementById('cat-modal-wrap');
   wrap.innerHTML = '';
+  /* close button */
   var closeBtn = document.createElement('button');
   closeBtn.className = 'modal-close'; closeBtn.innerHTML = '&#x2715;';
   closeBtn.onclick = function(){ overlay.classList.remove('open'); };
   wrap.appendChild(closeBtn);
+  /* handle */
   var handle = document.createElement('span'); handle.className = 'modal-handle';
   wrap.appendChild(handle);
+  /* title */
   var title = document.createElement('div');
   title.style.cssText = 'font-size:20px;font-weight:600;color:var(--text);margin-bottom:16px';
-  title.textContent = 'Nueva Categoria';
+  title.textContent = titleText;
   wrap.appendChild(title);
+  /* name field */
   var nameField = document.createElement('div'); nameField.className = 'ef';
-  nameField.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="new-cat-name" placeholder="Ej. Macarons">';
+  nameField.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="cat-modal-name" placeholder="Ej. Macarons" value="'+(nameVal||'')+'">';
   wrap.appendChild(nameField);
+  /* emoji picker */
   var emojiField = document.createElement('div'); emojiField.className = 'ef';
   emojiField.innerHTML = '<label class="elbl">Emoji</label>';
-  emojiField.appendChild(buildEmojiPicker('new-cat-emoji'));
+  emojiField.appendChild(buildEmojiPicker('cat-modal-emoji', currentEmoji));
   wrap.appendChild(emojiField);
+  /* save button */
   var saveBtn = document.createElement('button'); saveBtn.className = 'esave';
-  saveBtn.textContent = 'Guardar Categoria'; saveBtn.onclick = saveNewCat;
+  saveBtn.textContent = 'Guardar';
+  saveBtn.onclick = function() { onSave(); };
   wrap.appendChild(saveBtn);
   overlay.classList.add('open');
+}
+
+function openAddCat() {
+  openCatModal('Nueva Categoria', '', null, function() {
+    var name  = (document.getElementById('cat-modal-name')  || {}).value || '';
+    var emoji = (document.getElementById('cat-modal-emoji') || {}).value || '&#x1F370;';
+    if (!name.trim()) { alert('Por favor ingresa un nombre.'); return; }
+    if (CE[name]) { alert('Esta categoria ya existe.'); return; }
+    CE[name] = emoji;
+    saveCatsToDB();
+    document.getElementById('cat-overlay').classList.remove('open');
+    renderMgrTab('categories');
+    document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
+    updateCatDropdowns();
+  });
 }
 
 function saveNewCat() {
