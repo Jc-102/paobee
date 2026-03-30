@@ -2025,6 +2025,13 @@ to{transform:translateY(0);opacity:1}
 .pan-zoom{position:absolute;bottom:6px;right:6px;display:flex;flex-direction:column;gap:4px}
 .pan-zoom-btn{background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:26px;height:26px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700}
 
+/* ────────── CATEGORY PILLS ─────────────────────────────────── */
+.cat-pill-row{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 12px}
+.cat-pill{display:flex;align-items:center;gap:6px;background:var(--pl);border:1.5px solid var(--pm);border-radius:50px;padding:7px 12px;font-size:13px;font-weight:600;color:var(--pink);cursor:pointer}
+.cat-pill-edit{background:none;border:none;font-size:12px;cursor:pointer;color:var(--pink);padding:0 0 0 4px;line-height:1}
+.cat-pill-add{background:var(--pink);color:#fff;border:none;border-radius:50px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif}
+.cat-sec-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;padding:14px 16px 8px;display:flex;align-items:center;justify-content:space-between}
+
 /* ────────── AUTH SCREENS ──────────────────────────────────── */
 #auth-screen{position:fixed;inset:0;background:var(--cream);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;animation:fadeIn .3s ease}
 .auth-logo{font-family:Georgia,serif;font-size:42px;color:var(--pink);margin-bottom:6px;text-align:center}
@@ -2421,6 +2428,11 @@ to{transform:translateY(0);opacity:1}
   <div class="mgr-tabs"><button class="mgr-tab active" onclick="mgrTab(this,'orders')" data-i18n="orders_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'products')" data-i18n="products_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'schedule')" data-i18n="schedule_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'analytics')" data-i18n="analytics_tab"></button></div>
   <div id="mgr-content"></div>
 </div>
+<!-- ══ CATEGORY MODAL ════════════════════════════════════════ -->
+<div class="modal-overlay" id="cat-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="edit-modal" id="cat-modal-body"></div>
+</div>
+
 <nav class="bnav">
   <div class="nav-item active" id="nav-home" onclick="goTo('home')"><div class="nav-icon">&#x1F3E0;</div><div class="nav-lbl" data-i18n="home"></div><div class="nav-dot"></div></div>
   <div class="nav-item" id="nav-shop" onclick="goTo('shop')"><div class="nav-icon">&#x1F9C1;</div><div class="nav-lbl" data-i18n="shop"></div><div class="nav-dot"></div></div>
@@ -2558,6 +2570,142 @@ function setLang(nl){
 /* Save categories to Supabase categories table */
 
 /* Load categories from Supabase */
+
+/* ══════════════════════════════════════════════
+   CATEGORY MANAGEMENT
+   ══════════════════════════════════════════════ */
+
+var EMOJIS = ['&#x1F9C1;','&#x1F36A;','&#x1F7EB;','&#x1F382;','&#x1F369;',
+              '&#x1F962;','&#x1F36C;','&#x1F370;','&#x1F36B;','&#x1F9C0;',
+              '&#x1F36D;','&#x1F36E;','&#x1F375;','&#x1F967;','&#x1F9C6;',
+              '&#x1F35E;','&#x1F950;','&#x1F9C8;'];
+
+/* openCatModal(existingName, existingEmoji)
+   - existingName='' means ADD mode
+   - existingName set means EDIT mode */
+function openCatModal(existingName, existingEmoji) {
+  var isEdit = existingName !== '';
+  var overlay = document.getElementById('cat-overlay');
+  var body    = document.getElementById('cat-modal-body');
+  body.innerHTML = '';
+
+  /* close btn */
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close';
+  closeBtn.innerHTML = '&#x2715;';
+  closeBtn.onclick = function(){ overlay.classList.remove('open'); };
+  body.appendChild(closeBtn);
+
+  /* handle */
+  var handle = document.createElement('span');
+  handle.className = 'modal-handle';
+  body.appendChild(handle);
+
+  /* title */
+  var title = document.createElement('div');
+  title.style.cssText = 'font-size:20px;font-weight:600;color:var(--text);margin-bottom:16px';
+  title.textContent = isEdit ? 'Editar Categoria' : 'Nueva Categoria';
+  body.appendChild(title);
+
+  /* name input */
+  var nameWrap = document.createElement('div');
+  nameWrap.className = 'ef';
+  nameWrap.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="cm-name" placeholder="Ej. Macarons" value="' + (existingName||'') + '">';
+  body.appendChild(nameWrap);
+
+  /* emoji picker */
+  var emojiLabel = document.createElement('label');
+  emojiLabel.className = 'elbl';
+  emojiLabel.textContent = 'Emoji';
+  emojiLabel.style.display = 'block';
+  emojiLabel.style.marginBottom = '8px';
+  body.appendChild(emojiLabel);
+
+  var selectedEmoji = existingEmoji || EMOJIS[0];
+  var hiddenEmoji = document.createElement('input');
+  hiddenEmoji.type = 'hidden';
+  hiddenEmoji.id = 'cm-emoji';
+  hiddenEmoji.value = selectedEmoji;
+  body.appendChild(hiddenEmoji);
+
+  var grid = document.createElement('div');
+  grid.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px';
+  EMOJIS.forEach(function(em) {
+    var btn = document.createElement('div');
+    btn.style.cssText = 'font-size:24px;width:40px;height:40px;border-radius:10px;'
+      + 'display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid '
+      + (em === selectedEmoji ? 'var(--pink)' : 'var(--border)');
+    btn.innerHTML = em;
+    btn.onclick = function() {
+      grid.querySelectorAll('div').forEach(function(d){ d.style.borderColor='var(--border)'; });
+      btn.style.borderColor = 'var(--pink)';
+      hiddenEmoji.value = em;
+    };
+    grid.appendChild(btn);
+  });
+  body.appendChild(grid);
+
+  /* delete button (edit mode only) */
+  if (isEdit) {
+    var delBtn = document.createElement('button');
+    delBtn.style.cssText = 'width:100%;background:none;border:1.5px solid #C0392B;color:#C0392B;'
+      + 'border-radius:12px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;'
+      + 'font-family:sans-serif;margin-bottom:10px';
+    var prodCount = products.filter(function(p){return p.cat===existingName;}).length;
+    delBtn.textContent = 'Eliminar' + (prodCount ? ' (' + prodCount + ' productos quedan sin categoria)' : '');
+    delBtn.onclick = function() {
+      if (!confirm('Eliminar la categoria "' + existingName + '"?')) return;
+      delete CE[existingName];
+      saveCatsToDB();
+      overlay.classList.remove('open');
+      renderMgrTab('products');
+      document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});
+    };
+    body.appendChild(delBtn);
+  }
+
+  /* save button */
+  var saveBtn = document.createElement('button');
+  saveBtn.className = 'esave';
+  saveBtn.textContent = 'Guardar';
+  saveBtn.onclick = function() {
+    var newName  = (document.getElementById('cm-name')  ||{}).value.trim();
+    var newEmoji = (document.getElementById('cm-emoji') ||{}).value;
+    if (!newName) { alert('Por favor ingresa un nombre.'); return; }
+    if (!isEdit && CE[newName]) { alert('Esta categoria ya existe.'); return; }
+    /* rename: update products that had old category */
+    if (isEdit && newName !== existingName) {
+      products.forEach(function(p){ if(p.cat===existingName) p.cat=newName; });
+      delete CE[existingName];
+    }
+    CE[newName] = newEmoji;
+    saveCatsToDB();
+    overlay.classList.remove('open');
+    renderMgrTab('products');
+    document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});
+  };
+  body.appendChild(saveBtn);
+
+  overlay.classList.add('open');
+}
+
+function saveCatsToDB() {
+  if (!currentUser) return;
+  var rows = Object.entries(CE).map(function(e){ return {name:e[0], emoji:e[1]}; });
+  /* delete all then insert fresh */
+  sb.from('categories').delete().neq('name','__none__').then(function() {
+    if (rows.length) sb.from('categories').insert(rows);
+  });
+}
+
+function loadCatsFromDB() {
+  sb.from('categories').select('*').order('name').then(function(res) {
+    if (res.data && res.data.length) {
+      CE = {};
+      res.data.forEach(function(r){ CE[r.name] = r.emoji; });
+    }
+  });
+}
 
 /* ══════════════════════════════════════════════
    INIT – runs on page load
@@ -3001,8 +3149,63 @@ function renderMgrTab(tab){
     }).join('');
     el.innerHTML='<div style="padding:0 16px 12px"><div style="display:flex;gap:5px;flex-wrap:wrap">'+sh+'</div></div>'+oh;
   } else if(tab==='products'){
-    var ph=products.map(function(p){var iH=p.photo?'<img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover">':'<span style="font-size:20px">'+p.icon+'</span>';var skH='<div class="stk-btns"><button class="stk-btn'+(p.stock==='in'?' stk-in':'')+'" onclick="setStock('+p.id+',\'in\')">'+t('in_lbl')+'</button><button class="stk-btn'+(p.stock==='low'?' stk-low':'')+'" onclick="setStock('+p.id+',\'low\')">'+t('low_lbl')+'</button><button class="stk-btn'+(p.stock==='out'?' stk-out':'')+'" onclick="setStock('+p.id+',\'out\')">'+t('out_lbl')+'</button></div>';return '<div class="pad-card"><div class="pad-img">'+iH+'</div><div style="flex:1"><div style="font-weight:600;font-size:14px;color:var(--text)">'+p.name+'</div><div style="font-size:12px;color:var(--muted)">'+p.cat+(p.featured?' · Destacado':'')+(p.ratings.length?' · &#x2B50;'+p.avgRating.toFixed(1):'')+'</div>'+(p.allergens&&p.allergens.length?'<div style="font-size:11px;color:var(--muted)">&#x26A0;&#xFE0F; '+p.allergens.join(', ')+'</div>':'')+'<div class="pad-acts"><button class="pad-edit" onclick="openEdit('+p.id+')">&#x270F;&#xFE0F;</button><button class="pad-del" onclick="delProd('+p.id+')">&#x1F5D1;</button></div>'+skH+'</div><div style="font-size:14px;font-weight:600;color:var(--pink)">$'+p.price.toFixed(2)+'</div></div>';}).join('');
-    el.innerHTML='<button class="add-prod-btn" onclick="openAddMod()">'+t('add_product')+'</button>'+ph;
+    /* ── Category section ── */
+    el.innerHTML = '';
+    var catSec = document.createElement('div');
+    catSec.innerHTML = '<div class="cat-sec-title"><span>&#x1F3F7; Categorias</span></div>';
+    var pillRow = document.createElement('div');
+    pillRow.className = 'cat-pill-row';
+    Object.entries(CE).forEach(function(entry) {
+      var cName = entry[0], cEmoji = entry[1];
+      var pill = document.createElement('div');
+      pill.className = 'cat-pill';
+      pill.innerHTML = '<span>' + cEmoji + ' ' + cName + '</span>';
+      var editBtn = document.createElement('button');
+      editBtn.className = 'cat-pill-edit';
+      editBtn.innerHTML = '&#x270F;';
+      editBtn.title = 'Editar categoria';
+      editBtn.onclick = (function(n,e){ return function(ev){ ev.stopPropagation(); openCatModal(n,e); }; })(cName, cEmoji);
+      pill.appendChild(editBtn);
+      pillRow.appendChild(pill);
+    });
+    var addPillBtn = document.createElement('button');
+    addPillBtn.className = 'cat-pill-add';
+    addPillBtn.textContent = '+ Nueva';
+    addPillBtn.onclick = function() { openCatModal('', ''); };
+    pillRow.appendChild(addPillBtn);
+    catSec.appendChild(pillRow);
+    el.appendChild(catSec);
+
+    /* ── Products section ── */
+    var prodSec = document.createElement('div');
+    prodSec.innerHTML = '<div class="cat-sec-title"><span>Productos</span></div>';
+    el.appendChild(prodSec);
+    var addProdBtn = document.createElement('button');
+    addProdBtn.className = 'add-prod-btn';
+    addProdBtn.innerHTML = t('add_product');
+    addProdBtn.onclick = openAddMod;
+    el.appendChild(addProdBtn);
+    products.forEach(function(p) {
+      var iH = p.photo ? '<img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover">' : '<span style="font-size:20px">'+p.icon+'</span>';
+      var skH = '<div class="stk-btns">'
+        + '<button class="stk-btn'+(p.stock==='in'?' stk-in':'')+'" onclick="setStock('+p.id+',\'in\')">'+t('in_lbl')+'</button>'
+        + '<button class="stk-btn'+(p.stock==='low'?' stk-low':'')+'" onclick="setStock('+p.id+',\'low\')">'+t('low_lbl')+'</button>'
+        + '<button class="stk-btn'+(p.stock==='out'?' stk-out':'')+'" onclick="setStock('+p.id+',\'out\')">'+t('out_lbl')+'</button>'
+        + '</div>';
+      var card = document.createElement('div');
+      card.className = 'pad-card';
+      card.innerHTML = '<div class="pad-img">'+iH+'</div>'
+        + '<div style="flex:1">'
+        + '<div style="font-weight:600;font-size:14px;color:var(--text)">'+p.name+'</div>'
+        + '<div style="font-size:12px;color:var(--muted)">'+p.cat+(p.featured?' · Destacado':'')+(p.ratings.length?' · &#x2B50;'+p.avgRating.toFixed(1):'')+' </div>'
+        + (p.allergens&&p.allergens.length?'<div style="font-size:11px;color:var(--muted)">&#x26A0;&#xFE0F; '+p.allergens.join(', ')+'</div>':'')
+        + '<div class="pad-acts">'
+        + '<button class="pad-edit" onclick="openEdit('+p.id+')">&#x270F;&#xFE0F;</button>'
+        + '<button class="pad-del" onclick="delProd('+p.id+')">&#x1F5D1;</button>'
+        + '</div>'+skH+'</div>'
+        + '<div style="font-size:14px;font-weight:600;color:var(--pink)">$'+p.price.toFixed(2)+'</div>';
+      el.appendChild(card);
+    });
     } else if(tab==='schedule'){
     var DK=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     var DT={Mon:t('mon'),Tue:t('tue'),Wed:t('wed'),Thu:t('thu'),Fri:t('fri'),Sat:t('sat'),Sun:t('sun')};
@@ -3226,6 +3429,24 @@ function selectCatEmoji(el, em, inputId) {
 
 
 /* Load categories from Supabase */
+
+
+/* ══════════════════════════════════════════════
+   CATEGORY MANAGEMENT
+   ══════════════════════════════════════════════ */
+
+var EMOJIS = ['&#x1F9C1;','&#x1F36A;','&#x1F7EB;','&#x1F382;','&#x1F369;',
+              '&#x1F962;','&#x1F36C;','&#x1F370;','&#x1F36B;','&#x1F9C0;',
+              '&#x1F36D;','&#x1F36E;','&#x1F375;','&#x1F967;','&#x1F9C6;',
+              '&#x1F35E;','&#x1F950;','&#x1F9C8;'];
+
+/* openCatModal(existingName, existingEmoji)
+   - existingName='' means ADD mode
+   - existingName set means EDIT mode */
+
+
+
+
 
 
 /* ══════════════════════════════════════════════
@@ -3467,6 +3688,7 @@ function onAuthSuccess() {
   if (backBtn) backBtn.style.display = 'none';
   applyRoleUI();
   renderUserPill();
+  loadCatsFromDB();
   loadProductsFromDB();
   loadOrdersFromDB();
   loadLoyaltyFromDB();
