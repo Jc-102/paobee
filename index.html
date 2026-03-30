@@ -368,8 +368,8 @@ body.dark .bnav{background:rgba(26,17,24,0.97)}
 .pgrid{
   padding:4px 16px;
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px
+  grid-template-columns:1fr;
+  gap:16px
 }
 .pcard{
   background:var(--card);
@@ -381,12 +381,12 @@ body.dark .bnav{background:rgba(26,17,24,0.97)}
 }
 .pcard-img{
   width:100%;
-  height:130px;
+  height:220px;
   background:var(--pm);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:48px;
+  font-size:64px;
   overflow:hidden;
   position:relative
 }
@@ -428,9 +428,9 @@ body.dark .bnav{background:rgba(26,17,24,0.97)}
 }
 .pcard-name{
   font-family:Georgia,serif;
-  font-size:14px;
+  font-size:16px;
   font-weight:600;
-  margin-bottom:3px;
+  margin-bottom:4px;
   line-height:1.3;
   color:var(--text)
 }
@@ -2143,9 +2143,9 @@ to{transform:translateY(0);opacity:1}
   .dt-cat.active { background:var(--pink); color:#fff; border-color:var(--pink); }
 
   /* ── Product grid ─────────────────────────────── */
-  .dt-pgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; }
+  .dt-pgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
   .dt-pgrid .pcard { border-radius:20px; }
-  .dt-pgrid .pcard-img { height:160px; }
+  .dt-pgrid .pcard-img { height:240px; font-size:80px; }
 
   /* ── About section ────────────────────────────── */
   .dt-about { display:grid; grid-template-columns:1fr 1fr; gap:48px; padding:48px 64px; background:var(--card); margin:0 0 0 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); align-items:center; }
@@ -2338,6 +2338,7 @@ to{transform:translateY(0);opacity:1}
           <div style="font-family:Georgia,serif;font-size:18px;color:var(--text);margin-bottom:20px;padding:0 8px">Manager</div>
           <button class="dt-mgr-link active" id="dt-mgr-link-orders"   onclick="dtMgrTab(this,'orders')"   ><span class="dt-mgr-link-icon">&#x1F4CB;</span> Pedidos</button>
           <button class="dt-mgr-link"        id="dt-mgr-link-products" onclick="dtMgrTab(this,'products')" ><span class="dt-mgr-link-icon">&#x1F9C1;</span> Productos</button>
+          <button class="dt-mgr-link"        id="dt-mgr-link-categories" onclick="dtMgrTab(this,'categories')"><span class="dt-mgr-link-icon">&#x1F3F7;</span> Categorias</button>
           <button class="dt-mgr-link"        id="dt-mgr-link-schedule" onclick="dtMgrTab(this,'schedule')" ><span class="dt-mgr-link-icon">&#x1F4C5;</span> Horario</button>
           <button class="dt-mgr-link"        id="dt-mgr-link-analytics"onclick="dtMgrTab(this,'analytics')"><span class="dt-mgr-link-icon">&#x1F4CA;</span> Analiticas</button>
         </div>
@@ -2418,7 +2419,7 @@ to{transform:translateY(0);opacity:1}
 </div>
 <div id="screen-manager" class="screen">
   <div class="topbar"><span class="logo">Manager</span><span style="font-size:12px;color:var(--pink);background:var(--pl);padding:4px 10px;border-radius:50px;font-weight:600;">Admin</span></div>
-  <div class="mgr-tabs"><button class="mgr-tab active" onclick="mgrTab(this,'orders')" data-i18n="orders_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'products')" data-i18n="products_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'schedule')" data-i18n="schedule_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'analytics')" data-i18n="analytics_tab"></button></div>
+  <div class="mgr-tabs"><button class="mgr-tab active" onclick="mgrTab(this,'orders')" data-i18n="orders_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'products')" data-i18n="products_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'categories')">&#x1F3F7; Categorias</button><button class="mgr-tab" onclick="mgrTab(this,'schedule')" data-i18n="schedule_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'analytics')" data-i18n="analytics_tab"></button></div>
   <div id="mgr-content"></div>
 </div>
 <nav class="bnav">
@@ -2545,6 +2546,164 @@ function applyTranslations(){
 function setLang(nl){
   lang=nl;
 /* ══════════════════════════════════════════════
+   CATEGORY MANAGEMENT
+   ══════════════════════════════════════════════ */
+
+/* Common emoji options for categories */
+var CAT_EMOJIS = ['&#x1F9C1;','&#x1F36A;','&#x1F7EB;','&#x1F382;','&#x1F369;','&#x1F962;','&#x1F36C;','&#x1F370;','&#x1F36B;','&#x1F382;','&#x1F9C0;','&#x1F36D;','&#x1F36E;','&#x1F375;','&#x1F967;','&#x1F9C6;','&#x1F35E;','&#x1F950;'];
+
+function buildEmojiPicker(inputId, currentEmoji) {
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px';
+  var hidden = document.createElement('input');
+  hidden.type='hidden'; hidden.id=inputId; hidden.value=currentEmoji||CAT_EMOJIS[0];
+  CAT_EMOJIS.forEach(function(em) {
+    var div = document.createElement('div');
+    var isSelected = em === (currentEmoji||CAT_EMOJIS[0]);
+    div.style.cssText = 'font-size:24px;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid '+(isSelected?'var(--pink)':'var(--border)');
+    div.innerHTML = em;
+    div.onclick = function() {
+      wrap.querySelectorAll('div').forEach(function(e){ e.style.borderColor='var(--border)'; });
+      div.style.borderColor = 'var(--pink)';
+      hidden.value = em;
+    };
+    wrap.appendChild(div);
+  });
+  wrap.appendChild(hidden);
+  return wrap;
+}
+
+function openAddCat() {
+  var overlay = document.getElementById('add-overlay');
+  var wrap = overlay.querySelector('.edit-modal');
+  /* clear and build with DOM */
+  wrap.innerHTML = '';
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close'; closeBtn.innerHTML = '&#x2715;';
+  closeBtn.onclick = function(){ overlay.classList.remove('open'); };
+  wrap.appendChild(closeBtn);
+  var handle = document.createElement('span'); handle.className = 'modal-handle';
+  wrap.appendChild(handle);
+  var title = document.createElement('div');
+  title.style.cssText = 'font-size:20px;font-weight:600;color:var(--text);margin-bottom:16px';
+  title.textContent = 'Nueva Categoria';
+  wrap.appendChild(title);
+  var nameField = document.createElement('div'); nameField.className = 'ef';
+  nameField.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="new-cat-name" placeholder="Ej. Macarons">';
+  wrap.appendChild(nameField);
+  var emojiField = document.createElement('div'); emojiField.className = 'ef';
+  emojiField.innerHTML = '<label class="elbl">Emoji</label>';
+  emojiField.appendChild(buildEmojiPicker('new-cat-emoji'));
+  wrap.appendChild(emojiField);
+  var saveBtn = document.createElement('button'); saveBtn.className = 'esave';
+  saveBtn.textContent = 'Guardar Categoria'; saveBtn.onclick = saveNewCat;
+  wrap.appendChild(saveBtn);
+  overlay.classList.add('open');
+}
+
+function saveNewCat() {
+  var name  = (document.getElementById('new-cat-name') || {}).value || '';
+  var emoji = (document.getElementById('new-cat-emoji') || {}).value || '&#x1F370;';
+  if (!name.trim()) { alert('Por favor ingresa un nombre.'); return; }
+  if (CE[name]) { alert('Esta categoria ya existe.'); return; }
+  CE[name] = emoji;
+  saveCatsToDB();
+  document.getElementById('add-overlay').classList.remove('open');
+  renderMgrTab('categories');
+  document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
+  /* update all category dropdowns */
+  updateCatDropdowns();
+}
+
+function openEditCat(name, emoji) {
+  var overlay = document.getElementById('edit-overlay');
+  var wrap = overlay.querySelector('.edit-modal');
+  wrap.innerHTML = '';
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close'; closeBtn.innerHTML = '&#x2715;';
+  closeBtn.onclick = function(){ overlay.classList.remove('open'); };
+  wrap.appendChild(closeBtn);
+  var handle = document.createElement('span'); handle.className = 'modal-handle';
+  wrap.appendChild(handle);
+  var title = document.createElement('div');
+  title.style.cssText = 'font-size:20px;font-weight:600;color:var(--text);margin-bottom:16px';
+  title.textContent = 'Editar Categoria';
+  wrap.appendChild(title);
+  var nameField = document.createElement('div'); nameField.className = 'ef';
+  nameField.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="edit-cat-name" value="'+name+'">';
+  wrap.appendChild(nameField);
+  var emojiField = document.createElement('div'); emojiField.className = 'ef';
+  emojiField.innerHTML = '<label class="elbl">Emoji</label>';
+  var picker = buildEmojiPicker('edit-cat-emoji', emoji);
+  emojiField.appendChild(picker);
+  wrap.appendChild(emojiField);
+  var orig = document.createElement('input');
+  orig.type='hidden'; orig.id='edit-cat-original'; orig.value=name;
+  wrap.appendChild(orig);
+  var saveBtn = document.createElement('button'); saveBtn.className = 'esave';
+  saveBtn.textContent = 'Guardar Cambios'; saveBtn.onclick = saveEditCat;
+  wrap.appendChild(saveBtn);
+  overlay.classList.add('open');
+}
+
+function saveEditCat() {
+  var oldName = (document.getElementById('edit-cat-original') || {}).value || '';
+  var newName = (document.getElementById('edit-cat-name')     || {}).value || '';
+  var emoji   = (document.getElementById('edit-cat-emoji')    || {}).value || '&#x1F370;';
+  if (!newName.trim()) { alert('Por favor ingresa un nombre.'); return; }
+  if (newName !== oldName) {
+    /* rename: update all products that used old category */
+    products.forEach(function(p){ if (p.cat === oldName) { p.cat = newName; saveProductToDB(p); } });
+    delete CE[oldName];
+  }
+  CE[newName] = emoji;
+  saveCatsToDB();
+  document.getElementById('edit-overlay').classList.remove('open');
+  renderMgrTab('categories');
+  document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
+  updateCatDropdowns();
+}
+
+function deleteCat(name) {
+  var count = products.filter(function(p){ return p.cat===name; }).length;
+  var msg = count > 0
+    ? 'Hay ' + count + ' producto(s) en "' + name + '". Al eliminar la categoria esos productos quedaran sin categoria. Continuar?'
+    : 'Eliminar la categoria "' + name + '"?';
+  if (!confirm(msg)) return;
+  delete CE[name];
+  saveCatsToDB();
+  renderMgrTab('categories');
+  document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
+  updateCatDropdowns();
+}
+
+function updateCatDropdowns() {
+  /* update all select#edit-cat and select#add-cat in the DOM */
+  var opts = Object.keys(CE).map(function(c){ return '<option>'+c+'</option>'; }).join('');
+  ['edit-cat','add-cat'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = opts;
+  });
+}
+
+/* Save categories to Supabase categories table */
+function saveCatsToDB() {
+  if (!currentUser) return;
+  var rows = Object.entries(CE).map(function(e){ return {name:e[0], emoji:e[1]}; });
+  sb.from('categories').upsert(rows, {onConflict:'name'});
+}
+
+/* Load categories from Supabase */
+function loadCatsFromDB() {
+  sb.from('categories').select('*').order('name').then(function(res) {
+    if (res.data && res.data.length) {
+      CE = {};
+      res.data.forEach(function(row){ CE[row.name] = row.emoji; });
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════
    INIT – runs on page load
    ══════════════════════════════════════════════ */
 applyTranslations();
@@ -2555,7 +2714,8 @@ applyTranslations();
 /* ══════════════════════════════════════════════
    DATA  – categories, stages, schedule, products, orders, loyalty
    ══════════════════════════════════════════════ */
-var CE={Cupcakes:'&#x1F9C1;',Cookies:'&#x1F36A;',Brownies:'&#x1F7EB;','Tres Leches':'&#x1F382;',Donuts:'&#x1F369;',Churros:'&#x1F962;',Sweets:'&#x1F36C;'};
+var CE_DEFAULT={Cupcakes:'&#x1F9C1;',Cookies:'&#x1F36A;',Brownies:'&#x1F7EB;','Tres Leches':'&#x1F382;',Donuts:'&#x1F369;',Churros:'&#x1F962;',Sweets:'&#x1F36C;'};
+var CE = Object.assign({}, CE_DEFAULT); /* editable copy */
 var STAGES=['confirmed','preparing','on_the_way','completed'];
 var SICONS={confirmed:'&#x2705;',preparing:'&#x1F525;',on_the_way:'&#x1F6F5;',completed:'&#x1F389;'};
 var PROMOS={PAOBEE10:{pct:10,label:'10% off'},SWEET5:{flat:5,label:'$5 off'}};
@@ -2984,6 +3144,33 @@ function renderMgrTab(tab){
   } else if(tab==='products'){
     var ph=products.map(function(p){var iH=p.photo?'<img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover">':'<span style="font-size:20px">'+p.icon+'</span>';var skH='<div class="stk-btns"><button class="stk-btn'+(p.stock==='in'?' stk-in':'')+'" onclick="setStock('+p.id+',\'in\')">'+t('in_lbl')+'</button><button class="stk-btn'+(p.stock==='low'?' stk-low':'')+'" onclick="setStock('+p.id+',\'low\')">'+t('low_lbl')+'</button><button class="stk-btn'+(p.stock==='out'?' stk-out':'')+'" onclick="setStock('+p.id+',\'out\')">'+t('out_lbl')+'</button></div>';return '<div class="pad-card"><div class="pad-img">'+iH+'</div><div style="flex:1"><div style="font-weight:600;font-size:14px;color:var(--text)">'+p.name+'</div><div style="font-size:12px;color:var(--muted)">'+p.cat+(p.featured?' · Destacado':'')+(p.ratings.length?' · &#x2B50;'+p.avgRating.toFixed(1):'')+'</div>'+(p.allergens&&p.allergens.length?'<div style="font-size:11px;color:var(--muted)">&#x26A0;&#xFE0F; '+p.allergens.join(', ')+'</div>':'')+'<div class="pad-acts"><button class="pad-edit" onclick="openEdit('+p.id+')">&#x270F;&#xFE0F;</button><button class="pad-del" onclick="delProd('+p.id+')">&#x1F5D1;</button></div>'+skH+'</div><div style="font-size:14px;font-weight:600;color:var(--pink)">$'+p.price.toFixed(2)+'</div></div>';}).join('');
     el.innerHTML='<button class="add-prod-btn" onclick="openAddMod()">'+t('add_product')+'</button>'+ph;
+  } else if(tab==='categories'){
+    var addBtn = document.createElement('button');
+    addBtn.className = 'add-prod-btn';
+    addBtn.textContent = '+ Anadir Categoria';
+    addBtn.onclick = openAddCat;
+    el.innerHTML = '';
+    el.appendChild(addBtn);
+    Object.entries(CE).forEach(function(entry) {
+      var catName = entry[0], catEmoji = entry[1];
+      var count = products.filter(function(p){ return p.cat===catName; }).length;
+      var card = document.createElement('div');
+      card.className = 'pad-card';
+      card.style.alignItems = 'center';
+      card.innerHTML = '<div style="font-size:28px;width:48px;text-align:center">'+catEmoji+'</div>'
+        + '<div style="flex:1"><div style="font-weight:600;font-size:15px;color:var(--text)">'+catName+'</div>'
+        + '<div style="font-size:12px;color:var(--muted)">'+count+' productos</div></div>';
+      var editBtn = document.createElement('button');
+      editBtn.className = 'pad-edit'; editBtn.innerHTML = '&#x270F; Editar';
+      editBtn.onclick = (function(n,em){ return function(){ openEditCat(n,em); }; })(catName, catEmoji);
+      var delBtn = document.createElement('button');
+      delBtn.className = 'pad-del'; delBtn.innerHTML = '&#x1F5D1;';
+      delBtn.onclick = (function(n){ return function(){ deleteCat(n); }; })(catName);
+      card.appendChild(editBtn);
+      card.appendChild(delBtn);
+      el.appendChild(card);
+    });
+
   } else if(tab==='schedule'){
     var DK=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
     var DT={Mon:t('mon'),Tue:t('tue'),Wed:t('wed'),Thu:t('thu'),Fri:t('fri'),Sat:t('sat'),Sun:t('sun')};
@@ -3176,6 +3363,173 @@ function delProd(id) {
 }
 function openAddMod(){clearPP('add-preview');['add-name','add-price','add-desc','add-allergens'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});document.getElementById('add-featured').checked=false;document.getElementById('add-overlay').classList.add('open');}
 function saveNewProduct(){var name=document.getElementById('add-name').value.trim();var price=parseFloat(document.getElementById('add-price').value);if(!name||!price){alert('Por favor ingresa nombre y precio.');return;}var cat=document.getElementById('add-cat').value;products.push({id:nextId++,name:name,cat:cat,desc:document.getElementById('add-desc').value||'Un delicioso postre.',price:price,icon:CE[cat]||'&#x1F370;',photo:document.getElementById('add-photo-data').value||'',featured:document.getElementById('add-featured').checked,allergens:document.getElementById('add-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean),stock:'in',ratings:[],avgRating:0});document.getElementById('add-overlay').classList.remove('open');renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
+
+/* ══════════════════════════════════════════════
+   CATEGORY MANAGEMENT
+   ══════════════════════════════════════════════ */
+
+/* Common emoji options for categories */
+var CAT_EMOJIS = ['&#x1F9C1;','&#x1F36A;','&#x1F7EB;','&#x1F382;','&#x1F369;','&#x1F962;','&#x1F36C;','&#x1F370;','&#x1F36B;','&#x1F382;','&#x1F9C0;','&#x1F36D;','&#x1F36E;','&#x1F375;','&#x1F967;','&#x1F9C6;','&#x1F35E;','&#x1F950;'];
+
+function catEmojiPicker(selectedId, onSelect) {
+  return '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px">'
+    + CAT_EMOJIS.map(function(em) {
+        var epId = 'ep-' + i;
+        var isFirst = (i === 0);
+        var div = document.createElement('div');
+        div.id = epId;
+        div.style.cssText = 'font-size:24px;width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid ' + (isFirst ? 'var(--pink)' : 'var(--border)');
+        div.innerHTML = em;
+        div.setAttribute('data-emoji', em);
+        div.setAttribute('data-input', selectedId);
+        div.onclick = function() {
+          document.querySelectorAll('[id^="ep-"]').forEach(function(e){ e.style.borderColor='var(--border)'; });
+          this.style.borderColor = 'var(--pink)';
+          var inp = document.getElementById(this.getAttribute('data-input'));
+          if (inp) inp.value = this.getAttribute('data-emoji');
+        };
+        return div.outerHTML;
+      }).join('')
+    + '</div>'
+    + '<input type="hidden" id="' + selectedId + '" value="' + CAT_EMOJIS[0] + '">';
+}
+
+function selectCatEmoji(el, em, inputId) {
+  document.querySelectorAll('[id^="ep-"]').forEach(function(e){ e.style.borderColor='var(--border)'; });
+  el.style.borderColor = 'var(--pink)';
+  var inp = document.getElementById(inputId);
+  if (inp) inp.value = em;
+}
+
+function openAddCat() {
+  var overlay = document.getElementById('add-overlay');
+  var wrap = overlay.querySelector('.edit-modal');
+  /* clear and build with DOM */
+  wrap.innerHTML = '';
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close'; closeBtn.innerHTML = '&#x2715;';
+  closeBtn.onclick = function(){ overlay.classList.remove('open'); };
+  wrap.appendChild(closeBtn);
+  var handle = document.createElement('span'); handle.className = 'modal-handle';
+  wrap.appendChild(handle);
+  var title = document.createElement('div');
+  title.style.cssText = 'font-size:20px;font-weight:600;color:var(--text);margin-bottom:16px';
+  title.textContent = 'Nueva Categoria';
+  wrap.appendChild(title);
+  var nameField = document.createElement('div'); nameField.className = 'ef';
+  nameField.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="new-cat-name" placeholder="Ej. Macarons">';
+  wrap.appendChild(nameField);
+  var emojiField = document.createElement('div'); emojiField.className = 'ef';
+  emojiField.innerHTML = '<label class="elbl">Emoji</label>';
+  emojiField.appendChild(buildEmojiPicker('new-cat-emoji'));
+  wrap.appendChild(emojiField);
+  var saveBtn = document.createElement('button'); saveBtn.className = 'esave';
+  saveBtn.textContent = 'Guardar Categoria'; saveBtn.onclick = saveNewCat;
+  wrap.appendChild(saveBtn);
+  overlay.classList.add('open');
+}
+
+function saveNewCat() {
+  var name  = (document.getElementById('new-cat-name') || {}).value || '';
+  var emoji = (document.getElementById('new-cat-emoji') || {}).value || '&#x1F370;';
+  if (!name.trim()) { alert('Por favor ingresa un nombre.'); return; }
+  if (CE[name]) { alert('Esta categoria ya existe.'); return; }
+  CE[name] = emoji;
+  saveCatsToDB();
+  document.getElementById('add-overlay').classList.remove('open');
+  renderMgrTab('categories');
+  document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
+  /* update all category dropdowns */
+  updateCatDropdowns();
+}
+
+function openEditCat(name, emoji) {
+  var overlay = document.getElementById('edit-overlay');
+  var wrap = overlay.querySelector('.edit-modal');
+  wrap.innerHTML = '';
+  var closeBtn = document.createElement('button');
+  closeBtn.className = 'modal-close'; closeBtn.innerHTML = '&#x2715;';
+  closeBtn.onclick = function(){ overlay.classList.remove('open'); };
+  wrap.appendChild(closeBtn);
+  var handle = document.createElement('span'); handle.className = 'modal-handle';
+  wrap.appendChild(handle);
+  var title = document.createElement('div');
+  title.style.cssText = 'font-size:20px;font-weight:600;color:var(--text);margin-bottom:16px';
+  title.textContent = 'Editar Categoria';
+  wrap.appendChild(title);
+  var nameField = document.createElement('div'); nameField.className = 'ef';
+  nameField.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="edit-cat-name" value="'+name+'">';
+  wrap.appendChild(nameField);
+  var emojiField = document.createElement('div'); emojiField.className = 'ef';
+  emojiField.innerHTML = '<label class="elbl">Emoji</label>';
+  var picker = buildEmojiPicker('edit-cat-emoji', emoji);
+  emojiField.appendChild(picker);
+  wrap.appendChild(emojiField);
+  var orig = document.createElement('input');
+  orig.type='hidden'; orig.id='edit-cat-original'; orig.value=name;
+  wrap.appendChild(orig);
+  var saveBtn = document.createElement('button'); saveBtn.className = 'esave';
+  saveBtn.textContent = 'Guardar Cambios'; saveBtn.onclick = saveEditCat;
+  wrap.appendChild(saveBtn);
+  overlay.classList.add('open');
+}
+
+function saveEditCat() {
+  var oldName = (document.getElementById('edit-cat-original') || {}).value || '';
+  var newName = (document.getElementById('edit-cat-name')     || {}).value || '';
+  var emoji   = (document.getElementById('edit-cat-emoji')    || {}).value || '&#x1F370;';
+  if (!newName.trim()) { alert('Por favor ingresa un nombre.'); return; }
+  if (newName !== oldName) {
+    /* rename: update all products that used old category */
+    products.forEach(function(p){ if (p.cat === oldName) { p.cat = newName; saveProductToDB(p); } });
+    delete CE[oldName];
+  }
+  CE[newName] = emoji;
+  saveCatsToDB();
+  document.getElementById('edit-overlay').classList.remove('open');
+  renderMgrTab('categories');
+  document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
+  updateCatDropdowns();
+}
+
+function deleteCat(name) {
+  var count = products.filter(function(p){ return p.cat===name; }).length;
+  var msg = count > 0
+    ? 'Hay ' + count + ' producto(s) en "' + name + '". Al eliminar la categoria esos productos quedaran sin categoria. Continuar?'
+    : 'Eliminar la categoria "' + name + '"?';
+  if (!confirm(msg)) return;
+  delete CE[name];
+  saveCatsToDB();
+  renderMgrTab('categories');
+  document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
+  updateCatDropdowns();
+}
+
+function updateCatDropdowns() {
+  /* update all select#edit-cat and select#add-cat in the DOM */
+  var opts = Object.keys(CE).map(function(c){ return '<option>'+c+'</option>'; }).join('');
+  ['edit-cat','add-cat'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.innerHTML = opts;
+  });
+}
+
+/* Save categories to Supabase categories table */
+function saveCatsToDB() {
+  if (!currentUser) return;
+  var rows = Object.entries(CE).map(function(e){ return {name:e[0], emoji:e[1]}; });
+  sb.from('categories').upsert(rows, {onConflict:'name'});
+}
+
+/* Load categories from Supabase */
+function loadCatsFromDB() {
+  sb.from('categories').select('*').order('name').then(function(res) {
+    if (res.data && res.data.length) {
+      CE = {};
+      res.data.forEach(function(row){ CE[row.name] = row.emoji; });
+    }
+  });
+}
 
 /* ══════════════════════════════════════════════
    INIT – runs on page load
@@ -3402,6 +3756,7 @@ function onAuthSuccess() {
   if (backBtn) backBtn.style.display = 'none';
   applyRoleUI();
   renderUserPill();
+  loadCatsFromDB();
   loadProductsFromDB();
   loadOrdersFromDB();
   loadLoyaltyFromDB();
