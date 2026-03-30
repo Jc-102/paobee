@@ -3390,92 +3390,13 @@ function selectCatEmoji(el, em, inputId) {
   if (inp) inp.value = em;
 }
 
-function openCatModal(titleText, nameVal, currentEmoji, onSave) {
-  var overlay = document.getElementById('cat-overlay');
-  var wrap    = document.getElementById('cat-modal-wrap');
-  wrap.innerHTML = '';
-  /* close button */
-  var closeBtn = document.createElement('button');
-  closeBtn.className = 'modal-close'; closeBtn.innerHTML = '&#x2715;';
-  closeBtn.onclick = function(){ overlay.classList.remove('open'); };
-  wrap.appendChild(closeBtn);
-  /* handle */
-  var handle = document.createElement('span'); handle.className = 'modal-handle';
-  wrap.appendChild(handle);
-  /* title */
-  var title = document.createElement('div');
-  title.style.cssText = 'font-size:20px;font-weight:600;color:var(--text);margin-bottom:16px';
-  title.textContent = titleText;
-  wrap.appendChild(title);
-  /* name field */
-  var nameField = document.createElement('div'); nameField.className = 'ef';
-  nameField.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="cat-modal-name" placeholder="Ej. Macarons" value="'+(nameVal||'')+'">';
-  wrap.appendChild(nameField);
-  /* emoji picker */
-  var emojiField = document.createElement('div'); emojiField.className = 'ef';
-  emojiField.innerHTML = '<label class="elbl">Emoji</label>';
-  emojiField.appendChild(buildEmojiPicker('cat-modal-emoji', currentEmoji));
-  wrap.appendChild(emojiField);
-  /* hidden original name for edit */
-  var origInput = document.createElement('input');
-  origInput.type = 'hidden'; origInput.id = 'cat-modal-original';
-  origInput.value = nameVal || '';
-  wrap.appendChild(origInput);
-  /* save button */
-  var saveBtn = document.createElement('button'); saveBtn.className = 'esave';
-  saveBtn.textContent = 'Guardar';
-  saveBtn.onclick = function() { onSave(); };
-  wrap.appendChild(saveBtn);
-  overlay.classList.add('open');
-}
 
-function openAddCat() {
-  openCatModal('Nueva Categoria', '', null, saveNewCat);
-}
 
-function saveNewCat() {
-  var name  = (document.getElementById('cat-modal-name')  || {}).value || '';
-  var emoji = (document.getElementById('cat-modal-emoji') || {}).value || '&#x1F370;';
-  if (!name.trim()) { alert('Por favor ingresa un nombre.'); return; }
-  if (CE[name]) { alert('Esta categoria ya existe.'); return; }
-  CE[name] = emoji;
-  saveCatsToDB();
-  document.getElementById('cat-overlay').classList.remove('open');
-  renderMgrTab('categories');
-  document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
-  updateCatDropdowns();
-}
 
-function openEditCat(name, emoji) {
-  var overlay = document.getElementById('edit-overlay');
-  var wrap = overlay.querySelector('.edit-modal');
-  wrap.innerHTML = '';
-  var closeBtn = document.createElement('button');
-  closeBtn.className = 'modal-close'; closeBtn.innerHTML = '&#x2715;';
-  closeBtn.onclick = function(){ overlay.classList.remove('open'); };
-  wrap.appendChild(closeBtn);
-  var handle = document.createElement('span'); handle.className = 'modal-handle';
-  wrap.appendChild(handle);
-  var title = document.createElement('div');
-  title.style.cssText = 'font-size:20px;font-weight:600;color:var(--text);margin-bottom:16px';
-  title.textContent = 'Editar Categoria';
-  wrap.appendChild(title);
-  var nameField = document.createElement('div'); nameField.className = 'ef';
-  nameField.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="edit-cat-name" value="'+name+'">';
-  wrap.appendChild(nameField);
-  var emojiField = document.createElement('div'); emojiField.className = 'ef';
-  emojiField.innerHTML = '<label class="elbl">Emoji</label>';
-  var picker = buildEmojiPicker('edit-cat-emoji', emoji);
-  emojiField.appendChild(picker);
-  wrap.appendChild(emojiField);
-  var orig = document.createElement('input');
-  orig.type='hidden'; orig.id='edit-cat-original'; orig.value=name;
-  wrap.appendChild(orig);
-  var saveBtn = document.createElement('button'); saveBtn.className = 'esave';
-  saveBtn.textContent = 'Guardar Cambios'; saveBtn.onclick = saveEditCat;
-  wrap.appendChild(saveBtn);
-  overlay.classList.add('open');
-}
+
+
+
+
 
 function saveEditCat() {
   var oldName = (document.getElementById('cat-modal-original') || {}).value || '';
@@ -3494,44 +3415,15 @@ function saveEditCat() {
   updateCatDropdowns();
 }
 
-function deleteCat(name) {
-  var count = products.filter(function(p){ return p.cat===name; }).length;
-  var msg = count > 0
-    ? 'Hay ' + count + ' producto(s) en "' + name + '". Al eliminar la categoria esos productos quedaran sin categoria. Continuar?'
-    : 'Eliminar la categoria "' + name + '"?';
-  if (!confirm(msg)) return;
-  delete CE[name];
-  saveCatsToDB();
-  renderMgrTab('categories');
-  document.querySelectorAll('.mgr-tab').forEach(function(tb,i){ tb.classList.toggle('active', i===2); });
-  updateCatDropdowns();
-}
 
-function updateCatDropdowns() {
-  /* update all select#edit-cat and select#add-cat in the DOM */
-  var opts = Object.keys(CE).map(function(c){ return '<option>'+c+'</option>'; }).join('');
-  ['edit-cat','add-cat'].forEach(function(id){
-    var el = document.getElementById(id);
-    if (el) el.innerHTML = opts;
-  });
-}
+
+
 
 /* Save categories to Supabase categories table */
-function saveCatsToDB() {
-  if (!currentUser) return;
-  var rows = Object.entries(CE).map(function(e){ return {name:e[0], emoji:e[1]}; });
-  sb.from('categories').upsert(rows, {onConflict:'name'});
-}
+
 
 /* Load categories from Supabase */
-function loadCatsFromDB() {
-  sb.from('categories').select('*').order('name').then(function(res) {
-    if (res.data && res.data.length) {
-      CE = {};
-      res.data.forEach(function(row){ CE[row.name] = row.emoji; });
-    }
-  });
-}
+
 
 /* ══════════════════════════════════════════════
    INIT – runs on page load
