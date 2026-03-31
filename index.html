@@ -2153,7 +2153,7 @@ to{transform:translateY(0);opacity:1}
   /* ── Product grid ─────────────────────────────── */
   .dt-pgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
   .dt-pgrid .pcard { border-radius:20px; }
-  .dt-pgrid .pcard-img { height:300px; font-size:80px; }
+  .dt-pgrid .pcard-img { height:380px; font-size:80px; }
 
   /* ── About section ────────────────────────────── */
   .dt-about { display:grid; grid-template-columns:1fr 1fr; gap:48px; padding:48px 64px; background:var(--card); margin:0 0 0 0; border-top:1px solid var(--border); border-bottom:1px solid var(--border); align-items:center; }
@@ -2225,7 +2225,7 @@ to{transform:translateY(0);opacity:1}
     <button class="dt-link"        id="dt-link-manager" onclick="dtGoTo('manager')" style="display:none" data-i18n="nav_mgr">&#x1F469;&#x200D;&#x1F373; Manager</button>
   </div>
   <div class="dt-actions">
-    <button class="dt-cart-btn" id="dt-cart-btn-lbl" onclick="dtToggleCart()">&#x1F6D2; <span data-i18n="nav_cart">Carrito</span> <span id="dt-cc" style="background:#fff;color:var(--pink);border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">0</span></button>
+    <button class="dt-cart-btn" id="dt-cart-btn-lbl" onclick="dtToggleCart()"><span data-i18n="nav_cart">&#x1F6D2; Carrito</span> <span id="dt-cc" style="background:#fff;color:var(--pink);border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">0</span></button>
     <div id="dt-user-area"></div>
   </div>
 </nav>
@@ -2359,7 +2359,7 @@ to{transform:translateY(0);opacity:1}
   <!-- CART PANEL (slides in from right) -->
   <div id="dt-cart-panel">
     <div class="dt-cart-hdr">
-      <div class="dt-cart-hdr-title">&#x1F6D2; Carrito</div>
+      <div class="dt-cart-hdr-title" data-i18n="nav_cart">&#x1F6D2; Carrito</div>
       <button class="dt-cart-close" onclick="dtToggleCart()">&#x2715;</button>
     </div>
     <div id="dt-cart-content"></div>
