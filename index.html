@@ -2219,13 +2219,13 @@ to{transform:translateY(0);opacity:1}
 <nav id="dt-nav" style="display:none">
   <div class="dt-logo" onclick="dtGoTo('home')">Paobee</div>
   <div class="dt-links">
-    <button class="dt-link active" id="dt-link-home"    onclick="dtGoTo('home')"    >&#x1F3E0; Inicio</button>
-    <button class="dt-link"        id="dt-link-shop"    onclick="dtGoTo('shop')"    >&#x1F9C1; Tienda</button>
-    <button class="dt-link"        id="dt-link-orders"  onclick="dtGoTo('orders')"  >&#x1F4E6; Pedidos</button>
-    <button class="dt-link"        id="dt-link-manager" onclick="dtGoTo('manager')" style="display:none">&#x1F469;&#x200D;&#x1F373; Manager</button>
+    <button class="dt-link active" id="dt-link-home"    onclick="dtGoTo('home')"    data-i18n="nav_home">&#x1F3E0; Inicio</button>
+    <button class="dt-link"        id="dt-link-shop"    onclick="dtGoTo('shop')"    data-i18n="nav_shop">&#x1F9C1; Tienda</button>
+    <button class="dt-link"        id="dt-link-orders"  onclick="dtGoTo('orders')"  data-i18n="nav_orders">&#x1F4E6; Pedidos</button>
+    <button class="dt-link"        id="dt-link-manager" onclick="dtGoTo('manager')" style="display:none" data-i18n="nav_mgr">&#x1F469;&#x200D;&#x1F373; Manager</button>
   </div>
   <div class="dt-actions">
-    <button class="dt-cart-btn" onclick="dtToggleCart()">&#x1F6D2; Carrito <span id="dt-cc" style="background:#fff;color:var(--pink);border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">0</span></button>
+    <button class="dt-cart-btn" id="dt-cart-btn-lbl" onclick="dtToggleCart()">&#x1F6D2; <span data-i18n="nav_cart">Carrito</span> <span id="dt-cc" style="background:#fff;color:var(--pink);border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center">0</span></button>
     <div id="dt-user-area"></div>
   </div>
 </nav>
@@ -2241,28 +2241,28 @@ to{transform:translateY(0);opacity:1}
       <!-- Hero -->
       <div class="dt-hero">
         <div class="dt-hero-text">
-          <div class="dt-hero-tag">&#x2726; Hecho con amor</div>
-          <h1 class="dt-hero-title">Horneado Fresco, <em>Diario</em></h1>
-          <p class="dt-hero-sub">Desde cupcakes esponjosos hasta churros crujientes, cada trato hecho con los mejores ingredientes frescos de Puerto Rico.</p>
+          <div class="dt-hero-tag" data-i18n="hero_tag">&#x2726; Hecho con amor</div>
+          <h1 class="dt-hero-title"><span data-i18n="baked_fresh">Horneado Fresco,</span> <em data-i18n="daily">Diario</em></h1>
+          <p class="dt-hero-sub" data-i18n="hero_sub">Desde cupcakes esponjosos hasta churros crujientes, cada trato hecho con los mejores ingredientes frescos de Puerto Rico.</p>
           <div class="dt-hero-btns">
-            <button class="btn-pink" onclick="dtGoTo('shop')" style="font-size:15px;padding:14px 28px">Comprar Ahora &#x2192;</button>
-            <button class="btn-outline" onclick="dtScrollAbout()" style="font-size:15px;padding:13px 24px">Nuestra Historia</button>
+            <button class="btn-pink" onclick="dtGoTo('shop')" style="font-size:15px;padding:14px 28px" data-i18n="hero_btn_shop">Comprar Ahora &#x2192;</button>
+            <button class="btn-outline" onclick="dtScrollAbout()" style="font-size:15px;padding:13px 24px" data-i18n="hero_btn_story">Nuestra Historia</button>
           </div>
         </div>
         <div class="dt-hero-img">&#x1F9C1;</div>
       </div>
       <!-- Stats -->
       <div class="dt-stats">
-        <div class="dt-stat"><div class="dt-stat-num">7+</div><div class="dt-stat-lbl">Sabores</div></div>
-        <div class="dt-stat"><div class="dt-stat-num">100%</div><div class="dt-stat-lbl">Casero</div></div>
-        <div class="dt-stat"><div class="dt-stat-num">&#x2764;&#xFE0F;</div><div class="dt-stat-lbl">Con amor</div></div>
+        <div class="dt-stat"><div class="dt-stat-num">7+</div><div class="dt-stat-lbl" data-i18n="stat_flavors">Sabores</div></div>
+        <div class="dt-stat"><div class="dt-stat-num">100%</div><div class="dt-stat-lbl" data-i18n="stat_homemade">Casero</div></div>
+        <div class="dt-stat"><div class="dt-stat-num">&#x2764;&#xFE0F;</div><div class="dt-stat-lbl" data-i18n="stat_love">Con amor</div></div>
         <div class="dt-stat"><div class="dt-stat-num">&#x1F1F5;&#x1F1F7;</div><div class="dt-stat-lbl">Puerto Rico</div></div>
       </div>
       <!-- Featured products -->
       <div class="dt-sec">
         <div class="dt-sec-hdr">
-          <div class="dt-sec-title">Nuestros <em>Favoritos</em></div>
-          <span class="see-all" onclick="dtGoTo('shop')">Ver Todo &#x2192;</span>
+          <div class="dt-sec-title"><span data-i18n="featured_title">Nuestros </span><em data-i18n="featured_em">Favoritos</em></div>
+          <span class="see-all" onclick="dtGoTo('shop')" data-i18n="view_all_arrow">Ver Todo &#x2192;</span>
         </div>
         <div class="dt-pgrid" id="dt-featured"></div>
       </div>
@@ -2270,13 +2270,13 @@ to{transform:translateY(0);opacity:1}
       <div id="dt-about-anchor" class="dt-about">
         <div class="dt-about-img">&#x1F9C1;</div>
         <div>
-          <h2 class="dt-about-title">&#x1F44B; Hola, soy la repostera detras de Paobee!</h2>
-          <p class="dt-about-p">Todo aqui esta hecho desde cero en mi cocina casera con amor y los mejores ingredientes. Sin conservantes, sin atajos — solo postres reales y deliciosos hechos a pedido.</p>
-          <p class="dt-about-p">Ya sea que te estes dando un gusto o pidiendo para una ocasion especial, cada bocado esta hecho especialmente para ti. Gracias por apoyar mi pequeno negocio!</p>
+          <h2 class="dt-about-title" data-i18n="about_title_dt">&#x1F44B; Hola, soy la repostera detras de Paobee!</h2>
+          <p class="dt-about-p" data-i18n="about_p1_dt">Todo aqui esta hecho desde cero en mi cocina casera con amor y los mejores ingredientes. Sin conservantes, sin atajos — solo postres reales y deliciosos hechos a pedido.</p>
+          <p class="dt-about-p" data-i18n="about_p2_dt">Ya sea que te estes dando un gusto o pidiendo para una ocasion especial, cada bocado esta hecho especialmente para ti. Gracias por apoyar mi pequeno negocio!</p>
           <div class="dt-about-tags">
-            <span class="dt-about-tag">Hecho a pedido</span>
-            <span class="dt-about-tag">Sin conservantes</span>
-            <span class="dt-about-tag">Cocina casera</span>
+            <span class="dt-about-tag" data-i18n="tag_made_order">Hecho a pedido</span>
+            <span class="dt-about-tag" data-i18n="tag_no_pres">Sin conservantes</span>
+            <span class="dt-about-tag" data-i18n="tag_home_kitchen">Cocina casera</span>
             <span class="dt-about-tag">Puerto Rico &#x1F1F5;&#x1F1F7;</span>
           </div>
           <div class="dt-contact-row">
@@ -2288,7 +2288,7 @@ to{transform:translateY(0);opacity:1}
       <!-- Footer -->
       <div class="dt-footer">
         <div class="dt-footer-logo">Paobee</div>
-        <div class="dt-footer-copy">&#x00A9; 2025 Paobee. Hecho con &#x2764;&#xFE0F; en Puerto Rico.</div>
+        <div class="dt-footer-copy"><span data-i18n="footer_copy">&#x00A9; 2025 Paobee. Hecho con &#x2764;&#xFE0F; en Puerto Rico.</span></div>
         <div class="dt-footer-links">
           <a class="dt-footer-link" href="https://wa.me/17879699171" target="_blank">WhatsApp</a>
           <a class="dt-footer-link" href="https://www.instagram.com/paobee_/" target="_blank">Instagram</a>
@@ -2299,12 +2299,12 @@ to{transform:translateY(0);opacity:1}
     <!-- SHOP VIEW -->
     <div id="dt-view-shop" style="display:none">
       <div class="dt-panel">
-        <div class="dt-panel-title">&#x1F9C1; Tienda</div>
+        <div class="dt-panel-title" data-i18n="shop_title_dt">&#x1F9C1; Tienda</div>
         <!-- search -->
         <div style="margin-bottom:20px">
           <div class="search-wrap" style="max-width:400px">
             <span class="search-ico">&#x1F50D;</span>
-            <input class="search-inp" id="dt-search" placeholder="Buscar postres..." oninput="dtRenderShop()">
+            <input class="search-inp" id="dt-search" data-i18n-ph="search_ph_dt" placeholder="Buscar postres..." oninput="dtRenderShop()">
           </div>
         </div>
         <!-- cats -->
@@ -2325,7 +2325,7 @@ to{transform:translateY(0);opacity:1}
     <!-- ORDERS VIEW -->
     <div id="dt-view-orders" style="display:none">
       <div class="dt-panel">
-        <div class="dt-panel-title">&#x1F4E6; Mis Pedidos</div>
+        <div class="dt-panel-title" data-i18n="orders_title_dt">&#x1F4E6; Mis Pedidos</div>
         <div id="dt-orders-content"></div>
       </div>
     </div>
@@ -2333,7 +2333,7 @@ to{transform:translateY(0);opacity:1}
     <!-- SETTINGS VIEW -->
     <div id="dt-view-settings" style="display:none">
       <div class="dt-panel">
-        <div class="dt-panel-title">&#x2699;&#xFE0F; Ajustes</div>
+        <div class="dt-panel-title" data-i18n="settings_title_dt">&#x2699;&#xFE0F; Ajustes</div>
         <div id="dt-settings-content"></div>
       </div>
     </div>
@@ -2450,8 +2450,10 @@ to{transform:translateY(0);opacity:1}
   <div class="edit-modal"><button class="modal-close" onclick="document.getElementById('edit-overlay').classList.remove('open')">&#x2715;</button><span class="modal-handle"></span>
   <div style="font-family:Georgia,serif;font-size:20px;color:var(--text);margin-bottom:16px;" data-i18n="edit_product"></div>
   <div class="ef"><label class="elbl" data-i18n="name_lbl"></label><input class="einp" id="edit-name"></div>
+  <div class="ef"><label class="elbl">Name (English)</label><input class="einp" id="edit-name-en" placeholder="English name"></div>
   <div class="efr"><div class="ef"><label class="elbl" data-i18n="category"></label><select class="einp" id="edit-cat"><option>Cupcakes</option><option>Cookies</option><option>Brownies</option><option>Tres Leches</option><option>Donuts</option><option>Churros</option><option>Sweets</option></select></div><div class="ef"><label class="elbl" data-i18n="price"></label><input class="einp" id="edit-price" type="number" step="0.01"></div></div>
   <div class="ef"><label class="elbl" data-i18n="description"></label><textarea class="einp" id="edit-desc-i" rows="2" style="resize:none"></textarea></div>
+  <div class="ef"><label class="elbl">Description (English)</label><textarea class="einp" id="edit-desc-en" rows="2" style="resize:none" placeholder="English description..."></textarea></div>
   <div class="ef"><label class="elbl" data-i18n="allergens"></label><input class="einp" id="edit-allergens" placeholder="gluten, lacteos, huevos"></div>
   <div class="ef"><label class="elbl" data-i18n="photo"></label>
     <div class="photo-sec"><div class="ppl" id="edit-preview"><div class="php"><div class="php-icon">&#x1F4F7;</div><div class="php-text" data-i18n="no_photo"></div></div></div>
@@ -2466,8 +2468,10 @@ to{transform:translateY(0);opacity:1}
   <div class="edit-modal"><button class="modal-close" onclick="document.getElementById('add-overlay').classList.remove('open')">&#x2715;</button><span class="modal-handle"></span>
   <div style="font-family:Georgia,serif;font-size:20px;color:var(--text);margin-bottom:16px;" data-i18n="add_product_title"></div>
   <div class="ef"><label class="elbl" data-i18n="name_lbl"></label><input class="einp" id="add-name" placeholder="Ej. Red Velvet Cupcake"></div>
+  <div class="ef"><label class="elbl">Name (English)</label><input class="einp" id="add-name-en" placeholder="e.g. Red Velvet Cupcake"></div>
   <div class="efr"><div class="ef"><label class="elbl" data-i18n="category"></label><select class="einp" id="add-cat"><option>Cupcakes</option><option>Cookies</option><option>Brownies</option><option>Tres Leches</option><option>Donuts</option><option>Churros</option><option>Sweets</option></select></div><div class="ef"><label class="elbl" data-i18n="price"></label><input class="einp" id="add-price" type="number" step="0.01" placeholder="0.00"></div></div>
   <div class="ef"><label class="elbl" data-i18n="description"></label><textarea class="einp" id="add-desc" rows="2" style="resize:none" placeholder="Describe tu postre..."></textarea></div>
+  <div class="ef"><label class="elbl">Description (English)</label><textarea class="einp" id="add-desc-en" rows="2" style="resize:none" placeholder="English description..."></textarea></div>
   <div class="ef"><label class="elbl" data-i18n="allergens"></label><input class="einp" id="add-allergens" placeholder="gluten, lacteos, huevos"></div>
   <div class="ef"><label class="elbl" data-i18n="photo"></label>
     <div class="photo-sec"><div class="ppl" id="add-preview"><div class="php"><div class="php-icon">&#x1F4F7;</div><div class="php-text" data-i18n="no_photo"></div></div></div>
@@ -2544,8 +2548,34 @@ var currentRole = 'customer'; // 'customer' | 'manager'
 var lang='es';
 /* ── TRANSLATION STRINGS (es / en) ─────────── */
 var T={
-es:{home:'Inicio',shop:'Tienda',cart:'Carrito',orders:'Pedidos',settings:'Ajustes',manage:'Gestion',shop_title:'Tienda',handcrafted:'Hecho con amor',baked_fresh:'Horneado Fresco,',daily:'Diario',hero_sub:'Desde cupcakes esponjosos hasta churros crujientes, cada trato hecho con los mejores ingredientes.',shop_now:'Comprar',our_story:'Nuestra Historia',flavors:'Sabores',homemade:'Casero',with_love:'Con amor',our_cats:'Nuestras ',categories:'Categorias',order_again:'Pedir de ',again:'Nuevo',our_favs:'Nuestros ',favorites:'Favoritos',view_all:'Ver Todo',story_lbl:'Nuestra ',story_em:'Historia',about_title:'Hola, soy la repostera detras de Paobee!',about_p1:'Todo aqui esta hecho desde cero en mi cocina casera con amor y los mejores ingredientes. Sin conservantes, sin atajos - solo postres reales y deliciosos hechos a pedido.',about_p2:'Ya sea que te estes dando un gusto o pidiendo para una ocasion especial, cada bocado esta hecho especialmente para ti. Gracias por apoyar mi pequeno negocio!',made_to_order:'Hecho a pedido',no_preservatives:'Sin conservantes',home_kitchen:'Cocina casera',my_cart:'Mi Carrito',checkout:'Pago',my_orders:'Mis Pedidos',settings_title:'Ajustes',active_order:'Pedido Activo',history:'Historial',profile:'Perfil',name:'Nombre',phone:'Telefono',email:'Correo',save:'Guardar',dark_mode:'Modo Oscuro',order_updates:'Actualizaciones',promotions:'Promociones',language:'Idioma',payment_methods:'Metodos de Pago',add_pm:'+ Anadir Metodo',loyalty_pts:'Puntos de Lealtad',paobee_rewards:'Paobee Rewards',redeem:'Canjear',pts_history:'Historial',pickup:'Recoger',delivery:'Entrega',free:'Gratis',your_info:'Tu Informacion',payment_lbl:'Pago',promo_code:'Codigo Promo',order_summary:'Resumen del Pedido',subtotal:'Subtotal',delivery_fee:'Cargo de entrega',total:'Total',place_order:'Hacer Pedido',back_to_cart:'Volver al carrito',order_placed:'Pedido Realizado!',track_order:'Rastrear Pedido',back_home:'Volver al Inicio',cash:'Efectivo',cash_sub:'Pagar al recoger/recibir',ath:'ATH Movil',ath_sub:'Enviar a @paobee',paypal:'PayPal',paypal_sub:'Enviar a @paobee',stripe:'Pagar con Tarjeta',stripe_sub:'Proximamente con Stripe',promo_ph:'Codigo e.g. PAOBEE10',apply_btn:'Aplicar',confirmed:'Confirmado',preparing:'Preparando',on_the_way:'En Camino',completed:'Entregado',no_active:'Sin pedidos activos',no_active_sub:'Haz un pedido y rastrea aqui!',no_history:'Sin pedidos anteriores',no_history_sub:'Tus pedidos completados apareceran aqui.',your_items:'Tus Articulos',reorder:'Pedir de Nuevo',rate_order:'Califica Tu Pedido',rate_sub:'Recibiste esto hace 24+ horas.',submit_btn:'Enviar',skip_btn:'Omitir',use_pts:'Usar Puntos',pts_available:'pts disponibles',pts_min:'Necesitas 50+ pts',update_status:'Actualizar Estado',cancel_order:'Cancelar',orders_tab:'Pedidos',products_tab:'Productos',schedule_tab:'Horario',analytics_tab:'Analiticas',add_product:'+ Anadir Producto',revenue:'Ingresos',avg_order:'Promedio',products:'Productos',avail_days:'Dias y Horas Disponibles',advance:'Reserva anticipada',same_day:'Mismo dia',one_day:'1 dia antes',two_days:'2 dias antes',three_days:'3 dias antes',edit_product:'Editar Producto',add_product_title:'Anadir Producto',save_changes:'Guardar Cambios',name_lbl:'Nombre',category:'Categoria',price:'Precio ($)',description:'Descripcion',allergens:'Alergenos',photo:'Foto',featured:'Marcar como Destacado',home_page:'Pagina de inicio',or_url:'o pega un URL',upload:'Subir',camera:'Camara',stripe_note:'Pagos con tarjeta disponibles despues del despliegue.',export_orders:'Exportar Pedidos',export_sub:'Descargar pedidos como CSV',export_btn:'Exportar',add_pm_modal:'Anadir Metodo de Pago',username_lbl:'Usuario',save_btn:'Guardar',no_photo:'Sin foto',sold_out:'Agotado',low_stock:'Poco stock',schedule_title:'Horario',notes_ph:'Alergias, solicitudes especiales...',address_ph:'Tu direccion',to:'a',search_ph:'Buscar postres...',contains:'Contiene',add_to_cart:'Anadir',added:'Anadido!',mon:'Lun',tue:'Mar',wed:'Mie',thu:'Jue',fri:'Vie',sat:'Sab',sun:'Dom',in_lbl:'Hay',low_lbl:'Poco',out_lbl:'Agotado',del_confirm:'Eliminar este producto?',cancel_confirm:'Cancelar este pedido?',browse_shop:'Ver Tienda',pts_unlock:'Puntos desbloqueados',pts_note_applied:'aplicado'},
-en:{home:'Home',shop:'Shop',cart:'Cart',orders:'Orders',settings:'Settings',manage:'Manage',shop_title:'Shop',handcrafted:'Handcrafted with love',baked_fresh:'Baked Fresh,',daily:'Daily',hero_sub:'From fluffy cupcakes to crispy churros, every treat made with the finest ingredients.',shop_now:'Shop Now',our_story:'Our Story',flavors:'Flavors',homemade:'Homemade',with_love:'With love',our_cats:'Our ',categories:'Categories',order_again:'Order ',again:'Again',our_favs:'Our ',favorites:'Favorites',view_all:'View All',story_lbl:'Our ',story_em:'Story',about_title:"Hello, I'm the baker behind Paobee!",about_p1:'Everything here is made from scratch in my home kitchen with love and the best ingredients. No preservatives, no shortcuts - just real, delicious baked goods made to order.',about_p2:"Whether you're treating yourself or ordering for a special occasion, every bite is crafted just for you. Thank you for supporting my small business!",made_to_order:'Made to order',no_preservatives:'No preservatives',home_kitchen:'Home kitchen',my_cart:'My Cart',checkout:'Checkout',my_orders:'My Orders',settings_title:'Settings',active_order:'Active Order',history:'History',profile:'Profile',name:'Name',phone:'Phone',email:'Email',save:'Save',dark_mode:'Dark Mode',order_updates:'Order updates',promotions:'Promotions',language:'Language',payment_methods:'Payment Methods',add_pm:'+ Add Payment Method',loyalty_pts:'Loyalty Points',paobee_rewards:'Paobee Rewards',redeem:'Redeem',pts_history:'History',pickup:'Pickup',delivery:'Delivery',free:'Free',your_info:'Your Info',payment_lbl:'Payment',promo_code:'Promo Code',order_summary:'Order Summary',subtotal:'Subtotal',delivery_fee:'Delivery fee',total:'Total',place_order:'Place Order',back_to_cart:'Back to cart',order_placed:'Order Placed!',track_order:'Track My Order',back_home:'Back to Home',cash:'Cash',cash_sub:'Pay on pickup/delivery',ath:'ATH Movil',ath_sub:'Send to @paobee',paypal:'PayPal',paypal_sub:'Send to @paobee',stripe:'Pay with Card',stripe_sub:'Coming soon via Stripe',promo_ph:'Code e.g. PAOBEE10',apply_btn:'Apply',confirmed:'Confirmed',preparing:'Preparing',on_the_way:'On the Way',completed:'Completed',no_active:'No active orders',no_active_sub:'Place an order and track it here!',no_history:'No past orders',no_history_sub:'Your completed orders will appear here.',your_items:'Your Items',reorder:'Reorder',rate_order:'Rate Your Order',rate_sub:'You received this 24+ hours ago.',submit_btn:'Submit',skip_btn:'Skip',use_pts:'Use Loyalty Points',pts_available:'pts available',pts_min:'Need 50+ pts to redeem',update_status:'Update Status',cancel_order:'Cancel Order',orders_tab:'Orders',products_tab:'Products',schedule_tab:'Schedule',analytics_tab:'Analytics',add_product:'+ Add Product',revenue:'Revenue',avg_order:'Avg Order',products:'Products',avail_days:'Available Days & Hours',advance:'Advance booking',same_day:'Same day',one_day:'1 day ahead',two_days:'2 days ahead',three_days:'3 days ahead',edit_product:'Edit Product',add_product_title:'Add Product',save_changes:'Save Changes',name_lbl:'Name',category:'Category',price:'Price ($)',description:'Description',allergens:'Allergens',photo:'Photo',featured:'Mark as Featured',home_page:'Home page',or_url:'or paste URL',upload:'Upload',camera:'Camera',stripe_note:'Stripe card payments will be enabled after deployment.',export_orders:'Export Orders',export_sub:'Download all orders as CSV',export_btn:'Export',add_pm_modal:'Add Payment Method',username_lbl:'Username',save_btn:'Save',no_photo:'No photo',sold_out:'Sold Out',low_stock:'Low Stock',schedule_title:'Schedule',notes_ph:'Allergies, special requests...',address_ph:'Your address',to:'to',search_ph:'Search treats...',contains:'Contains',add_to_cart:'Add to Cart',added:'Added!',mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun',in_lbl:'In',low_lbl:'Low',out_lbl:'Out',del_confirm:'Delete this product?',cancel_confirm:'Cancel this order?',browse_shop:'Browse Shop',pts_unlock:'Points unlocked!',pts_note_applied:'applied'}
+es:{home:'Inicio',shop:'Tienda',cart:'Carrito',orders:'Pedidos',settings:'Ajustes',manage:'Gestion',shop_title:'Tienda',handcrafted:'Hecho con amor',baked_fresh:'Horneado Fresco,',daily:'Diario',hero_sub:'Desde cupcakes esponjosos hasta churros crujientes, cada trato hecho con los mejores ingredientes.',shop_now:'Comprar',our_story:'Nuestra Historia',flavors:'Sabores',homemade:'Casero',with_love:'Con amor',our_cats:'Nuestras ',categories:'Categorias',order_again:'Pedir de ',again:'Nuevo',our_favs:'Nuestros ',favorites:'Favoritos',view_all:'Ver Todo',story_lbl:'Nuestra ',story_em:'Historia',about_title:'Hola, soy la repostera detras de Paobee!',about_p1:'Todo aqui esta hecho desde cero en mi cocina casera con amor y los mejores ingredientes. Sin conservantes, sin atajos - solo postres reales y deliciosos hechos a pedido.',about_p2:'Ya sea que te estes dando un gusto o pidiendo para una ocasion especial, cada bocado esta hecho especialmente para ti. Gracias por apoyar mi pequeno negocio!',made_to_order:'Hecho a pedido',no_preservatives:'Sin conservantes',home_kitchen:'Cocina casera',my_cart:'Mi Carrito',checkout:'Pago',my_orders:'Mis Pedidos',settings_title:'Ajustes',active_order:'Pedido Activo',history:'Historial',profile:'Perfil',name:'Nombre',phone:'Telefono',email:'Correo',save:'Guardar',dark_mode:'Modo Oscuro',order_updates:'Actualizaciones',promotions:'Promociones',language:'Idioma',payment_methods:'Metodos de Pago',add_pm:'+ Anadir Metodo',loyalty_pts:'Puntos de Lealtad',paobee_rewards:'Paobee Rewards',redeem:'Canjear',pts_history:'Historial',pickup:'Recoger',delivery:'Entrega',free:'Gratis',your_info:'Tu Informacion',payment_lbl:'Pago',promo_code:'Codigo Promo',order_summary:'Resumen del Pedido',subtotal:'Subtotal',delivery_fee:'Cargo de entrega',total:'Total',place_order:'Hacer Pedido',back_to_cart:'Volver al carrito',order_placed:'Pedido Realizado!',track_order:'Rastrear Pedido',back_home:'Volver al Inicio',cash:'Efectivo',cash_sub:'Pagar al recoger/recibir',ath:'ATH Movil',ath_sub:'Enviar a @paobee',paypal:'PayPal',paypal_sub:'Enviar a @paobee',stripe:'Pagar con Tarjeta',stripe_sub:'Proximamente con Stripe',promo_ph:'Codigo e.g. PAOBEE10',apply_btn:'Aplicar',confirmed:'Confirmado',preparing:'Preparando',on_the_way:'En Camino',completed:'Entregado',no_active:'Sin pedidos activos',no_active_sub:'Haz un pedido y rastrea aqui!',no_history:'Sin pedidos anteriores',no_history_sub:'Tus pedidos completados apareceran aqui.',your_items:'Tus Articulos',reorder:'Pedir de Nuevo',rate_order:'Califica Tu Pedido',rate_sub:'Recibiste esto hace 24+ horas.',submit_btn:'Enviar',skip_btn:'Omitir',use_pts:'Usar Puntos',pts_available:'pts disponibles',pts_min:'Necesitas 50+ pts',update_status:'Actualizar Estado',cancel_order:'Cancelar',orders_tab:'Pedidos',products_tab:'Productos',schedule_tab:'Horario',analytics_tab:'Analiticas',add_product:'+ Anadir Producto',revenue:'Ingresos',avg_order:'Promedio',products:'Productos',avail_days:'Dias y Horas Disponibles',advance:'Reserva anticipada',same_day:'Mismo dia',one_day:'1 dia antes',two_days:'2 dias antes',three_days:'3 dias antes',edit_product:'Editar Producto',add_product_title:'Anadir Producto',save_changes:'Guardar Cambios',name_lbl:'Nombre',category:'Categoria',price:'Precio ($)',description:'Descripcion',allergens:'Alergenos',photo:'Foto',featured:'Marcar como Destacado',home_page:'Pagina de inicio',or_url:'o pega un URL',upload:'Subir',camera:'Camara',stripe_note:'Pagos con tarjeta disponibles despues del despliegue.',export_orders:'Exportar Pedidos',export_sub:'Descargar pedidos como CSV',export_btn:'Exportar',add_pm_modal:'Anadir Metodo de Pago',username_lbl:'Usuario',save_btn:'Guardar',no_photo:'Sin foto',sold_out:'Agotado',low_stock:'Poco stock',schedule_title:'Horario',notes_ph:'Alergias, solicitudes especiales...',address_ph:'Tu direccion',to:'a',search_ph:'Buscar postres...',contains:'Contiene',add_to_cart:'Anadir',added:'Anadido!',mon:'Lun',tue:'Mar',wed:'Mie',thu:'Jue',fri:'Vie',sat:'Sab',sun:'Dom',in_lbl:'Hay',low_lbl:'Poco',out_lbl:'Agotado',del_confirm:'Eliminar este producto?',cancel_confirm:'Cancelar este pedido?',browse_shop:'Ver Tienda',pts_unlock:'Puntos desbloqueados',pts_note_applied:'aplicado',
+  redeemable:'canjeables',pts_ready:'Listo para canjear! &#x1F389;',pts_need:'Necesitas',pts_more:'pts mas',
+  nav_home:'&#x1F3E0; Inicio',nav_shop:'&#x1F9C1; Tienda',nav_orders:'&#x1F4E6; Pedidos',nav_cart:'&#x1F6D2; Carrito',nav_mgr:'&#x1F469;&#x200D;&#x1F373; Manager',
+  hero_tag:'&#x2726; Hecho con amor',hero_btn_shop:'Comprar Ahora &#x2192;',hero_btn_story:'Nuestra Historia',
+  stat_flavors:'Sabores',stat_homemade:'Casero',stat_love:'Con amor',
+  featured_title:'Nuestros ',featured_em:'Favoritos',view_all_arrow:'Ver Todo &#x2192;',
+  about_title_dt:'&#x1F44B; Hola, soy la repostera detras de Paobee!',
+  about_p1_dt:'Todo aqui esta hecho desde cero en mi cocina casera con amor y los mejores ingredientes. Sin conservantes, sin atajos — solo postres reales y deliciosos hechos a pedido.',
+  about_p2_dt:'Ya sea que te estes dando un gusto o pidiendo para una ocasion especial, cada bocado esta hecho especialmente para ti. Gracias por apoyar mi pequeno negocio!',
+  tag_made_order:'Hecho a pedido',tag_no_pres:'Sin conservantes',tag_home_kitchen:'Cocina casera',
+  footer_copy:'&#x00A9; 2025 Paobee. Hecho con &#x2764;&#xFE0F; en Puerto Rico.',
+  shop_title_dt:'&#x1F9C1; Tienda',search_ph_dt:'Buscar postres...',
+  orders_title_dt:'&#x1F4E6; Mis Pedidos',settings_title_dt:'&#x2699;&#xFE0F; Ajustes',checkout_title:'Pago',
+  continue_pay:'Continuar al Pago &#x2192;',no_featured:'Sin productos destacados.',no_in_cat:'Sin productos en esta categoria.',all_cat:'Todo'},
+en:{home:'Home',shop:'Shop',cart:'Cart',orders:'Orders',settings:'Settings',manage:'Manage',shop_title:'Shop',handcrafted:'Handcrafted with love',baked_fresh:'Baked Fresh,',daily:'Daily',hero_sub:'From fluffy cupcakes to crispy churros, every treat made with the finest ingredients.',shop_now:'Shop Now',our_story:'Our Story',flavors:'Flavors',homemade:'Homemade',with_love:'With love',our_cats:'Our ',categories:'Categories',order_again:'Order ',again:'Again',our_favs:'Our ',favorites:'Favorites',view_all:'View All',story_lbl:'Our ',story_em:'Story',about_title:"Hello, I'm the baker behind Paobee!",about_p1:'Everything here is made from scratch in my home kitchen with love and the best ingredients. No preservatives, no shortcuts - just real, delicious baked goods made to order.',about_p2:"Whether you're treating yourself or ordering for a special occasion, every bite is crafted just for you. Thank you for supporting my small business!",made_to_order:'Made to order',no_preservatives:'No preservatives',home_kitchen:'Home kitchen',my_cart:'My Cart',checkout:'Checkout',my_orders:'My Orders',settings_title:'Settings',active_order:'Active Order',history:'History',profile:'Profile',name:'Name',phone:'Phone',email:'Email',save:'Save',dark_mode:'Dark Mode',order_updates:'Order updates',promotions:'Promotions',language:'Language',payment_methods:'Payment Methods',add_pm:'+ Add Payment Method',loyalty_pts:'Loyalty Points',paobee_rewards:'Paobee Rewards',redeem:'Redeem',pts_history:'History',pickup:'Pickup',delivery:'Delivery',free:'Free',your_info:'Your Info',payment_lbl:'Payment',promo_code:'Promo Code',order_summary:'Order Summary',subtotal:'Subtotal',delivery_fee:'Delivery fee',total:'Total',place_order:'Place Order',back_to_cart:'Back to cart',order_placed:'Order Placed!',track_order:'Track My Order',back_home:'Back to Home',cash:'Cash',cash_sub:'Pay on pickup/delivery',ath:'ATH Movil',ath_sub:'Send to @paobee',paypal:'PayPal',paypal_sub:'Send to @paobee',stripe:'Pay with Card',stripe_sub:'Coming soon via Stripe',promo_ph:'Code e.g. PAOBEE10',apply_btn:'Apply',confirmed:'Confirmed',preparing:'Preparing',on_the_way:'On the Way',completed:'Completed',no_active:'No active orders',no_active_sub:'Place an order and track it here!',no_history:'No past orders',no_history_sub:'Your completed orders will appear here.',your_items:'Your Items',reorder:'Reorder',rate_order:'Rate Your Order',rate_sub:'You received this 24+ hours ago.',submit_btn:'Submit',skip_btn:'Skip',use_pts:'Use Loyalty Points',pts_available:'pts available',pts_min:'Need 50+ pts to redeem',update_status:'Update Status',cancel_order:'Cancel Order',orders_tab:'Orders',products_tab:'Products',schedule_tab:'Schedule',analytics_tab:'Analytics',add_product:'+ Add Product',revenue:'Revenue',avg_order:'Avg Order',products:'Products',avail_days:'Available Days & Hours',advance:'Advance booking',same_day:'Same day',one_day:'1 day ahead',two_days:'2 days ahead',three_days:'3 days ahead',edit_product:'Edit Product',add_product_title:'Add Product',save_changes:'Save Changes',name_lbl:'Name',category:'Category',price:'Price ($)',description:'Description',allergens:'Allergens',photo:'Photo',featured:'Mark as Featured',home_page:'Home page',or_url:'or paste URL',upload:'Upload',camera:'Camera',stripe_note:'Stripe card payments will be enabled after deployment.',export_orders:'Export Orders',export_sub:'Download all orders as CSV',export_btn:'Export',add_pm_modal:'Add Payment Method',username_lbl:'Username',save_btn:'Save',no_photo:'No photo',sold_out:'Sold Out',low_stock:'Low Stock',schedule_title:'Schedule',notes_ph:'Allergies, special requests...',address_ph:'Your address',to:'to',search_ph:'Search treats...',contains:'Contains',add_to_cart:'Add to Cart',added:'Added!',mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun',in_lbl:'In',low_lbl:'Low',out_lbl:'Out',del_confirm:'Delete this product?',cancel_confirm:'Cancel this order?',browse_shop:'Browse Shop',pts_unlock:'Points unlocked!',pts_note_applied:'applied',
+  redeemable:'redeemable',pts_ready:'Ready to redeem! &#x1F389;',pts_need:'Need',pts_more:'more pts',
+  nav_home:'&#x1F3E0; Home',nav_shop:'&#x1F9C1; Shop',nav_orders:'&#x1F4E6; Orders',nav_cart:'&#x1F6D2; Cart',nav_mgr:'&#x1F469;&#x200D;&#x1F373; Manager',
+  hero_tag:'&#x2726; Handcrafted with love',hero_btn_shop:'Shop Now &#x2192;',hero_btn_story:'Our Story',
+  stat_flavors:'Flavors',stat_homemade:'Homemade',stat_love:'With love',
+  featured_title:'Our ',featured_em:'Favorites',view_all_arrow:'View All &#x2192;',
+  about_title_dt:'&#x1F44B; Hello, I\'m the baker behind Paobee!',
+  about_p1_dt:'Everything here is made from scratch in my home kitchen with love and the best ingredients. No preservatives, no shortcuts - just real, delicious baked goods made to order.',
+  about_p2_dt:"Whether you\'re treating yourself or ordering for a special occasion, every bite is crafted just for you. Thank you for supporting my small business!",
+  tag_made_order:'Made to order',tag_no_pres:'No preservatives',tag_home_kitchen:'Home kitchen',
+  footer_copy:'&#x00A9; 2025 Paobee. Made with &#x2764;&#xFE0F; in Puerto Rico.',
+  shop_title_dt:'&#x1F9C1; Shop',search_ph_dt:'Search treats...',
+  orders_title_dt:'&#x1F4E6; My Orders',settings_title_dt:'&#x2699;&#xFE0F; Settings',checkout_title:'Payment',
+  continue_pay:'Continue to Pay &#x2192;',no_featured:'No featured products.',no_in_cat:'No products in this category.',all_cat:'All'}
 };
 /* ── t(key) helper ─────────────────────────── */
 function t(k){return(T[lang]&&T[lang][k])||T.en[k]||k;}
@@ -2609,8 +2639,13 @@ function openCatModal(existingName, existingEmoji) {
   /* name input */
   var nameWrap = document.createElement('div');
   nameWrap.className = 'ef';
-  nameWrap.innerHTML = '<label class="elbl">Nombre</label><input class="einp" id="cm-name" placeholder="Ej. Macarons" value="' + (existingName||'') + '">';
+  nameWrap.innerHTML = '<label class="elbl">Nombre (Español)</label><input class="einp" id="cm-name" placeholder="Ej. Macarons" value="' + (existingName||'') + '">';
   body.appendChild(nameWrap);
+  var nameWrapEn = document.createElement('div');
+  nameWrapEn.className = 'ef';
+  var existingEn = (CE[existingName]&&CE[existingName].en&&CE[existingName].en!==existingName)?CE[existingName].en:'';
+  nameWrapEn.innerHTML = '<label class="elbl">Name (English)</label><input class="einp" id="cm-name-en" placeholder="e.g. Macarons" value="' + existingEn + '">';
+  body.appendChild(nameWrapEn);
 
   /* emoji picker */
   var emojiLabel = document.createElement('label');
@@ -2668,8 +2703,9 @@ function openCatModal(existingName, existingEmoji) {
   saveBtn.className = 'esave';
   saveBtn.textContent = 'Guardar';
   saveBtn.onclick = function() {
-    var newName  = (document.getElementById('cm-name')  ||{}).value.trim();
-    var newEmoji = (document.getElementById('cm-emoji') ||{}).value;
+    var newName   = (document.getElementById('cm-name')    ||{}).value.trim();
+    var newNameEn = (document.getElementById('cm-name-en') ||{}).value.trim();
+    var newEmoji  = (document.getElementById('cm-emoji')   ||{}).value;
     if (!newName) { alert('Por favor ingresa un nombre.'); return; }
     if (!isEdit && CE[newName]) { alert('Esta categoria ya existe.'); return; }
     /* rename: update products that had old category */
@@ -2677,7 +2713,7 @@ function openCatModal(existingName, existingEmoji) {
       products.forEach(function(p){ if(p.cat===existingName) p.cat=newName; });
       delete CE[existingName];
     }
-    CE[newName] = newEmoji;
+    CE[newName] = {emoji: newEmoji, en: newNameEn||newName};
     saveCatsToDB();
     overlay.classList.remove('open');
     renderMgrTab('products');
@@ -2690,7 +2726,7 @@ function openCatModal(existingName, existingEmoji) {
 
 function saveCatsToDB() {
   if (!currentUser) return;
-  var rows = Object.entries(CE).map(function(e){ return {name:e[0], emoji:e[1]}; });
+  var rows = Object.entries(CE).map(function(e){ var v=e[1]; return {name:e[0], emoji:(v.emoji||v), name_en:(v.en||e[0])}; });
   /* delete all then insert fresh */
   sb.from('categories').delete().neq('name','__none__').then(function() {
     if (rows.length) sb.from('categories').insert(rows);
@@ -2701,7 +2737,7 @@ function loadCatsFromDB() {
   sb.from('categories').select('*').order('name').then(function(res) {
     if (res.data && res.data.length) {
       CE = {};
-      res.data.forEach(function(r){ CE[r.name] = r.emoji; });
+      res.data.forEach(function(r){ CE[r.name] = {emoji: r.emoji||'&#x1F370;', en: r.name_en||r.name}; });
     }
   });
 }
@@ -2729,7 +2765,22 @@ function setLang(nl){
 /* ══════════════════════════════════════════════
    DATA  – categories, stages, schedule, products, orders, loyalty
    ══════════════════════════════════════════════ */
-var CE={Cupcakes:'&#x1F9C1;',Cookies:'&#x1F36A;',Brownies:'&#x1F7EB;',"Tres Leches":'&#x1F382;',Donuts:'&#x1F369;',Churros:'&#x1F962;',Sweets:'&#x1F36C;'};
+var CE={
+  Cupcakes:{emoji:'&#x1F9C1;',en:'Cupcakes'},
+  Cookies:{emoji:'&#x1F36A;',en:'Cookies'},
+  Brownies:{emoji:'&#x1F7EB;',en:'Brownies'},
+  'Tres Leches':{emoji:'&#x1F382;',en:'Tres Leches'},
+  Donuts:{emoji:'&#x1F369;',en:'Donuts'},
+  Churros:{emoji:'&#x1F962;',en:'Churros'},
+  Sweets:{emoji:'&#x1F36C;',en:'Sweets'}
+};
+/* Returns display name of category in current language */
+function catName(key){ var c=CE[key]; if(!c)return key; return(lang==='en'&&c.en)?c.en:key; }
+/* Returns emoji for category key */
+function catEmoji(key){ var c=CE[key]; return c?(c.emoji||c):''; }
+/* Returns product name/desc in current language */
+function prodName(p){ return (lang==='en'&&p.name_en)?p.name_en:p.name; }
+function prodDesc(p){ return (lang==='en'&&p.desc_en)?p.desc_en:p.desc; }
 var STAGES=['confirmed','preparing','on_the_way','completed'];
 var SICONS={confirmed:'&#x2705;',preparing:'&#x1F525;',on_the_way:'&#x1F6F5;',completed:'&#x1F389;'};
 var PROMOS={PAOBEE10:{pct:10,label:'10% off'},SWEET5:{flat:5,label:'$5 off'}};
@@ -2945,8 +2996,8 @@ function openProduct(id){
   if(p.photo){var img=document.createElement('img');img.src=p.photo;img.style.cssText='width:100%;height:100%;object-fit:cover';img.onerror=function(){mi.innerHTML='<span style="font-size:68px">'+p.icon+'</span>';};mi.appendChild(img);}
   else mi.innerHTML='<span style="font-size:68px">'+p.icon+'</span>';
   document.getElementById('modal-cat').textContent=p.cat;
-  document.getElementById('modal-name').textContent=p.name;
-  document.getElementById('modal-desc').textContent=p.desc;
+  document.getElementById('modal-name').textContent=prodName(p);
+  document.getElementById('modal-desc').textContent=prodDesc(p);
   document.getElementById('modal-price').textContent='$'+p.price.toFixed(2);
   document.getElementById('modal-rating').innerHTML=p.ratings.length?'&#x2B50; '+p.avgRating.toFixed(1)+' ('+p.ratings.length+')':'';
   var ab=document.getElementById('modal-abox');var at=document.getElementById('modal-allergens');
@@ -2965,15 +3016,15 @@ function renderCard(p){
   var so=p.stock==='out',low=p.stock==='low';
   return '<div class="pcard" onclick="openProduct('+p.id+')">'
     +'<div class="pcard-img">'+iH+(so?'<div class="sold-overlay"><div class="sold-badge">'+t('sold_out')+'</div></div>':'')+(low?'<div class="low-badge">'+t('low_stock')+'</div>':'')+'</div>'
-    +'<div class="pcard-body">'+(p.featured?'<div class="feat-badge">Destacado</div>':'')
+    +'<div class="pcard-body">'+(p.featured?'<div class="feat-badge">'+t('featured')+'</div>':'')
     +'<div class="pcard-cat">'+p.cat+'</div><div class="pcard-name">'+p.name+'</div>'
     +(p.ratings.length?'<span class="star-mini">&#x2B50; '+p.avgRating.toFixed(1)+' ('+p.ratings.length+')</span>':'')
-    +'<div class="pcard-desc">'+p.desc+'</div>'
+    +'<div class="pcard-desc">'+prodDesc(p)+'</div>'
     +'<div class="pcard-row"><div class="pcard-price" style="'+(so?'color:var(--muted)':'')+'">$'+p.price.toFixed(2)+'</div>'
     +'<button class="add-btn" '+(so?'disabled':'')+' onclick="event.stopPropagation();addToCart('+p.id+',this)">+</button></div></div></div>';
 }
 function renderHome(){
-  document.getElementById('home-cats').innerHTML=Object.keys(CE).map(function(c){return '<div class="cat" onclick="goTo(\'shop\');activeCat=\''+c+'\';renderShop()">'+CE[c]+' '+c+'</div>';}).join('');
+  document.getElementById('home-cats').innerHTML=Object.keys(CE).map(function(c){return '<div class="cat" onclick="goTo(\'shop\');activeCat=\''+c+'\';renderShop()">'+catEmoji(c)+' '+catName(c)+'</div>';}).join('');
   document.getElementById('home-featured').innerHTML=products.filter(function(p){return p.featured;}).map(renderCard).join('');
   var comp=orders.filter(function(o){return o.status==='completed';});
   var sec=document.getElementById('reorder-section');
@@ -2987,7 +3038,7 @@ function renderHome(){
    ══════════════════════════════════════════════ */
 function renderShop(){
   var cats=['All'].concat(Object.keys(CE));
-  document.getElementById('shop-cats').innerHTML=cats.map(function(c){return '<div class="cat'+(activeCat===c?' active':'')+'" onclick="activeCat=\''+c+'\';renderShop()">'+(CE[c]?CE[c]+' ':'')+c+'</div>';}).join('');
+  document.getElementById('shop-cats').innerHTML=cats.map(function(c){return '<div class="cat'+(activeCat===c?' active':'')+'" onclick="activeCat=\''+c+'\';renderShop()">'+(catEmoji(c)?catEmoji(c)+' ':'')+( c==='All'?t('all_cat'):catName(c) )+'</div>';}).join('');
   var q=(document.getElementById('search-input')||{}).value||'';
   document.getElementById('shop-products').innerHTML=products.filter(function(p){return(activeCat==='All'||p.cat===activeCat)&&(!q||p.name.toLowerCase().includes(q.toLowerCase()));}).map(renderCard).join('');
 }
@@ -3122,7 +3173,7 @@ function renderSettings(){
   var pct=Math.min(100,(loyalty.points%50)/50*100);
   var pmC=payMethods.map(function(pm){var ic=pm.type==='ath'?'&#x1F4F1;':'&#x1F499;';var bg=pm.type==='ath'?'#0057FF22':'#00317822';var lb=pm.type==='ath'?'ATH Movil':'PayPal';return '<div class="pm-card"><div class="pm-icon" style="background:'+bg+'">'+ic+'</div><div><div class="pm-label">'+lb+'</div><div class="pm-sub">'+pm.username+'</div></div><button class="pm-rem" onclick="remPm('+pm.id+')">&#x1F5D1;</button></div>';}).join('');
   var loyH='<div class="stitle">&#x2B50; '+t('loyalty_pts')+'</div>'
-    +'<div class="loyalty-card"><div class="loy-tag">'+t('paobee_rewards')+'</div><div class="loy-pts">'+loyalty.points+' pts</div><div class="loy-sub">= $'+Math.floor(loyalty.points/10).toFixed(2)+' canjeables</div><div class="loy-bg"><div class="loy-fill" style="width:'+pct+'%"></div></div><div class="loy-hint">'+(loyalty.points>=50?'Listo para canjear! &#x1F389;':'Necesitas '+(50-(loyalty.points%50))+' pts mas')+'</div><div class="loy-acts"><div class="loy-btn" onclick="togPtsH()">'+t('pts_history')+'</div>'+(loyalty.points>=50?'<div class="loy-btn red" onclick="goTo(\'shop\')">'+t('redeem')+'</div>':'')+'</div></div>'
+    +'<div class="loyalty-card"><div class="loy-tag">'+t('paobee_rewards')+'</div><div class="loy-pts">'+loyalty.points+' pts</div><div class="loy-sub">= $'+Math.floor(loyalty.points/10).toFixed(2)+' '+t('redeemable')+'</div><div class="loy-bg"><div class="loy-fill" style="width:'+pct+'%"></div></div><div class="loy-hint">'+(loyalty.points>=50?t('pts_ready'):t('pts_need')+' '+(50-(loyalty.points%50))+' '+t('pts_more'))+'</div><div class="loy-acts"><div class="loy-btn" onclick="togPtsH()">'+t('pts_history')+'</div>'+(loyalty.points>=50?'<div class="loy-btn red" onclick="goTo(\'shop\')">'+t('redeem')+'</div>':'')+'</div></div>'
     +'<div id="pts-h-sec" style="display:none;margin:0 16px 14px"><div class="pts-hcard"><div style="padding:12px 16px;font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)">'+t('pts_history')+'</div>'
     +loyalty.history.map(function(h){var bg=h.type==='earn'?'#E8F5E9':h.type==='spend'?'#FDF0F3':'#FFF8E1';var ic=h.type==='earn'?'&#x1F389;':h.type==='spend'?'&#x1F6CD;&#xFE0F;':'&#x23F3;';var cl=h.type==='earn'?'pts-earn':h.type==='spend'?'pts-spend':'pts-pend';return '<div class="pts-row"><div style="display:flex;align-items:center"><div class="pts-icon" style="background:'+bg+'">'+ic+'</div><div><div style="font-size:13px;font-weight:500;color:var(--text)">'+h.desc+'</div><div style="font-size:11px;color:var(--muted)">'+h.sub+'</div></div></div><div class="'+cl+'">'+(h.amount>0?'+':'')+h.amount+'</div></div>';}).join('')+'</div></div>';
   /* build avatar — photo or initials */
@@ -3265,7 +3316,7 @@ function renderMgrTab(tab){
       card.innerHTML = '<div class="pad-img">'+iH+'</div>'
         + '<div style="flex:1">'
         + '<div style="font-weight:600;font-size:14px;color:var(--text)">'+p.name+'</div>'
-        + '<div style="font-size:12px;color:var(--muted)">'+p.cat+(p.featured?' · Destacado':'')+(p.ratings.length?' · &#x2B50;'+p.avgRating.toFixed(1):'')+' </div>'
+        + '<div style="font-size:12px;color:var(--muted)">'+p.cat+(p.featured?' · '+t('featured'):'')+(p.ratings.length?' · &#x2B50;'+p.avgRating.toFixed(1):'')+' </div>'
         + (p.allergens&&p.allergens.length?'<div style="font-size:11px;color:var(--muted)">&#x26A0;&#xFE0F; '+p.allergens.join(', ')+'</div>':'')
         + '<div class="pad-acts">'
         + '<button class="pad-edit" onclick="openEdit('+p.id+')">&#x270F;&#xFE0F;</button>'
@@ -3445,12 +3496,12 @@ function exportCSV(){var headers=['Pedido','Nombre','Telefono','Email','Fecha','
 /* ══════════════════════════════════════════════
    PRODUCT EDITOR (add / edit / delete)
    ══════════════════════════════════════════════ */
-function openEdit(id){var p=products.find(function(x){return x.id===id;});if(!p)return;editingId=id;document.getElementById('edit-name').value=p.name;document.getElementById('edit-cat').value=p.cat;document.getElementById('edit-price').value=p.price;document.getElementById('edit-desc-i').value=p.desc;document.getElementById('edit-allergens').value=(p.allergens||[]).join(', ');document.getElementById('edit-featured').checked=p.featured;document.getElementById('edit-photo-data').value=p.photo||'';document.getElementById('edit-url').value='';if(p.photo)showPP('edit-preview',p.photo);else clearPP('edit-preview');document.getElementById('edit-overlay').classList.add('open');}
-function saveEdit(){var p=products.find(function(x){return x.id===editingId;});if(!p)return;p.name=document.getElementById('edit-name').value||p.name;p.cat=document.getElementById('edit-cat').value;p.price=parseFloat(document.getElementById('edit-price').value)||p.price;p.desc=document.getElementById('edit-desc-i').value||p.desc;
+function openEdit(id){var p=products.find(function(x){return x.id===id;});if(!p)return;editingId=id;document.getElementById('edit-name').value=p.name;document.getElementById('edit-name-en').value=p.name_en&&p.name_en!==p.name?p.name_en:'';document.getElementById('edit-cat').value=p.cat;document.getElementById('edit-price').value=p.price;document.getElementById('edit-desc-i').value=p.desc;document.getElementById('edit-desc-en').value=p.desc_en&&p.desc_en!==p.desc?p.desc_en:'';document.getElementById('edit-allergens').value=(p.allergens||[]).join(', ');document.getElementById('edit-featured').checked=p.featured;document.getElementById('edit-photo-data').value=p.photo||'';document.getElementById('edit-url').value='';if(p.photo)showPP('edit-preview',p.photo);else clearPP('edit-preview');document.getElementById('edit-overlay').classList.add('open');}
+function saveEdit(){var p=products.find(function(x){return x.id===editingId;});if(!p)return;p.name=document.getElementById('edit-name').value||p.name;p.name_en=document.getElementById('edit-name-en').value||p.name;p.cat=document.getElementById('edit-cat').value;p.price=parseFloat(document.getElementById('edit-price').value)||p.price;p.desc=document.getElementById('edit-desc-i').value||p.desc;p.desc_en=document.getElementById('edit-desc-en').value||p.desc;
   /* capture panned/zoomed crop if available */
   var prevEl=document.getElementById('edit-preview');
   if(prevEl&&prevEl._getSnapshot){document.getElementById('edit-photo-data').value=prevEl._getSnapshot();}
-  p.photo=document.getElementById('edit-photo-data').value||'';p.featured=document.getElementById('edit-featured').checked;p.allergens=document.getElementById('edit-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean);p.icon=CE[p.cat]||p.icon;document.getElementById('edit-overlay').classList.remove('open');renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
+  p.photo=document.getElementById('edit-photo-data').value||'';p.featured=document.getElementById('edit-featured').checked;p.allergens=document.getElementById('edit-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean);p.icon=catEmoji(p.cat)||p.icon;document.getElementById('edit-overlay').classList.remove('open');renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
 function delProd(id) {
   if (!confirm(t('del_confirm'))) return;
   /* delete from Supabase first */
@@ -3466,7 +3517,7 @@ function delProd(id) {
   });
 }
 function openAddMod(){clearPP('add-preview');['add-name','add-price','add-desc','add-allergens'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});document.getElementById('add-featured').checked=false;document.getElementById('add-overlay').classList.add('open');}
-function saveNewProduct(){var name=document.getElementById('add-name').value.trim();var price=parseFloat(document.getElementById('add-price').value);if(!name||!price){alert('Por favor ingresa nombre y precio.');return;}var cat=document.getElementById('add-cat').value;products.push({id:nextId++,name:name,cat:cat,desc:document.getElementById('add-desc').value||'Un delicioso postre.',price:price,icon:CE[cat]||'&#x1F370;',photo:document.getElementById('add-photo-data').value||'',featured:document.getElementById('add-featured').checked,allergens:document.getElementById('add-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean),stock:'in',ratings:[],avgRating:0});document.getElementById('add-overlay').classList.remove('open');renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
+function saveNewProduct(){var name=document.getElementById('add-name').value.trim();var price=parseFloat(document.getElementById('add-price').value);if(!name||!price){alert('Por favor ingresa nombre y precio.');return;}var cat=document.getElementById('add-cat').value;products.push({id:nextId++,name:name,cat:cat,desc:document.getElementById('add-desc').value||'Un delicioso postre.',price:price,icon:catEmoji(cat)||'&#x1F370;',photo:document.getElementById('add-photo-data').value||'',featured:document.getElementById('add-featured').checked,allergens:document.getElementById('add-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean),stock:'in',ratings:[],avgRating:0});document.getElementById('add-overlay').classList.remove('open');renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
 
 /* ══════════════════════════════════════════════
    CATEGORY MANAGEMENT
@@ -3874,7 +3925,7 @@ function loadProductsFromDB() {
     if (res.data && res.data.length) {
       products = res.data.map(function(p) {
         return {
-          id: p.id, name: p.name, cat: p.cat, desc: p.description,
+          id: p.id, name: p.name, name_en: p.name_en||p.name, cat: p.cat, desc: p.description, desc_en: p.desc_en||p.description,
           price: parseFloat(p.price), icon: p.icon || '&#x1F370;',
           photo: p.photo || '', featured: p.featured,
           allergens: p.allergens || [], stock: p.stock,
@@ -3951,7 +4002,7 @@ function updateOrderStatusDB(id, status) {
 /* ── Save product to DB ──────────────────────── */
 function saveProductToDB(p) {
   var data = {
-    name: p.name, cat: p.cat, description: p.desc,
+    name: p.name, name_en: p.name_en||p.name, cat: p.cat, description: p.desc, desc_en: p.desc_en||p.desc,
     price: p.price, icon: p.icon, photo: p.photo,
     featured: p.featured, stock: p.stock,
     allergens: p.allergens, avg_rating: p.avgRating, ratings: p.ratings
@@ -4068,10 +4119,13 @@ saveNewProduct = function() {
   /* capture panned/zoomed crop if available */
   var addPrevEl = document.getElementById('add-preview');
   if (addPrevEl && addPrevEl._getSnapshot) { document.getElementById('add-photo-data').value = addPrevEl._getSnapshot(); }
+  var nameEn = document.getElementById('add-name-en').value.trim();
+  var descEn = document.getElementById('add-desc-en').value.trim();
   var newP = {
-    id: nextId++, name: name, cat: cat,
+    id: nextId++, name: name, name_en: nameEn||name, cat: cat,
     desc: document.getElementById('add-desc').value || 'Un delicioso postre.',
-    price: price, icon: CE[cat] || '&#x1F370;',
+    desc_en: descEn || document.getElementById('add-desc').value || '',
+    price: price, icon: catEmoji(cat) || '&#x1F370;',
     photo: document.getElementById('add-photo-data').value || '',
     featured: document.getElementById('add-featured').checked,
     allergens: document.getElementById('add-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean),
@@ -4079,7 +4133,7 @@ saveNewProduct = function() {
   };
   /* save to Supabase and get real DB id back */
   sb.from('products').insert({
-    name: newP.name, cat: newP.cat, description: newP.desc,
+    name: newP.name, name_en: newP.name_en||newP.name, cat: newP.cat, description: newP.desc, desc_en: newP.desc_en||newP.desc,
     price: newP.price, icon: newP.icon, photo: newP.photo,
     featured: newP.featured, stock: newP.stock,
     allergens: newP.allergens, avg_rating: 0, ratings: '{}'
@@ -4301,10 +4355,10 @@ function dtRenderCartPanel() {
   el.innerHTML = items
     + '<div style="padding:20px">'
     + '<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:8px;color:var(--text)">'
-    + '<span style="color:var(--muted)">Subtotal</span><span>$' + sub.toFixed(2) + '</span></div>'
+    + '<span style="color:var(--muted)">'+t('subtotal')+'</span><span>$' + sub.toFixed(2) + '</span></div>'
     + '<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700;border-top:1px solid var(--border);padding-top:12px;margin-bottom:16px;color:var(--text)">'
-    + '<span>Total</span><span style="color:var(--pink)">$' + sub.toFixed(2) + '</span></div>'
-    + '<button class="place-btn" onclick="dtGoToCheckout()">Continuar al Pago &#x2192;</button>'
+    + '<span>'+t('total')+'</span><span style="color:var(--pink)">$' + sub.toFixed(2) + '</span></div>'
+    + '<button class="place-btn" onclick="dtGoToCheckout()" data-i18n="continue_pay">'+t('continue_pay')+'</button>'
     + '</div>';
 }
 
@@ -4327,7 +4381,7 @@ function dtGoToCheckout() {
   var el = document.getElementById('dt-orders-content');
   if (el) { renderCheckout(el); }
   var title = document.querySelector('#dt-view-orders .dt-panel-title');
-  if (title) title.textContent = 'Pago';
+  if (title) title.textContent = t('checkout_title');
 }
 
 function dtRenderFeatured() {
@@ -4345,7 +4399,7 @@ function dtRenderFeatured() {
           + '<div style="height:10px;background:var(--pm);border-radius:6px;width:60%;opacity:.4"></div></div></div>';
       }).join('');
     } else {
-      el.innerHTML = '<div style="color:var(--muted);font-size:14px">Sin productos destacados.</div>';
+      el.innerHTML = '<div style="color:var(--muted);font-size:14px">'+t('no_featured')+'</div>';
     }
     return;
   }
@@ -4363,7 +4417,7 @@ function dtRenderShop() {
   cats.forEach(function(c) {
     var pill = document.createElement('div');
     pill.className = 'dt-cat' + (dtActiveCat===c ? ' active' : '');
-    pill.textContent = (CE[c] ? CE[c]+' ' : '') + c;
+    pill.textContent = (CE[c] ? CE[c]+' ' : '') + (c==='All' ? t('all_cat') : c);
     pill.onclick = (function(cat){ return function(){ dtActiveCat=cat; dtRenderShop(); }; })(c);
     catsEl.appendChild(pill);
   });
@@ -4375,7 +4429,7 @@ function dtRenderShop() {
     return (dtActiveCat==='All'||p.cat===dtActiveCat) && (!q||p.name.toLowerCase().includes(q.toLowerCase()));
   });
   if (!filtered.length) {
-    gridEl.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:20px 0">Sin productos en esta categoria.</div>';
+    gridEl.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:20px 0">'+t('no_in_cat')+'</div>';
     return;
   }
   filtered.forEach(function(p){ gridEl.appendChild(dtRenderCard(p)); });
@@ -4386,19 +4440,19 @@ function dtRenderCard(p) {
   var img = p.photo
     ? '<img src="' + p.photo + '" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'">'
     : '<span style="font-size:48px">' + p.icon + '</span>';
-  var overlay = so ? '<div class="sold-overlay"><div class="sold-badge">Agotado</div></div>' : '';
-  var lowBadge = low ? '<div class="low-badge">Poco stock</div>' : '';
-  var featBadge = p.featured ? '<div class="feat-badge">Destacado</div>' : '';
+  var overlay = so ? '<div class="sold-overlay"><div class="sold-badge">'+t('sold_out')+'</div></div>' : '';
+  var lowBadge = low ? '<div class="low-badge">'+t('low_stock')+'</div>' : '';
+  var featBadge = p.featured ? '<div class="feat-badge">'+t('featured')+'</div>' : '';
   var stars = p.ratings.length ? '<span class="star-mini">&#x2B50; '+p.avgRating.toFixed(1)+' ('+p.ratings.length+')</span>' : '';
   var card = document.createElement('div');
   card.className = 'pcard';
   card.onclick = function(){ openProduct(p.id); };
   card.innerHTML = '<div class="pcard-img">' + img + overlay + lowBadge + '</div>'
     + '<div class="pcard-body">' + featBadge
-    + '<div class="pcard-cat">' + p.cat + '</div>'
-    + '<div class="pcard-name">' + p.name + '</div>'
+    + '<div class="pcard-cat">' + catName(p.cat) + '</div>'
+    + '<div class="pcard-name">' + prodName(p) + '</div>'
     + stars
-    + '<div class="pcard-desc">' + p.desc + '</div>'
+    + '<div class="pcard-desc">' + prodDesc(p) + '</div>'
     + '<div class="pcard-row">'
     + '<div class="pcard-price" style="' + (so?'color:var(--muted)':'') + '">$' + p.price.toFixed(2) + '</div>'
     + '<button class="add-btn" ' + (so?'disabled':'') + '>+</button>'
