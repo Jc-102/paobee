@@ -3275,7 +3275,7 @@ function renderMgrTab(tab){
     var pillRow = document.createElement('div');
     pillRow.className = 'cat-pill-row';
     Object.entries(CE).forEach(function(entry) {
-      var cName = entry[0], cEmoji = entry[1];
+      var cName = entry[0], cEmoji = (entry[1]&&entry[1].emoji)?entry[1].emoji:entry[1];
       var pill = document.createElement('div');
       pill.className = 'cat-pill';
       pill.innerHTML = '<span>' + cEmoji + ' ' + cName + '</span>';
@@ -4417,7 +4417,7 @@ function dtRenderShop() {
   cats.forEach(function(c) {
     var pill = document.createElement('div');
     pill.className = 'dt-cat' + (dtActiveCat===c ? ' active' : '');
-    pill.textContent = (CE[c] ? CE[c]+' ' : '') + (c==='All' ? t('all_cat') : c);
+    pill.textContent = (catEmoji(c)?catEmoji(c)+' ':'') + (c==='All'?t('all_cat'):catName(c));
     pill.onclick = (function(cat){ return function(){ dtActiveCat=cat; dtRenderShop(); }; })(c);
     catsEl.appendChild(pill);
   });
