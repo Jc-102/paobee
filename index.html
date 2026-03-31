@@ -2708,8 +2708,17 @@ function loadCatsFromDB() {
 
 function setLang(nl){
   lang=nl;applyTranslations();
-  var a=document.querySelector('.screen.active');
-  if(a){var id=a.id;if(id==='screen-home')renderHome();else if(id==='screen-shop')renderShop();else if(id==='screen-track'){renderTrackActive();renderTrackHistory();}else if(id==='screen-settings')renderSettings();else if(id==='screen-manager')renderManager();}
+  savePref('lang',nl);
+  if(IS_DESKTOP){
+    dtRenderFeatured();
+    if(dtActiveView==='shop')dtRenderShop();
+    else if(dtActiveView==='orders')dtRenderOrders();
+    else if(dtActiveView==='settings')dtRenderSettings();
+    else if(dtActiveView==='manager')dtMgrTab(document.getElementById('dt-mgr-link-'+dtMgrActive),dtMgrActive);
+  } else {
+    var a=document.querySelector('.screen.active');
+    if(a){var id=a.id;if(id==='screen-home')renderHome();else if(id==='screen-shop')renderShop();else if(id==='screen-track'){renderTrackActive();renderTrackHistory();}else if(id==='screen-settings')renderSettings();else if(id==='screen-manager')renderManager();}
+  }
 }
 /* ══════════════════════════════════════════════
    DATA  – categories, stages, schedule, products, orders, loyalty
@@ -3152,7 +3161,9 @@ function savProf() {
       email:          prof.email,
       avatar_url:     prof.avatar_url     || null,
       birthday_month: prof.birthday_month || null,
-      birthday_day:   prof.birthday_day   || null
+      birthday_day:   prof.birthday_day   || null,
+      lang:           lang,
+      dark_mode:      cfg.dark
     }).eq('id', currentUser.id).then(function(res) {
       if (res.error) { alert('Error guardando perfil.'); return; }
       renderSettings();
@@ -3162,7 +3173,19 @@ function savProf() {
     renderSettings();
   }
 }
-function togDark(el){cfg.dark=el.checked;document.body.classList.toggle('dark',el.checked);}
+function togDark(el){cfg.dark=el.checked;document.body.classList.toggle('dark',el.checked);savePref('dark_mode',el.checked);}
+
+/* ── Persist preferences to Supabase profiles ── */
+function savePref(col, val){
+  if(!currentUser)return;
+  var upd={};upd[col]=val;
+  sb.from('profiles').update(upd).eq('id',currentUser.id).then(function(){});
+}
+function applyPrefs(data){
+  if(!data)return;
+  if(data.lang){lang=data.lang;applyTranslations();}
+  if(data.dark_mode){cfg.dark=true;document.body.classList.add('dark');}
+}
 function remPm(id){payMethods=payMethods.filter(function(p){return p.id!==id;});renderSettings();}
 function openPmMod(){pmType='ath';renderPmForm();document.getElementById('pm-overlay').classList.add('open');}
 function selPmType(type){pmType=type;['ath','pp','stripe'].forEach(function(tp){var el=document.getElementById('pmt-'+tp);if(el)el.classList.toggle('active',tp===type);});renderPmForm();}
@@ -3712,6 +3735,7 @@ function loadUserRole(uid, displayName) {
       prof.avatar_url      = res.data.avatar_url      || '';
       prof.birthday_month  = res.data.birthday_month  || '';
       prof.birthday_day    = res.data.birthday_day    || '';
+      applyPrefs(res.data);
     } else {
       currentRole = 'customer';
       prof.name   = displayName;
@@ -3853,6 +3877,11 @@ function loadProductsFromDB() {
       });
       if (document.getElementById('screen-home').classList.contains('active')) renderHome();
       if (document.getElementById('screen-shop').classList.contains('active')) renderShop();
+      /* Desktop — refresh immediately after data arrives */
+      if (IS_DESKTOP) {
+        dtRenderFeatured();
+        if (dtActiveView === 'shop') dtRenderShop();
+      }
     }
   });
 }
@@ -4506,17 +4535,7 @@ updateCounts = function() {
   if (IS_DESKTOP) dtUpdateCartCount();
 };
 
-var _origLoadProducts = loadProductsFromDB;
-loadProductsFromDB = function() {
-  _origLoadProducts.apply(this, arguments);
-  /* Products arrive async — re-render whichever desktop view is active.
-     100 ms is plenty: just needs to land after the Supabase promise resolves. */
-  setTimeout(function() {
-    if (!IS_DESKTOP) return;
-    dtRenderFeatured();                          /* always refresh home featured */
-    if (dtActiveView === 'shop') dtRenderShop(); /* also refresh shop if open   */
-  }, 100);
-};
+/* loadProductsFromDB already handles desktop refresh internally */
 
 window.addEventListener('resize', function() {
   var wasDesktop = IS_DESKTOP;
