@@ -2581,7 +2581,7 @@ en:{home:'Home',shop:'Shop',cart:'Cart',orders:'Orders',settings:'Settings',mana
 function t(k){return(T[lang]&&T[lang][k])||T.en[k]||k;}
 /* ── applyTranslations() ───────────────────── */
 function applyTranslations(){
-  document.querySelectorAll('[data-i18n]').forEach(function(el){el.textContent=t(el.getAttribute('data-i18n'));});
+  document.querySelectorAll('[data-i18n]').forEach(function(el){el.innerHTML=t(el.getAttribute('data-i18n'));});
   document.querySelectorAll('[data-i18n-ph]').forEach(function(el){el.placeholder=t(el.getAttribute('data-i18n-ph'));});
 }
 /* ── setLang(newLang) ──────────────────────── */
@@ -2995,7 +2995,7 @@ function openProduct(id){
   var mi=document.getElementById('modal-img');mi.innerHTML='';
   if(p.photo){var img=document.createElement('img');img.src=p.photo;img.style.cssText='width:100%;height:100%;object-fit:cover';img.onerror=function(){mi.innerHTML='<span style="font-size:68px">'+p.icon+'</span>';};mi.appendChild(img);}
   else mi.innerHTML='<span style="font-size:68px">'+p.icon+'</span>';
-  document.getElementById('modal-cat').textContent=p.cat;
+  document.getElementById('modal-cat').textContent=catName(p.cat);
   document.getElementById('modal-name').textContent=prodName(p);
   document.getElementById('modal-desc').textContent=prodDesc(p);
   document.getElementById('modal-price').textContent='$'+p.price.toFixed(2);
@@ -4417,7 +4417,7 @@ function dtRenderShop() {
   cats.forEach(function(c) {
     var pill = document.createElement('div');
     pill.className = 'dt-cat' + (dtActiveCat===c ? ' active' : '');
-    pill.textContent = (catEmoji(c)?catEmoji(c)+' ':'') + (c==='All'?t('all_cat'):catName(c));
+    pill.innerHTML = (catEmoji(c)?catEmoji(c)+' ':'') + (c==='All'?t('all_cat'):catName(c));
     pill.onclick = (function(cat){ return function(){ dtActiveCat=cat; dtRenderShop(); }; })(c);
     catsEl.appendChild(pill);
   });
