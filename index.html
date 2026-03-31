@@ -2707,17 +2707,23 @@ function loadCatsFromDB() {
 }
 
 function setLang(nl){
-  lang=nl;applyTranslations();
+  lang=nl;
   savePref('lang',nl);
+  /* Re-render everything so all dynamic content picks up the new language */
+  applyTranslations();   /* static data-i18n elements */
+  renderHome();
+  renderShop();
+  renderCart();
+  renderTrackActive();
+  renderTrackHistory();
+  renderSettings();
   if(IS_DESKTOP){
+    dtRenderNav();
     dtRenderFeatured();
-    if(dtActiveView==='shop')dtRenderShop();
-    else if(dtActiveView==='orders')dtRenderOrders();
-    else if(dtActiveView==='settings')dtRenderSettings();
-    else if(dtActiveView==='manager')dtMgrTab(document.getElementById('dt-mgr-link-'+dtMgrActive),dtMgrActive);
-  } else {
-    var a=document.querySelector('.screen.active');
-    if(a){var id=a.id;if(id==='screen-home')renderHome();else if(id==='screen-shop')renderShop();else if(id==='screen-track'){renderTrackActive();renderTrackHistory();}else if(id==='screen-settings')renderSettings();else if(id==='screen-manager')renderManager();}
+    dtRenderShop();
+    dtRenderOrders();
+    dtRenderSettings();
+    if(dtMgrActive)dtMgrTab(document.getElementById('dt-mgr-link-'+dtMgrActive),dtMgrActive);
   }
 }
 /* ══════════════════════════════════════════════
