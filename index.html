@@ -3186,9 +3186,17 @@ function renderCheckout(el){
   var lrb='<div class="lrb"><div class="lrb-top"><div class="lrb-title">&#x2B50; '+t('use_pts')+'</div><div class="lrb-pts">'+loyalty.points+' '+t('pts_available')+'</div></div>'+(pok?'<div style="display:flex;align-items:center;gap:8px;margin-top:6px"><span style="font-size:13px;color:var(--text)">'+loyalty.points+' pts = $'+Math.floor(loyalty.points/10)+' off</span><label class="tog-sw"><input type="checkbox" id="pts-tog" onchange="togPts(this)"><span class="tog-sl"></span></label></div>':'<div style="font-size:12px;color:var(--muted);margin-top:4px">'+t('pts_min')+'</div>')+'<div id="pts-note" style="display:none;font-size:12px;color:var(--pink);margin-top:6px">-$'+Math.floor(loyalty.points/10).toFixed(2)+' '+t('pts_note_applied')+'</div></div>';
   var spm=payMethods.length?payMethods.map(function(pm){var ic=pm.type==='ath'?'&#x1F4F1;':'&#x1F499;';var lb=pm.type==='ath'?'ATH Movil':'PayPal';return '<div class="pay-opt" id="spm-'+pm.id+'" onclick="selSPm('+pm.id+',\''+pm.type+'\')"><div style="font-size:20px;width:32px;text-align:center">'+ic+'</div><div><div class="pay-opt-lbl">'+lb+'</div><div class="pay-opt-sub">'+pm.username+'</div></div></div>';}).join(''):'';
   el.innerHTML='<div class="co-section">'
-    +'<div class="co-card"><h3>'+t('pickup')+' / '+t('delivery')+'?</h3><div class="del-opts"><div class="del-opt active" id="opt-pu" onclick="selDel(\'pickup\')"><div class="del-opt-icon">&#x1F3E0;</div><div class="del-opt-lbl">'+t('pickup')+'</div><div class="del-opt-sub">'+t('free')+'</div></div><div class="del-opt" id="opt-de" onclick="selDel(\'delivery\')"><div class="del-opt-icon">&#x1F6F5;</div><div class="del-opt-lbl">'+t('delivery')+'</div><div class="del-opt-sub">+$1.50</div></div></div></div>'
+    +'<div class="co-card"><h3>'+t('pickup')+' / '+t('delivery')+'?</h3><div class="del-opts"><div class="del-opt active" id="opt-pu" onclick="selDel(\'pickup\')"><div class="del-opt-icon">&#x1F3E0;</div><div class="del-opt-lbl">'+t('pickup')+'</div><div class="del-opt-sub">'+t('free')+'</div></div><div class="del-opt" id="opt-de" onclick="selDel(\'delivery\')"><div class="del-opt-icon">&#x1F6F5;</div><div class="del-opt-lbl">'+t('delivery')+'</div><div class="del-opt-sub">Ver zonas</div></div></div></div>'
     +'<div class="co-card"><h3>'+t('schedule_title')+'</h3><div class="date-slots">'+ds+'</div>'+ts+'</div>'
-    +'<div class="co-card" id="addr-c" style="display:none"><h3>&#x1F4CD; '+t('delivery')+'</h3><div class="fld"><input class="finp" id="co-addr" placeholder="'+t('address_ph')+'"></div></div>'
+    /* ── MAP CARD (hidden until delivery selected) ── */
+    +'<div class="co-card" id="addr-c" style="display:none">'
+      +'<h3>&#x1F4CD; Ubicacion de entrega</h3>'
+      +'<div class="dz-hint">Las zonas en <span style="color:var(--pink);font-weight:700">rosa</span> tienen entrega disponible. Toca el mapa para poner tu pin.</div>'
+      +'<div id="checkout-map" style="height:280px;border-radius:14px;overflow:hidden;border:1.5px solid var(--border);margin-bottom:10px"></div>'
+      +'<div id="co-zone-status"></div>'
+      +'<input type="hidden" id="co-addr" value="">'
+      +'<div id="co-addr-auto" style="margin-top:6px;font-size:12px;color:var(--muted);line-height:1.5"></div>'
+    +'</div>'
     +'<div class="co-card"><h3>'+t('your_info')+'</h3><div class="fld"><label class="flbl">'+t('name')+'</label><input class="finp" id="co-name" value="'+prof.name+'"></div><div class="frow"><div class="fld"><label class="flbl">'+t('phone')+'</label><input class="finp" id="co-phone" value="'+prof.phone+'"></div><div class="fld"><label class="flbl">'+t('email')+'</label><input class="finp" id="co-email" value="'+prof.email+'"></div></div><div class="fld"><label class="flbl">Notas</label><textarea class="finp" id="co-notes" rows="2" style="resize:none" placeholder="'+t('notes_ph')+'"></textarea></div></div>'
     +'<div class="co-card"><h3>'+t('payment_lbl')+'</h3>'+spm+'<div class="pay-opts"><div class="pay-opt active" id="pay-cash" onclick="selPay(\'cash\')"><div style="font-size:20px;width:32px;text-align:center">&#x1F4B5;</div><div><div class="pay-opt-lbl">'+t('cash')+'</div><div class="pay-opt-sub">'+t('cash_sub')+'</div></div></div><div class="pay-opt" id="pay-ath" onclick="selPay(\'ath\')"><div style="font-size:20px;width:32px;text-align:center">&#x1F4F1;</div><div><div class="pay-opt-lbl">'+t('ath')+'</div><div class="pay-opt-sub">'+t('ath_sub')+'</div></div></div><div class="pay-opt" id="pay-pp" onclick="selPay(\'pp\')"><div style="font-size:20px;width:32px;text-align:center">&#x1F499;</div><div><div class="pay-opt-lbl">'+t('paypal')+'</div><div class="pay-opt-sub">'+t('paypal_sub')+'</div></div></div><div class="pay-opt" id="pay-stripe" onclick="selPay(\'stripe\')"><div style="font-size:20px;width:32px;text-align:center">&#x1F4B3;</div><div><div class="pay-opt-lbl">'+t('stripe')+'</div><div class="pay-opt-sub">'+t('stripe_sub')+'</div></div></div></div><div class="pay-note" id="pay-note">'+t('cash_sub')+'.</div></div>'
     +lrb
@@ -3198,13 +3206,45 @@ function renderCheckout(el){
 }
 function selDate(el,ds,o,c){document.querySelectorAll('.dslot').forEach(function(d){d.classList.remove('active');});el.classList.add('active');window._sd=ds;var sl=getTSlots(o,c);var w=document.getElementById('tslots-w');if(w){w.innerHTML=sl.map(function(x,i){return '<div class="tslot'+(i===0?' active':'')+'" onclick="selTime(this,\''+x+'\')">'+x+'</div>';}).join('');if(sl[0])window._st=sl[0];}}
 function selTime(el,ts){document.querySelectorAll('.tslot').forEach(function(s){s.classList.remove('active');});el.classList.add('active');window._st=ts;}
-function selDel(m){window._dm=m;document.getElementById('opt-pu').classList.toggle('active',m==='pickup');document.getElementById('opt-de').classList.toggle('active',m==='delivery');var ac=document.getElementById('addr-c');if(ac)ac.style.display=m==='delivery'?'block':'none';updTotals();}
+function selDel(m){
+  window._dm=m;
+  document.getElementById('opt-pu').classList.toggle('active',m==='pickup');
+  document.getElementById('opt-de').classList.toggle('active',m==='delivery');
+  var ac=document.getElementById('addr-c');
+  if(ac){
+    ac.style.display=m==='delivery'?'block':'none';
+    if(m==='delivery'){
+      /* small timeout so the card is visible before Leaflet measures it */
+      setTimeout(function(){ initCheckoutMap(); }, 80);
+    } else {
+      /* reset zone detection when switching back to pickup */
+      _detectedZone=null;
+      window._deliveryFee=null;
+    }
+  }
+  updTotals();
+}
 function selSPm(id,type){document.querySelectorAll('.pay-opt').forEach(function(o){o.classList.remove('active');});var el=document.getElementById('spm-'+id);if(el)el.classList.add('active');window._pm=type;}
 function selPay(m){window._pm=m;document.querySelectorAll('.pay-opt').forEach(function(o){o.classList.remove('active');});var el=document.getElementById('pay-'+m);if(el)el.classList.add('active');var n={cash:t('cash_sub')+'.',ath:'Enviar ATH Movil a @paobee.',pp:'Enviar PayPal a @paobee.',stripe:t('stripe_note')};var pn=document.getElementById('pay-note');if(pn)pn.textContent=n[m]||'';}
 function togPts(el){redeemPts=el.checked;var note=document.getElementById('pts-note');if(note)note.style.display=redeemPts?'block':'none';updTotals();}
 function applyPromo(){var code=(document.getElementById('promo-inp').value||'').trim().toUpperCase();var msg=document.getElementById('promo-msg');if(!code){msg.innerHTML='';appliedPromo=null;updTotals();return;}if(PROMOS[code]){appliedPromo=Object.assign({code:code},PROMOS[code]);msg.innerHTML='<div class="promo-ok">OK '+appliedPromo.label+'</div>';updTotals();}else{appliedPromo=null;msg.innerHTML='<div class="promo-err">Codigo invalido</div>';updTotals();}}
-function updTotals(){var sub=cartTotal();var del=window._dm==='delivery'?1.50:0;var disc=0;if(appliedPromo){if(appliedPromo.pct)disc=sub*appliedPromo.pct/100;if(appliedPromo.flat)disc=Math.min(appliedPromo.flat,sub);}var pd=0;if(redeemPts&&loyalty.points>=50)pd=Math.floor(loyalty.points/10);var total=Math.max(0,sub+del-disc-pd);var df=document.getElementById('del-fee');if(df)df.textContent='$'+del.toFixed(2);var td=document.getElementById('total-d');if(td)td.textContent='$'+total.toFixed(2);var pr=document.getElementById('promo-row');var pdisc=document.getElementById('promo-disc');if(pr&&pdisc){pr.style.display=disc>0?'flex':'none';pdisc.textContent='-$'+disc.toFixed(2);}var pr2=document.getElementById('pts-row');var pd2=document.getElementById('pts-disc');if(pr2&&pd2){pr2.style.display=pd>0?'flex':'none';pd2.textContent='-$'+pd.toFixed(2);}}
-/* ── placeOrder() ──────────────────────────── */
+function updTotals(){
+  var sub=cartTotal();
+  var del=0;
+  if(window._dm==='delivery'){
+    del=(_detectedZone)?_detectedZone.fee:0;
+  }
+  var disc=0;if(appliedPromo){if(appliedPromo.pct)disc=sub*appliedPromo.pct/100;if(appliedPromo.flat)disc=Math.min(appliedPromo.flat,sub);}
+  var pd=0;if(redeemPts&&loyalty.points>=50)pd=Math.floor(loyalty.points/10);
+  var total=Math.max(0,sub+del-disc-pd);
+  var df=document.getElementById('del-fee');
+  if(df) df.textContent=del>0?'$'+del.toFixed(2):'$0.00';
+  var td=document.getElementById('total-d');if(td)td.textContent='$'+total.toFixed(2);
+  var pr=document.getElementById('promo-row');var pdisc=document.getElementById('promo-disc');
+  if(pr&&pdisc){pr.style.display=disc>0?'flex':'none';pdisc.textContent='-$'+disc.toFixed(2);}
+  var pr2=document.getElementById('pts-row');var pd2=document.getElementById('pts-disc');
+  if(pr2&&pd2){pr2.style.display=pd>0?'flex':'none';pd2.textContent='-$'+pd.toFixed(2);}
+}/* ── placeOrder() ──────────────────────────── */
 function placeOrder(){
   var name=(document.getElementById('co-name')||{}).value||'';var phone=(document.getElementById('co-phone')||{}).value||'';
   if(!name||!phone){alert('Por favor ingresa tu nombre y telefono.');return;}
@@ -5017,6 +5057,7 @@ function placeCustomerPin(lat, lng) {
   /* check which zone the pin is in */
   _detectedZone = detectZone(lat, lng);
   updateCoZoneStatus(_detectedZone);
+  updTotals(); /* refresh delivery fee in order summary */
 
   /* reverse geocode via Nominatim (free, no key) */
   fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng + '&format=json')
@@ -5084,47 +5125,6 @@ function syncDeliveryFee() {
   }
 }
 
-/* ── Patch renderCheckout to inject the map ──────────────────── */
-/* We wrap the delivery address section to insert the map widget */
-var _origRenderCheckout = typeof renderCheckout === 'function' ? renderCheckout : null;
-
-/* Hook into the checkout delivery address field render.
-   Since renderCheckout builds HTML as a string, we intercept
-   after render and inject our map into the address container. */
-function injectCheckoutMap() {
-  /* look for the address field wrapper by its label */
-  var addrFld = document.getElementById('co-addr');
-  if (!addrFld) return;
-  var parent = addrFld.parentElement;
-  if (!parent) return;
-  /* insert map above the address input */
-  var mapWrap = document.createElement('div');
-  mapWrap.id = 'co-map-wrap';
-  mapWrap.style.marginBottom = '12px';
-  parent.parentElement.insertBefore(mapWrap, parent);
-  renderCheckoutMap('co-map-wrap');
-}
-
-/* Patch placeOrder to use detected zone fee */
-var _origPlaceOrder2 = placeOrder;
-placeOrder = function() {
-  /* if delivery mode and no zone detected, block order */
-  var mode = window._dm || 'pickup';
-  if (mode === 'delivery' && !_detectedZone) {
-    alert('Por favor ubica tu direccion en el mapa para continuar con la entrega, o selecciona "Recoger".');
-    return;
-  }
-  /* inject zone fee into the delivery cost calculation */
-  if (_detectedZone) window._deliveryZoneFee = _detectedZone.fee;
-  _origPlaceOrder2.apply(this, arguments);
-};
-
-/* Override _dm delivery fee: use zone fee if available */
-(function() {
-  var _origSetDM = window.setDeliveryMode;
-  /* we'll patch at render time instead — see renderCheckoutMap call */
-})();
-
 /* ── renderMgrTab extension for 'zones' ──────────────────────── */
 var _origRenderMgrTab = renderMgrTab;
 renderMgrTab = function(tab) {
@@ -5169,21 +5169,6 @@ onAuthSuccess = function() {
 
 /* Also load zones at startup for the checkout map (public read) */
 loadZonesFromDB();
-
-/* ── Auto-inject map when checkout renders ───────────────────── */
-/* Patch goTo so that when cart/checkout screen shows, we inject the map */
-var _origGoTo = goTo;
-goTo = function(screen) {
-  _origGoTo.apply(this, arguments);
-  if (screen === 'cart') {
-    /* give renderCart/renderCheckout time to finish, then inject */
-    setTimeout(function() {
-      if (!document.getElementById('co-map-wrap') && document.getElementById('co-addr')) {
-        injectCheckoutMap();
-      }
-    }, 200);
-  }
-};
 
 /* ══════════════════════════════════════════════════════════════ */
 
