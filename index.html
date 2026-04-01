@@ -4734,87 +4734,55 @@ window.addEventListener('resize', function() {
    ──────────────────────────────────────────────────────────────
 */
 
-/* ── PR Municipio polygons (simplified real boundaries) ──────── */
-var PR_MUNICIPIOS = {
-  "Adjuntas":[[18.1630,-66.7230],[18.1888,-66.6601],[18.1388,-66.5980],[18.0741,-66.6280],[18.0574,-66.7022],[18.1630,-66.7230]],
-  "Aguada":[[18.3622,-67.2032],[18.4050,-67.1621],[18.3821,-67.1190],[18.3250,-67.1350],[18.3050,-67.1890],[18.3622,-67.2032]],
-  "Aguadilla":[[18.4272,-67.1890],[18.5020,-67.1421],[18.4821,-67.0821],[18.4050,-67.0980],[18.3821,-67.1621],[18.4272,-67.1890]],
-  "Aguas Buenas":[[18.2572,-66.1020],[18.2888,-66.0421],[18.2421,-65.9880],[18.1888,-65.9980],[18.1821,-66.0821],[18.2572,-66.1020]],
-  "Aibonito":[[18.1421,-66.2890],[18.1821,-66.2232],[18.1421,-66.1690],[18.0888,-66.1821],[18.0788,-66.2621],[18.1421,-66.2890]],
-  "Añasco":[[18.2822,-67.1421],[18.3250,-67.1001],[18.3050,-67.0421],[18.2450,-67.0521],[18.2222,-67.1121],[18.2822,-67.1421]],
-  "Arecibo":[[18.4272,-66.7980],[18.5050,-66.7232],[18.4821,-66.6421],[18.3988,-66.6721],[18.3721,-66.7690],[18.4272,-66.7980]],
-  "Arroyo":[[17.9670,-66.0621],[17.9988,-65.9921],[17.9621,-65.9321],[17.9188,-65.9421],[17.9088,-66.0221],[17.9670,-66.0621]],
-  "Barceloneta":[[18.4388,-66.6221],[18.4921,-66.5580],[18.4688,-66.4880],[18.3988,-66.5021],[18.3721,-66.5821],[18.4388,-66.6221]],
-  "Barranquitas":[[18.1821,-66.3121],[18.2150,-66.2480],[18.1750,-66.1890],[18.1150,-66.2021],[18.1050,-66.2888],[18.1821,-66.3121]],
-  "Bayamón":[[18.3388,-66.1980],[18.4050,-66.1421],[18.3821,-66.0721],[18.3021,-66.0821],[18.2721,-66.1521],[18.3388,-66.1980]],
-  "Cabo Rojo":[[17.9888,-67.2221],[18.0988,-67.1721],[18.0721,-67.0721],[17.9721,-67.0421],[17.9021,-67.1421],[17.9888,-67.2221]],
-  "Caguas":[[18.2421,-66.0880],[18.2888,-66.0221],[18.2588,-65.9421],[18.1721,-65.9521],[18.1488,-66.0421],[18.2421,-66.0880]],
-  "Camuy":[[18.4521,-66.8721],[18.5021,-66.8021],[18.4788,-66.7221],[18.3988,-66.7421],[18.3688,-66.8221],[18.4521,-66.8721]],
-  "Canóvanas":[[18.3721,-65.9021],[18.4021,-65.8321],[18.3621,-65.7521],[18.3021,-65.7721],[18.2921,-65.8621],[18.3721,-65.9021]],
-  "Carolina":[[18.3721,-65.9980],[18.4321,-65.9421],[18.4121,-65.8621],[18.3421,-65.8621],[18.3021,-65.9421],[18.3721,-65.9980]],
-  "Cataño":[[18.4272,-66.1421],[18.4521,-66.1080],[18.4321,-66.0721],[18.3988,-66.0821],[18.3888,-66.1221],[18.4272,-66.1421]],
-  "Cayey":[[18.1121,-66.1780],[18.1588,-66.1080],[18.1288,-66.0421],[18.0521,-66.0421],[18.0321,-66.1221],[18.1121,-66.1780]],
-  "Ceiba":[[18.2621,-65.6721],[18.2921,-65.5921],[18.2421,-65.5321],[18.1821,-65.5521],[18.1821,-65.6421],[18.2621,-65.6721]],
-  "Ciales":[[18.2988,-66.5780],[18.3521,-66.5021],[18.3221,-66.4221],[18.2421,-66.4321],[18.2121,-66.5221],[18.2988,-66.5780]],
-  "Cidra":[[18.1788,-66.1721],[18.2221,-66.1021],[18.1921,-66.0221],[18.1121,-66.0221],[18.0921,-66.1021],[18.1788,-66.1721]],
-  "Coamo":[[18.0788,-66.3680],[18.1288,-66.2921],[18.0988,-66.2121],[18.0021,-66.2121],[17.9821,-66.3021],[18.0788,-66.3680]],
-  "Comerío":[[18.2221,-66.2280],[18.2588,-66.1521],[18.2221,-66.0821],[18.1521,-66.0921],[18.1388,-66.1721],[18.2221,-66.2280]],
-  "Corozal":[[18.3388,-66.3221],[18.3821,-66.2421],[18.3488,-66.1621],[18.2688,-66.1721],[18.2488,-66.2621],[18.3388,-66.3221]],
-  "Culebra":[[18.3521,-65.2621],[18.3421,-65.2121],[18.2921,-65.2521],[18.3021,-65.3121],[18.3521,-65.2621]],
-  "Dorado":[[18.4521,-66.2821],[18.4988,-66.2121],[18.4688,-66.1321],[18.3888,-66.1421],[18.3688,-66.2221],[18.4521,-66.2821]],
-  "Fajardo":[[18.3221,-65.6921],[18.3521,-65.6321],[18.3221,-65.5621],[18.2621,-65.5721],[18.2421,-65.6521],[18.3221,-65.6921]],
-  "Florida":[[18.3721,-66.5621],[18.4088,-66.5121],[18.3888,-66.4421],[18.3221,-66.4421],[18.2988,-66.5121],[18.3721,-66.5621]],
-  "Guánica":[[17.9721,-66.9421],[18.0221,-66.8821],[18.0021,-66.8121],[17.9221,-66.8121],[17.8921,-66.8921],[17.9721,-66.9421]],
-  "Guayama":[[17.9821,-66.1480],[18.0421,-66.0921],[18.0121,-66.0121],[17.9421,-66.0121],[17.9221,-66.0921],[17.9821,-66.1480]],
-  "Guayanilla":[[18.0121,-66.8121],[18.0721,-66.7521],[18.0521,-66.6821],[17.9721,-66.6821],[17.9521,-66.7621],[18.0121,-66.8121]],
-  "Guaynabo":[[18.3588,-66.1280],[18.3988,-66.0721],[18.3688,-66.0021],[18.2988,-66.0121],[18.2788,-66.0821],[18.3588,-66.1280]],
-  "Gurabo":[[18.2521,-65.9780],[18.2988,-65.9121],[18.2688,-65.8421],[18.1888,-65.8421],[18.1688,-65.9221],[18.2521,-65.9780]],
-  "Hatillo":[[18.4788,-66.8480],[18.5321,-66.7821],[18.5021,-66.7021],[18.4221,-66.7121],[18.3988,-66.7921],[18.4788,-66.8480]],
-  "Hormigueros":[[18.1321,-67.1321],[18.1688,-67.0821],[18.1488,-67.0221],[18.0888,-67.0221],[18.0688,-67.0921],[18.1321,-67.1321]],
-  "Humacao":[[18.1621,-65.8280],[18.2021,-65.7621],[18.1721,-65.6921],[18.1021,-65.6921],[18.0721,-65.7721],[18.1621,-65.8280]],
-  "Isabela":[[18.4921,-67.0321],[18.5388,-66.9621],[18.5121,-66.8821],[18.4321,-66.8921],[18.4021,-66.9721],[18.4921,-67.0321]],
-  "Jayuya":[[18.2021,-66.6021],[18.2421,-66.5321],[18.2121,-66.4521],[18.1421,-66.4621],[18.1121,-66.5421],[18.2021,-66.6021]],
-  "Juana Díaz":[[18.0521,-66.5180],[18.1021,-66.4421],[18.0721,-66.3621],[17.9921,-66.3721],[17.9721,-66.4621],[18.0521,-66.5180]],
-  "Juncos":[[18.2288,-65.9280],[18.2721,-65.8521],[18.2421,-65.7821],[18.1621,-65.7921],[18.1421,-65.8721],[18.2288,-65.9280]],
-  "Lajas":[[17.9721,-67.1121],[18.0321,-67.0521],[18.0121,-66.9721],[17.9221,-66.9721],[17.8921,-67.0521],[17.9721,-67.1121]],
-  "Lares":[[18.2788,-66.8821],[18.3221,-66.8021],[18.2988,-66.7121],[18.2121,-66.7221],[18.1888,-66.8121],[18.2788,-66.8821]],
-  "Las Marías":[[18.2521,-66.9921],[18.2921,-66.9221],[18.2688,-66.8421],[18.1888,-66.8521],[18.1688,-66.9321],[18.2521,-66.9921]],
-  "Las Piedras":[[18.1888,-65.8680],[18.2321,-65.8021],[18.2021,-65.7221],[18.1221,-65.7321],[18.0921,-65.8121],[18.1888,-65.8680]],
-  "Loíza":[[18.4321,-65.8921],[18.4688,-65.8321],[18.4421,-65.7621],[18.3721,-65.7721],[18.3488,-65.8421],[18.4321,-65.8921]],
-  "Luquillo":[[18.3688,-65.7321],[18.3921,-65.6721],[18.3588,-65.5921],[18.2988,-65.6021],[18.2821,-65.6821],[18.3688,-65.7321]],
-  "Manatí":[[18.4321,-66.5221],[18.4888,-66.4421],[18.4588,-66.3621],[18.3721,-66.3721],[18.3488,-66.4621],[18.4321,-66.5221]],
-  "Maricao":[[18.1821,-66.9921],[18.2221,-66.9221],[18.2021,-66.8421],[18.1221,-66.8421],[18.0921,-66.9221],[18.1821,-66.9921]],
-  "Maunabo":[[18.0021,-65.9180],[18.0421,-65.8421],[18.0121,-65.7621],[17.9421,-65.7721],[17.9221,-65.8621],[18.0021,-65.9180]],
-  "Mayagüez":[[18.1888,-67.1980],[18.2721,-67.1121],[18.2421,-67.0321],[18.1521,-67.0421],[18.1021,-67.1321],[18.1888,-67.1980]],
-  "Moca":[[18.3788,-67.1021],[18.4321,-67.0421],[18.4121,-66.9721],[18.3321,-66.9721],[18.3021,-67.0521],[18.3788,-67.1021]],
-  "Morovis":[[18.3221,-66.4121],[18.3688,-66.3421],[18.3388,-66.2621],[18.2588,-66.2721],[18.2321,-66.3521],[18.3221,-66.4121]],
-  "Naguabo":[[18.2121,-65.7380],[18.2521,-65.6621],[18.2221,-65.5921],[18.1421,-65.6021],[18.1221,-65.6821],[18.2121,-65.7380]],
-  "Naranjito":[[18.2988,-66.2580],[18.3388,-66.1821],[18.3088,-66.1021],[18.2288,-66.1121],[18.2021,-66.1921],[18.2988,-66.2580]],
-  "Orocovis":[[18.2221,-66.4280],[18.2688,-66.3521],[18.2388,-66.2721],[18.1588,-66.2721],[18.1388,-66.3521],[18.2221,-66.4280]],
-  "Patillas":[[18.0021,-66.0180],[18.0421,-65.9421],[18.0121,-65.8621],[17.9421,-65.8721],[17.9221,-65.9621],[18.0021,-66.0180]],
-  "Peñuelas":[[17.9921,-66.7080],[18.0621,-66.6321],[18.0421,-66.5521],[17.9621,-66.5521],[17.9321,-66.6321],[17.9921,-66.7080]],
-  "Ponce":[[18.0021,-66.6480],[18.0721,-66.5721],[18.0521,-66.4921],[17.9621,-66.4921],[17.9321,-66.5821],[18.0021,-66.6480]],
-  "Quebradillas":[[18.4788,-67.0321],[18.5188,-66.9621],[18.4921,-66.8821],[18.4121,-66.8921],[18.3888,-66.9721],[18.4788,-67.0321]],
-  "Rincón":[[18.3421,-67.2780],[18.3921,-67.2221],[18.3721,-67.1521],[18.3021,-67.1521],[18.2721,-67.2221],[18.3421,-67.2780]],
-  "Río Grande":[[18.3521,-65.8521],[18.3888,-65.7821],[18.3588,-65.6921],[18.2888,-65.7121],[18.2688,-65.7921],[18.3521,-65.8521]],
-  "Sabana Grande":[[18.0788,-66.9680],[18.1321,-66.8921],[18.1121,-66.8121],[18.0321,-66.8121],[18.0021,-66.8921],[18.0788,-66.9680]],
-  "Salinas":[[17.9721,-66.3021],[18.0221,-66.2421],[18.0021,-66.1621],[17.9221,-66.1521],[17.8921,-66.2321],[17.9721,-66.3021]],
-  "San Germán":[[18.0821,-67.0480],[18.1421,-66.9721],[18.1221,-66.8921],[18.0421,-66.8921],[18.0121,-66.9721],[18.0821,-67.0480]],
-  "San Juan":[[18.3988,-66.1180],[18.4688,-66.0421],[18.4421,-65.9621],[18.3521,-65.9621],[18.3188,-66.0521],[18.3988,-66.1180]],
-  "San Lorenzo":[[18.1888,-65.9780],[18.2321,-65.9021],[18.2021,-65.8221],[18.1221,-65.8221],[18.0921,-65.9021],[18.1888,-65.9780]],
-  "San Sebastián":[[18.3421,-66.9921],[18.3921,-66.9221],[18.3688,-66.8421],[18.2888,-66.8421],[18.2621,-66.9221],[18.3421,-66.9921]],
-  "Santa Isabel":[[17.9721,-66.4221],[18.0221,-66.3521],[18.0021,-66.2721],[17.9221,-66.2721],[17.8921,-66.3521],[17.9721,-66.4221]],
-  "Toa Alta":[[18.3888,-66.2680],[18.4321,-66.1921],[18.4021,-66.1121],[18.3221,-66.1221],[18.2988,-66.2021],[18.3888,-66.2680]],
-  "Toa Baja":[[18.4421,-66.2321],[18.4888,-66.1521],[18.4588,-66.0821],[18.3788,-66.0921],[18.3588,-66.1721],[18.4421,-66.2321]],
-  "Trujillo Alto":[[18.3521,-66.0280],[18.3888,-65.9521],[18.3588,-65.8821],[18.2888,-65.8921],[18.2688,-65.9721],[18.3521,-66.0280]],
-  "Utuado":[[18.2621,-66.7321],[18.3121,-66.6521],[18.2821,-66.5721],[18.1921,-66.5821],[18.1721,-66.6621],[18.2621,-66.7321]],
-  "Vega Alta":[[18.4121,-66.3480],[18.4621,-66.2721],[18.4321,-66.1921],[18.3521,-66.1921],[18.3221,-66.2721],[18.4121,-66.3480]],
-  "Vega Baja":[[18.4388,-66.4221],[18.4921,-66.3421],[18.4621,-66.2721],[18.3721,-66.2721],[18.3421,-66.3521],[18.4388,-66.4221]],
-  "Vieques":[[18.1721,-65.5221],[18.1621,-65.3721],[18.0921,-65.3721],[18.0421,-65.5121],[18.1021,-65.5821],[18.1721,-65.5221]],
-  "Villalba":[[18.1121,-66.5021],[18.1621,-66.4221],[18.1421,-66.3421],[18.0621,-66.3421],[18.0321,-66.4221],[18.1121,-66.5021]],
-  "Yabucoa":[[18.0521,-65.8880],[18.0988,-65.8021],[18.0688,-65.7221],[17.9888,-65.7321],[17.9688,-65.8221],[18.0521,-65.8880]],
-  "Yauco":[[18.0321,-66.8521],[18.0921,-66.7721],[18.0721,-66.6921],[17.9921,-66.6921],[17.9621,-66.7721],[18.0321,-66.8521]]
-};
+/* ── Real PR Municipio GeoJSON — loaded at runtime ───────────── */
+/* Source: commonwealth-of-puerto-rico/crime-spotter (Census Bureau data)
+   Property used for name matching: feature.properties.NAME                */
+var PR_GEOJSON_URL = 'https://raw.githubusercontent.com/commonwealth-of-puerto-rico/crime-spotter/master/public/data/municipalities.geojson';
+var PR_GEOJSON = null; /* populated after fetch */
+
+/* Normalise name for matching (handles accent differences) */
+function normalizeMuni(s) {
+  return (s || '').toLowerCase()
+    .replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i')
+    .replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u')
+    .replace(/ñ/g,'n').trim();
+}
+
+/* Load GeoJSON once, then call cb() */
+function loadPRGeoJSON(cb) {
+  if (PR_GEOJSON) { if (cb) cb(); return; }
+  fetch(PR_GEOJSON_URL)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      PR_GEOJSON = data;
+      if (cb) cb();
+    })
+    .catch(function(e) {
+      console.error('Could not load PR GeoJSON:', e);
+    });
+}
+
+/* Point-in-GeoJSON-polygon (ray casting, handles MultiPolygon) */
+function pointInGeoFeature(lat, lng, feature) {
+  var geom = feature.geometry;
+  var polys = geom.type === 'MultiPolygon' ? geom.coordinates : [geom.coordinates];
+  for (var p = 0; p < polys.length; p++) {
+    var rings = polys[p];
+    /* only test outer ring (index 0) */
+    var ring = rings[0];
+    var inside = false;
+    for (var i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      /* GeoJSON is [lng, lat] */
+      var xi = ring[i][1], yi = ring[i][0];
+      var xj = ring[j][1], yj = ring[j][0];
+      var intersect = ((yi > lng) !== (yj > lng)) &&
+        (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+      if (intersect) inside = !inside;
+    }
+    if (inside) return true;
+  }
+  return false;
+}
 
 /* ── In-memory delivery zones state ─────────────────────────── */
 var deliveryZones = {}; /* { municipio: fee } — only active zones */
@@ -4869,55 +4837,68 @@ function renderZonesTab(el) {
 function initManagerMap() {
   var mapEl = document.getElementById('dz-map');
   if (!mapEl) return;
-  /* destroy old instance if any */
   if (_dzMapInst) { _dzMapInst.remove(); _dzMapInst = null; _dzLayers = {}; }
 
   _dzMapInst = L.map('dz-map', { zoomControl: true, scrollWheelZoom: false })
     .setView([18.22, -66.59], 9);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap',
-    maxZoom: 14
+    attribution: '© OpenStreetMap', maxZoom: 14
   }).addTo(_dzMapInst);
 
-  /* render all 78 municipios */
-  Object.entries(PR_MUNICIPIOS).forEach(function(entry) {
-    var muni = entry[0], coords = entry[1];
-    var active = deliveryZones.hasOwnProperty(muni);
-    var layer = L.polygon(coords, {
-      color: active ? '#E8587A' : '#aaa',
-      fillColor: active ? '#E8587A' : '#ccc',
-      fillOpacity: active ? 0.35 : 0.10,
-      weight: active ? 2 : 1
+  /* show loading indicator */
+  mapEl.style.position = 'relative';
+  var loadDiv = document.createElement('div');
+  loadDiv.id = 'dz-map-loading';
+  loadDiv.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(250,247,244,.7);z-index:500;font-size:14px;color:var(--muted);font-family:\'DM Sans\',sans-serif;border-radius:16px';
+  loadDiv.textContent = 'Cargando mapa…';
+  mapEl.appendChild(loadDiv);
+
+  loadPRGeoJSON(function() {
+    var ld = document.getElementById('dz-map-loading');
+    if (ld) ld.remove();
+
+    L.geoJSON(PR_GEOJSON, {
+      style: function(feature) {
+        var name = feature.properties.NAME;
+        var active = Object.keys(deliveryZones).some(function(z) {
+          return normalizeMuni(z) === normalizeMuni(name);
+        });
+        return {
+          color:       active ? '#E8587A' : '#aaa',
+          fillColor:   active ? '#E8587A' : '#ddd',
+          fillOpacity: active ? 0.35 : 0.08,
+          weight:      active ? 2 : 1
+        };
+      },
+      onEachFeature: function(feature, layer) {
+        var name = feature.properties.NAME;
+        layer.bindTooltip(name, { permanent: false, direction: 'center' });
+        layer.on('click', function() { dzToggleMuniGeo(name, layer); });
+        _dzLayers[normalizeMuni(name)] = layer;
+      }
     }).addTo(_dzMapInst);
-
-    layer.bindTooltip(muni, { permanent: false, direction: 'center', className: 'dz-tt' });
-
-    layer.on('click', function() { dzToggleMuni(muni); });
-    _dzLayers[muni] = layer;
   });
 }
 
-function dzToggleMuni(muni) {
-  if (deliveryZones.hasOwnProperty(muni)) {
-    delete deliveryZones[muni];
+function dzToggleMuniGeo(name, layer) {
+  /* find existing key with same normalized name */
+  var existingKey = Object.keys(deliveryZones).find(function(z) {
+    return normalizeMuni(z) === normalizeMuni(name);
+  });
+  if (existingKey) {
+    delete deliveryZones[existingKey];
   } else {
-    deliveryZones[muni] = 3.00; /* default $3 */
+    deliveryZones[name] = 3.00;
   }
-  dzRefreshMapLayer(muni);
-  renderZoneList();
-}
-
-function dzRefreshMapLayer(muni) {
-  var layer = _dzLayers[muni];
-  if (!layer) return;
-  var active = deliveryZones.hasOwnProperty(muni);
+  var active = deliveryZones.hasOwnProperty(name);
   layer.setStyle({
-    color: active ? '#E8587A' : '#aaa',
-    fillColor: active ? '#E8587A' : '#ccc',
-    fillOpacity: active ? 0.35 : 0.10,
-    weight: active ? 2 : 1
+    color:       active ? '#E8587A' : '#aaa',
+    fillColor:   active ? '#E8587A' : '#ddd',
+    fillOpacity: active ? 0.35 : 0.08,
+    weight:      active ? 2 : 1
   });
+  renderZoneList();
 }
 
 function renderZoneList() {
@@ -4978,47 +4959,52 @@ function initCheckoutMap() {
   if (_coMapInst) { _coMapInst.remove(); _coMapInst = null; _coZoneLayers = {}; _coMarker = null; _detectedZone = null; }
 
   _coMapInst = L.map('checkout-map', { zoomControl: true, scrollWheelZoom: false })
-    .setView([18.40, -66.07], 9); /* centered on San Juan metro */
+    .setView([18.25, -66.50], 9);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap',
-    maxZoom: 18
+    attribution: '© OpenStreetMap', maxZoom: 18
   }).addTo(_coMapInst);
 
-  /* draw active delivery zones */
-  Object.keys(deliveryZones).forEach(function(muni) {
-    if (!PR_MUNICIPIOS[muni]) return;
-    var layer = L.polygon(PR_MUNICIPIOS[muni], {
-      color: '#E8587A',
-      fillColor: '#E8587A',
-      fillOpacity: 0.20,
-      weight: 2
-    }).addTo(_coMapInst);
-    layer.bindTooltip(muni + ' · $' + deliveryZones[muni].toFixed(2), { sticky: true });
-    _coZoneLayers[muni] = layer;
+  loadPRGeoJSON(function() {
+    /* draw only active delivery zones */
+    if (!PR_GEOJSON) return;
+    PR_GEOJSON.features.forEach(function(feature) {
+      var name = feature.properties.NAME;
+      var matchKey = Object.keys(deliveryZones).find(function(z) {
+        return normalizeMuni(z) === normalizeMuni(name);
+      });
+      if (!matchKey) return;
+      var fee = deliveryZones[matchKey];
+      var layer = L.geoJSON(feature, {
+        style: { color: '#E8587A', fillColor: '#E8587A', fillOpacity: 0.20, weight: 2 }
+      }).addTo(_coMapInst);
+      layer.bindTooltip(name + ' · $' + fee.toFixed(2), { sticky: true });
+      _coZoneLayers[normalizeMuni(name)] = layer;
+    });
   });
 
-  /* click to drop pin */
   _coMapInst.on('click', function(e) {
     placeCustomerPin(e.latlng.lat, e.latlng.lng);
   });
 
-  /* hint label */
   updateCoZoneStatus(null);
 }
 
 function refreshCheckoutZones() {
-  if (!_coMapInst) return;
-  /* remove old zone layers */
+  if (!_coMapInst || !PR_GEOJSON) return;
   Object.values(_coZoneLayers).forEach(function(l) { _coMapInst.removeLayer(l); });
   _coZoneLayers = {};
-  Object.keys(deliveryZones).forEach(function(muni) {
-    if (!PR_MUNICIPIOS[muni]) return;
-    var layer = L.polygon(PR_MUNICIPIOS[muni], {
-      color: '#E8587A', fillColor: '#E8587A', fillOpacity: 0.20, weight: 2
+  PR_GEOJSON.features.forEach(function(feature) {
+    var name = feature.properties.NAME;
+    var matchKey = Object.keys(deliveryZones).find(function(z) {
+      return normalizeMuni(z) === normalizeMuni(name);
+    });
+    if (!matchKey) return;
+    var layer = L.geoJSON(feature, {
+      style: { color: '#E8587A', fillColor: '#E8587A', fillOpacity: 0.20, weight: 2 }
     }).addTo(_coMapInst);
-    layer.bindTooltip(muni + ' · $' + deliveryZones[muni].toFixed(2), { sticky: true });
-    _coZoneLayers[muni] = layer;
+    layer.bindTooltip(name + ' · $' + deliveryZones[matchKey].toFixed(2), { sticky: true });
+    _coZoneLayers[normalizeMuni(name)] = layer;
   });
 }
 
@@ -5049,26 +5035,20 @@ function placeCustomerPin(lat, lng) {
   syncDeliveryFee();
 }
 
-/* Point-in-polygon (ray casting) */
-function pointInPoly(lat, lng, poly) {
-  var inside = false;
-  for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
-    var xi = poly[i][0], yi = poly[i][1];
-    var xj = poly[j][0], yj = poly[j][1];
-    var intersect = ((yi > lng) !== (yj > lng)) &&
-      (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
-    if (intersect) inside = !inside;
-  }
-  return inside;
-}
+/* point-in-polygon now handled by pointInGeoFeature above */
 
 function detectZone(lat, lng) {
-  var keys = Object.keys(deliveryZones);
-  for (var i = 0; i < keys.length; i++) {
-    var muni = keys[i];
-    var poly = PR_MUNICIPIOS[muni];
-    if (poly && pointInPoly(lat, lng, poly)) {
-      return { municipio: muni, fee: deliveryZones[muni] };
+  if (!PR_GEOJSON) return null;
+  var features = PR_GEOJSON.features;
+  for (var i = 0; i < features.length; i++) {
+    var feature = features[i];
+    var name = feature.properties.NAME;
+    var matchKey = Object.keys(deliveryZones).find(function(z) {
+      return normalizeMuni(z) === normalizeMuni(name);
+    });
+    if (!matchKey) continue;
+    if (pointInGeoFeature(lat, lng, feature)) {
+      return { municipio: name, fee: deliveryZones[matchKey] };
     }
   }
   return null;
