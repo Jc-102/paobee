@@ -2455,6 +2455,7 @@ to{transform:translateY(0);opacity:1}
   <div class="ef"><label class="elbl" data-i18n="description"></label><textarea class="einp" id="edit-desc-i" rows="2" style="resize:none"></textarea></div>
   <div class="ef"><label class="elbl">Description (English)</label><textarea class="einp" id="edit-desc-en" rows="2" style="resize:none" placeholder="English description..."></textarea></div>
   <div class="ef"><label class="elbl" data-i18n="allergens"></label><input class="einp" id="edit-allergens" placeholder="gluten, lacteos, huevos"></div>
+  <div class="ef"><label class="elbl">Allergens (English)</label><input class="einp" id="edit-allergens-en" placeholder="gluten, dairy, eggs"></div>
   <div class="ef"><label class="elbl" data-i18n="photo"></label>
     <div class="photo-sec"><div class="ppl" id="edit-preview"><div class="php"><div class="php-icon">&#x1F4F7;</div><div class="php-text" data-i18n="no_photo"></div></div></div>
     <div class="photo-acts"><label class="photo-btn pink" style="cursor:pointer"><span data-i18n="upload"></span><input type="file" accept="image/*" style="display:none" onchange="handlePhoto(this,'edit-preview','edit-photo-data')"></label><label class="photo-btn" style="cursor:pointer"><span data-i18n="camera"></span><input type="file" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this,'edit-preview','edit-photo-data')"></label></div>
@@ -2473,6 +2474,7 @@ to{transform:translateY(0);opacity:1}
   <div class="ef"><label class="elbl" data-i18n="description"></label><textarea class="einp" id="add-desc" rows="2" style="resize:none" placeholder="Describe tu postre..."></textarea></div>
   <div class="ef"><label class="elbl">Description (English)</label><textarea class="einp" id="add-desc-en" rows="2" style="resize:none" placeholder="English description..."></textarea></div>
   <div class="ef"><label class="elbl" data-i18n="allergens"></label><input class="einp" id="add-allergens" placeholder="gluten, lacteos, huevos"></div>
+  <div class="ef"><label class="elbl">Allergens (English)</label><input class="einp" id="add-allergens-en" placeholder="gluten, dairy, eggs"></div>
   <div class="ef"><label class="elbl" data-i18n="photo"></label>
     <div class="photo-sec"><div class="ppl" id="add-preview"><div class="php"><div class="php-icon">&#x1F4F7;</div><div class="php-text" data-i18n="no_photo"></div></div></div>
     <div class="photo-acts"><label class="photo-btn pink" style="cursor:pointer"><span data-i18n="upload"></span><input type="file" accept="image/*" style="display:none" onchange="handlePhoto(this,'add-preview','add-photo-data')"></label><label class="photo-btn" style="cursor:pointer"><span data-i18n="camera"></span><input type="file" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this,'add-preview','add-photo-data')"></label></div>
@@ -2781,6 +2783,7 @@ function catEmoji(key){ var c=CE[key]; return c?(c.emoji||c):''; }
 /* Returns product name/desc in current language */
 function prodName(p){ return (lang==='en'&&p.name_en)?p.name_en:p.name; }
 function prodDesc(p){ return (lang==='en'&&p.desc_en)?p.desc_en:p.desc; }
+function prodAllergens(p){ return (lang==='en'&&p.allergens_en&&p.allergens_en.length)?p.allergens_en:p.allergens; }
 var STAGES=['confirmed','preparing','on_the_way','completed'];
 var SICONS={confirmed:'&#x2705;',preparing:'&#x1F525;',on_the_way:'&#x1F6F5;',completed:'&#x1F389;'};
 var PROMOS={PAOBEE10:{pct:10,label:'10% off'},SWEET5:{flat:5,label:'$5 off'}};
@@ -3001,7 +3004,7 @@ function openProduct(id){
   document.getElementById('modal-price').textContent='$'+p.price.toFixed(2);
   document.getElementById('modal-rating').innerHTML=p.ratings.length?'&#x2B50; '+p.avgRating.toFixed(1)+' ('+p.ratings.length+')':'';
   var ab=document.getElementById('modal-abox');var at=document.getElementById('modal-allergens');
-  if(p.allergens&&p.allergens.length){ab.style.display='block';at.innerHTML=p.allergens.map(function(a){return '<span class="allergen-tag">'+a+'</span>';}).join('');}else ab.style.display='none';
+  var al=prodAllergens(p);if(al&&al.length){ab.style.display='block';at.innerHTML=al.map(function(a){return '<span class="allergen-tag">'+a+'</span>';}).join('');}else ab.style.display='none';
   var btn=document.getElementById('modal-add-btn');
   btn.textContent=p.stock==='out'?t('sold_out'):t('add_to_cart');btn.style.background=p.stock==='out'?'var(--muted)':'';btn.disabled=p.stock==='out';
   btn.onclick=p.stock==='out'?null:function(){cart[p.id]=(cart[p.id]||0)+1;updateCounts();btn.textContent=t('added');btn.style.background='#2E7D32';setTimeout(function(){btn.textContent=t('add_to_cart');btn.style.background='';},900);};
@@ -3317,7 +3320,7 @@ function renderMgrTab(tab){
         + '<div style="flex:1">'
         + '<div style="font-weight:600;font-size:14px;color:var(--text)">'+p.name+'</div>'
         + '<div style="font-size:12px;color:var(--muted)">'+p.cat+(p.featured?' · '+t('featured'):'')+(p.ratings.length?' · &#x2B50;'+p.avgRating.toFixed(1):'')+' </div>'
-        + (p.allergens&&p.allergens.length?'<div style="font-size:11px;color:var(--muted)">&#x26A0;&#xFE0F; '+p.allergens.join(', ')+'</div>':'')
+        + (prodAllergens(p)&&prodAllergens(p).length?'<div style="font-size:11px;color:var(--muted)">&#x26A0;&#xFE0F; '+prodAllergens(p).join(', ')+'</div>':'')
         + '<div class="pad-acts">'
         + '<button class="pad-edit" onclick="openEdit('+p.id+')">&#x270F;&#xFE0F;</button>'
         + '<button class="pad-del" onclick="delProd('+p.id+')">&#x1F5D1;</button>'
@@ -3496,12 +3499,12 @@ function exportCSV(){var headers=['Pedido','Nombre','Telefono','Email','Fecha','
 /* ══════════════════════════════════════════════
    PRODUCT EDITOR (add / edit / delete)
    ══════════════════════════════════════════════ */
-function openEdit(id){var p=products.find(function(x){return x.id===id;});if(!p)return;editingId=id;document.getElementById('edit-name').value=p.name;document.getElementById('edit-name-en').value=p.name_en&&p.name_en!==p.name?p.name_en:'';document.getElementById('edit-cat').value=p.cat;document.getElementById('edit-price').value=p.price;document.getElementById('edit-desc-i').value=p.desc;document.getElementById('edit-desc-en').value=p.desc_en&&p.desc_en!==p.desc?p.desc_en:'';document.getElementById('edit-allergens').value=(p.allergens||[]).join(', ');document.getElementById('edit-featured').checked=p.featured;document.getElementById('edit-photo-data').value=p.photo||'';document.getElementById('edit-url').value='';if(p.photo)showPP('edit-preview',p.photo);else clearPP('edit-preview');document.getElementById('edit-overlay').classList.add('open');}
+function openEdit(id){var p=products.find(function(x){return x.id===id;});if(!p)return;editingId=id;document.getElementById('edit-name').value=p.name;document.getElementById('edit-name-en').value=p.name_en&&p.name_en!==p.name?p.name_en:'';document.getElementById('edit-cat').value=p.cat;document.getElementById('edit-price').value=p.price;document.getElementById('edit-desc-i').value=p.desc;document.getElementById('edit-desc-en').value=p.desc_en&&p.desc_en!==p.desc?p.desc_en:'';document.getElementById('edit-allergens').value=(p.allergens||[]).join(', ');document.getElementById('edit-allergens-en').value=(p.allergens_en&&p.allergens_en.length&&p.allergens_en.join(',')!==p.allergens.join(','))?(p.allergens_en||[]).join(', '):'';document.getElementById('edit-featured').checked=p.featured;document.getElementById('edit-photo-data').value=p.photo||'';document.getElementById('edit-url').value='';if(p.photo)showPP('edit-preview',p.photo);else clearPP('edit-preview');document.getElementById('edit-overlay').classList.add('open');}
 function saveEdit(){var p=products.find(function(x){return x.id===editingId;});if(!p)return;p.name=document.getElementById('edit-name').value||p.name;p.name_en=document.getElementById('edit-name-en').value||p.name;p.cat=document.getElementById('edit-cat').value;p.price=parseFloat(document.getElementById('edit-price').value)||p.price;p.desc=document.getElementById('edit-desc-i').value||p.desc;p.desc_en=document.getElementById('edit-desc-en').value||p.desc;
   /* capture panned/zoomed crop if available */
   var prevEl=document.getElementById('edit-preview');
   if(prevEl&&prevEl._getSnapshot){document.getElementById('edit-photo-data').value=prevEl._getSnapshot();}
-  p.photo=document.getElementById('edit-photo-data').value||'';p.featured=document.getElementById('edit-featured').checked;p.allergens=document.getElementById('edit-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean);p.icon=catEmoji(p.cat)||p.icon;document.getElementById('edit-overlay').classList.remove('open');renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
+  p.photo=document.getElementById('edit-photo-data').value||'';p.featured=document.getElementById('edit-featured').checked;p.allergens=document.getElementById('edit-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean);p.allergens_en=document.getElementById('edit-allergens-en').value.split(',').map(function(s){return s.trim();}).filter(Boolean);p.icon=catEmoji(p.cat)||p.icon;document.getElementById('edit-overlay').classList.remove('open');renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
 function delProd(id) {
   if (!confirm(t('del_confirm'))) return;
   /* delete from Supabase first */
@@ -3516,7 +3519,7 @@ function delProd(id) {
     if (IS_DESKTOP) { dtRenderFeatured(); dtRenderShop(); }
   });
 }
-function openAddMod(){clearPP('add-preview');['add-name','add-price','add-desc','add-allergens'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});document.getElementById('add-featured').checked=false;document.getElementById('add-overlay').classList.add('open');}
+function openAddMod(){clearPP('add-preview');['add-name','add-price','add-desc','add-allergens','add-allergens-en','add-name-en','add-desc-en'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});document.getElementById('add-featured').checked=false;document.getElementById('add-overlay').classList.add('open');}
 function saveNewProduct(){var name=document.getElementById('add-name').value.trim();var price=parseFloat(document.getElementById('add-price').value);if(!name||!price){alert('Por favor ingresa nombre y precio.');return;}var cat=document.getElementById('add-cat').value;products.push({id:nextId++,name:name,cat:cat,desc:document.getElementById('add-desc').value||'Un delicioso postre.',price:price,icon:catEmoji(cat)||'&#x1F370;',photo:document.getElementById('add-photo-data').value||'',featured:document.getElementById('add-featured').checked,allergens:document.getElementById('add-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean),stock:'in',ratings:[],avgRating:0});document.getElementById('add-overlay').classList.remove('open');renderMgrTab('products');document.querySelectorAll('.mgr-tab').forEach(function(tb,i){tb.classList.toggle('active',i===1);});}
 
 /* ══════════════════════════════════════════════
@@ -3928,7 +3931,7 @@ function loadProductsFromDB() {
           id: p.id, name: p.name, name_en: p.name_en||p.name, cat: p.cat, desc: p.description, desc_en: p.desc_en||p.description,
           price: parseFloat(p.price), icon: p.icon || '&#x1F370;',
           photo: p.photo || '', featured: p.featured,
-          allergens: p.allergens || [], stock: p.stock,
+          allergens: p.allergens || [], allergens_en: p.allergens_en || [], stock: p.stock,
           ratings: p.ratings || [], avgRating: parseFloat(p.avg_rating) || 0
         };
       });
@@ -4129,6 +4132,7 @@ saveNewProduct = function() {
     photo: document.getElementById('add-photo-data').value || '',
     featured: document.getElementById('add-featured').checked,
     allergens: document.getElementById('add-allergens').value.split(',').map(function(s){return s.trim();}).filter(Boolean),
+    allergens_en: document.getElementById('add-allergens-en').value.split(',').map(function(s){return s.trim();}).filter(Boolean),
     stock: 'in', ratings: [], avgRating: 0
   };
   /* save to Supabase and get real DB id back */
@@ -4136,7 +4140,7 @@ saveNewProduct = function() {
     name: newP.name, name_en: newP.name_en||newP.name, cat: newP.cat, description: newP.desc, desc_en: newP.desc_en||newP.desc,
     price: newP.price, icon: newP.icon, photo: newP.photo,
     featured: newP.featured, stock: newP.stock,
-    allergens: newP.allergens, avg_rating: 0, ratings: '{}'
+    allergens: newP.allergens, allergens_en: newP.allergens_en||[], avg_rating: 0, ratings: '{}'
   }).select().single().then(function(res) {
     if (res.error) { alert('Error guardando producto: ' + res.error.message); return; }
     if (res.data) newP.id = res.data.id; /* use real DB id */
@@ -4158,7 +4162,7 @@ saveEdit = function() {
     name: p.name, cat: p.cat, description: p.desc,
     price: p.price, icon: p.icon, photo: p.photo,
     featured: p.featured, stock: p.stock,
-    allergens: p.allergens, avg_rating: p.avgRating
+    allergens: p.allergens, allergens_en: p.allergens_en||[], avg_rating: p.avgRating
   }).eq('id', p.id).then(function(res) {
     if (res.error) alert('Error actualizando producto: ' + res.error.message);
     else if (IS_DESKTOP) { dtRenderFeatured(); dtRenderShop(); }
