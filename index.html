@@ -6,6 +6,8 @@
 <title>Paobee</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <!-- Supabase -->
 <script src="https://unpkg.com/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <style>
@@ -1879,6 +1881,101 @@ body.dark .bnav{background:rgba(26,17,24,0.97)}
   cursor:pointer
 }
 
+/* ────────── DELIVERY ZONES ──────────────────────────────────── */
+
+#dz-map, #checkout-map {
+  width: 100%;
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  overflow: hidden;
+  background: var(--sbg);
+  z-index: 1;
+}
+#dz-map { height: 480px; }
+#checkout-map { height: 280px; }
+.dz-zone-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+}
+.dz-zone-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--pink);
+  flex-shrink: 0;
+}
+.dz-zone-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); }
+.dz-fee-inp {
+  width: 72px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--pink);
+  text-align: center;
+  background: var(--ibg);
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+}
+.dz-fee-inp:focus { border-color: var(--pink); }
+.dz-remove-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 4px;
+  border-radius: 6px;
+}
+.dz-remove-btn:hover { color: #C0392B; background: #FFF0F0; }
+.dz-save-btn {
+  background: var(--pink);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+}
+.dz-hint {
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--sbg);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  line-height: 1.6;
+}
+.dz-status-ok {
+  font-size: 13px;
+  color: #2E7D32;
+  background: #E8F5E9;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-top: 10px;
+  font-weight: 600;
+}
+.dz-status-no {
+  font-size: 13px;
+  color: #856404;
+  background: #FFF8E1;
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-top: 10px;
+  font-weight: 600;
+}
+.leaflet-container { font-family: 'DM Sans', sans-serif !important; }
+
 /* ────────── UTILITY ─────────────────────────────────────────── */
 
 .empty-state{text-align:center;padding:48px 24px}
@@ -2348,6 +2445,7 @@ to{transform:translateY(0);opacity:1}
           <button class="dt-mgr-link"        id="dt-mgr-link-products" onclick="dtMgrTab(this,'products')" ><span class="dt-mgr-link-icon">&#x1F9C1;</span> Productos</button>
           <button class="dt-mgr-link"        id="dt-mgr-link-schedule" onclick="dtMgrTab(this,'schedule')" ><span class="dt-mgr-link-icon">&#x1F4C5;</span> Horario</button>
           <button class="dt-mgr-link"        id="dt-mgr-link-analytics"onclick="dtMgrTab(this,'analytics')"><span class="dt-mgr-link-icon">&#x1F4CA;</span> Analiticas</button>
+          <button class="dt-mgr-link"        id="dt-mgr-link-zones"    onclick="dtMgrTab(this,'zones')"    ><span class="dt-mgr-link-icon">&#x1F5FA;&#xFE0F;</span> Zonas</button>
         </div>
         <!-- Content -->
         <div id="dt-mgr-content"></div>
@@ -2426,7 +2524,7 @@ to{transform:translateY(0);opacity:1}
 </div>
 <div id="screen-manager" class="screen">
   <div class="topbar"><span class="logo">Manager</span><span style="font-size:12px;color:var(--pink);background:var(--pl);padding:4px 10px;border-radius:50px;font-weight:600;">Admin</span></div>
-  <div class="mgr-tabs"><button class="mgr-tab active" onclick="mgrTab(this,'orders')" data-i18n="orders_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'products')" data-i18n="products_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'schedule')" data-i18n="schedule_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'analytics')" data-i18n="analytics_tab"></button></div>
+  <div class="mgr-tabs"><button class="mgr-tab active" onclick="mgrTab(this,'orders')" data-i18n="orders_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'products')" data-i18n="products_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'schedule')" data-i18n="schedule_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'analytics')" data-i18n="analytics_tab"></button><button class="mgr-tab" onclick="mgrTab(this,'zones')">&#x1F5FA; Zonas</button></div>
   <div id="mgr-content"></div>
 </div>
 <!-- ══ CATEGORY MODAL ════════════════════════════════════════ -->
@@ -4606,6 +4704,508 @@ window.addEventListener('resize', function() {
   IS_DESKTOP = window.innerWidth >= 1024;
   if (IS_DESKTOP !== wasDesktop) initDesktop();
 });
+
+/* ══════════════════════════════════════════════════════════════
+   DELIVERY ZONES  — Leaflet + OpenStreetMap + Supabase
+   ══════════════════════════════════════════════════════════════
+
+   SUPABASE SQL — run this once in your Supabase SQL editor:
+   ──────────────────────────────────────────────────────────────
+   create table if not exists delivery_zones (
+     id          serial primary key,
+     municipio   text not null unique,
+     fee         numeric(6,2) not null default 3.00,
+     active      boolean not null default true,
+     created_at  timestamptz default now()
+   );
+   alter table delivery_zones enable row level security;
+   -- Anyone can read active zones (needed for checkout map)
+   create policy "Public read" on delivery_zones
+     for select using (true);
+   -- Only managers can write
+   create policy "Manager write" on delivery_zones
+     for all using (
+       exists (
+         select 1 from profiles
+         where profiles.id = auth.uid()
+         and profiles.role = 'manager'
+       )
+     );
+   ──────────────────────────────────────────────────────────────
+*/
+
+/* ── PR Municipio polygons (simplified real boundaries) ──────── */
+var PR_MUNICIPIOS = {
+  "Adjuntas":[[18.1630,-66.7230],[18.1888,-66.6601],[18.1388,-66.5980],[18.0741,-66.6280],[18.0574,-66.7022],[18.1630,-66.7230]],
+  "Aguada":[[18.3622,-67.2032],[18.4050,-67.1621],[18.3821,-67.1190],[18.3250,-67.1350],[18.3050,-67.1890],[18.3622,-67.2032]],
+  "Aguadilla":[[18.4272,-67.1890],[18.5020,-67.1421],[18.4821,-67.0821],[18.4050,-67.0980],[18.3821,-67.1621],[18.4272,-67.1890]],
+  "Aguas Buenas":[[18.2572,-66.1020],[18.2888,-66.0421],[18.2421,-65.9880],[18.1888,-65.9980],[18.1821,-66.0821],[18.2572,-66.1020]],
+  "Aibonito":[[18.1421,-66.2890],[18.1821,-66.2232],[18.1421,-66.1690],[18.0888,-66.1821],[18.0788,-66.2621],[18.1421,-66.2890]],
+  "Añasco":[[18.2822,-67.1421],[18.3250,-67.1001],[18.3050,-67.0421],[18.2450,-67.0521],[18.2222,-67.1121],[18.2822,-67.1421]],
+  "Arecibo":[[18.4272,-66.7980],[18.5050,-66.7232],[18.4821,-66.6421],[18.3988,-66.6721],[18.3721,-66.7690],[18.4272,-66.7980]],
+  "Arroyo":[[17.9670,-66.0621],[17.9988,-65.9921],[17.9621,-65.9321],[17.9188,-65.9421],[17.9088,-66.0221],[17.9670,-66.0621]],
+  "Barceloneta":[[18.4388,-66.6221],[18.4921,-66.5580],[18.4688,-66.4880],[18.3988,-66.5021],[18.3721,-66.5821],[18.4388,-66.6221]],
+  "Barranquitas":[[18.1821,-66.3121],[18.2150,-66.2480],[18.1750,-66.1890],[18.1150,-66.2021],[18.1050,-66.2888],[18.1821,-66.3121]],
+  "Bayamón":[[18.3388,-66.1980],[18.4050,-66.1421],[18.3821,-66.0721],[18.3021,-66.0821],[18.2721,-66.1521],[18.3388,-66.1980]],
+  "Cabo Rojo":[[17.9888,-67.2221],[18.0988,-67.1721],[18.0721,-67.0721],[17.9721,-67.0421],[17.9021,-67.1421],[17.9888,-67.2221]],
+  "Caguas":[[18.2421,-66.0880],[18.2888,-66.0221],[18.2588,-65.9421],[18.1721,-65.9521],[18.1488,-66.0421],[18.2421,-66.0880]],
+  "Camuy":[[18.4521,-66.8721],[18.5021,-66.8021],[18.4788,-66.7221],[18.3988,-66.7421],[18.3688,-66.8221],[18.4521,-66.8721]],
+  "Canóvanas":[[18.3721,-65.9021],[18.4021,-65.8321],[18.3621,-65.7521],[18.3021,-65.7721],[18.2921,-65.8621],[18.3721,-65.9021]],
+  "Carolina":[[18.3721,-65.9980],[18.4321,-65.9421],[18.4121,-65.8621],[18.3421,-65.8621],[18.3021,-65.9421],[18.3721,-65.9980]],
+  "Cataño":[[18.4272,-66.1421],[18.4521,-66.1080],[18.4321,-66.0721],[18.3988,-66.0821],[18.3888,-66.1221],[18.4272,-66.1421]],
+  "Cayey":[[18.1121,-66.1780],[18.1588,-66.1080],[18.1288,-66.0421],[18.0521,-66.0421],[18.0321,-66.1221],[18.1121,-66.1780]],
+  "Ceiba":[[18.2621,-65.6721],[18.2921,-65.5921],[18.2421,-65.5321],[18.1821,-65.5521],[18.1821,-65.6421],[18.2621,-65.6721]],
+  "Ciales":[[18.2988,-66.5780],[18.3521,-66.5021],[18.3221,-66.4221],[18.2421,-66.4321],[18.2121,-66.5221],[18.2988,-66.5780]],
+  "Cidra":[[18.1788,-66.1721],[18.2221,-66.1021],[18.1921,-66.0221],[18.1121,-66.0221],[18.0921,-66.1021],[18.1788,-66.1721]],
+  "Coamo":[[18.0788,-66.3680],[18.1288,-66.2921],[18.0988,-66.2121],[18.0021,-66.2121],[17.9821,-66.3021],[18.0788,-66.3680]],
+  "Comerío":[[18.2221,-66.2280],[18.2588,-66.1521],[18.2221,-66.0821],[18.1521,-66.0921],[18.1388,-66.1721],[18.2221,-66.2280]],
+  "Corozal":[[18.3388,-66.3221],[18.3821,-66.2421],[18.3488,-66.1621],[18.2688,-66.1721],[18.2488,-66.2621],[18.3388,-66.3221]],
+  "Culebra":[[18.3521,-65.2621],[18.3421,-65.2121],[18.2921,-65.2521],[18.3021,-65.3121],[18.3521,-65.2621]],
+  "Dorado":[[18.4521,-66.2821],[18.4988,-66.2121],[18.4688,-66.1321],[18.3888,-66.1421],[18.3688,-66.2221],[18.4521,-66.2821]],
+  "Fajardo":[[18.3221,-65.6921],[18.3521,-65.6321],[18.3221,-65.5621],[18.2621,-65.5721],[18.2421,-65.6521],[18.3221,-65.6921]],
+  "Florida":[[18.3721,-66.5621],[18.4088,-66.5121],[18.3888,-66.4421],[18.3221,-66.4421],[18.2988,-66.5121],[18.3721,-66.5621]],
+  "Guánica":[[17.9721,-66.9421],[18.0221,-66.8821],[18.0021,-66.8121],[17.9221,-66.8121],[17.8921,-66.8921],[17.9721,-66.9421]],
+  "Guayama":[[17.9821,-66.1480],[18.0421,-66.0921],[18.0121,-66.0121],[17.9421,-66.0121],[17.9221,-66.0921],[17.9821,-66.1480]],
+  "Guayanilla":[[18.0121,-66.8121],[18.0721,-66.7521],[18.0521,-66.6821],[17.9721,-66.6821],[17.9521,-66.7621],[18.0121,-66.8121]],
+  "Guaynabo":[[18.3588,-66.1280],[18.3988,-66.0721],[18.3688,-66.0021],[18.2988,-66.0121],[18.2788,-66.0821],[18.3588,-66.1280]],
+  "Gurabo":[[18.2521,-65.9780],[18.2988,-65.9121],[18.2688,-65.8421],[18.1888,-65.8421],[18.1688,-65.9221],[18.2521,-65.9780]],
+  "Hatillo":[[18.4788,-66.8480],[18.5321,-66.7821],[18.5021,-66.7021],[18.4221,-66.7121],[18.3988,-66.7921],[18.4788,-66.8480]],
+  "Hormigueros":[[18.1321,-67.1321],[18.1688,-67.0821],[18.1488,-67.0221],[18.0888,-67.0221],[18.0688,-67.0921],[18.1321,-67.1321]],
+  "Humacao":[[18.1621,-65.8280],[18.2021,-65.7621],[18.1721,-65.6921],[18.1021,-65.6921],[18.0721,-65.7721],[18.1621,-65.8280]],
+  "Isabela":[[18.4921,-67.0321],[18.5388,-66.9621],[18.5121,-66.8821],[18.4321,-66.8921],[18.4021,-66.9721],[18.4921,-67.0321]],
+  "Jayuya":[[18.2021,-66.6021],[18.2421,-66.5321],[18.2121,-66.4521],[18.1421,-66.4621],[18.1121,-66.5421],[18.2021,-66.6021]],
+  "Juana Díaz":[[18.0521,-66.5180],[18.1021,-66.4421],[18.0721,-66.3621],[17.9921,-66.3721],[17.9721,-66.4621],[18.0521,-66.5180]],
+  "Juncos":[[18.2288,-65.9280],[18.2721,-65.8521],[18.2421,-65.7821],[18.1621,-65.7921],[18.1421,-65.8721],[18.2288,-65.9280]],
+  "Lajas":[[17.9721,-67.1121],[18.0321,-67.0521],[18.0121,-66.9721],[17.9221,-66.9721],[17.8921,-67.0521],[17.9721,-67.1121]],
+  "Lares":[[18.2788,-66.8821],[18.3221,-66.8021],[18.2988,-66.7121],[18.2121,-66.7221],[18.1888,-66.8121],[18.2788,-66.8821]],
+  "Las Marías":[[18.2521,-66.9921],[18.2921,-66.9221],[18.2688,-66.8421],[18.1888,-66.8521],[18.1688,-66.9321],[18.2521,-66.9921]],
+  "Las Piedras":[[18.1888,-65.8680],[18.2321,-65.8021],[18.2021,-65.7221],[18.1221,-65.7321],[18.0921,-65.8121],[18.1888,-65.8680]],
+  "Loíza":[[18.4321,-65.8921],[18.4688,-65.8321],[18.4421,-65.7621],[18.3721,-65.7721],[18.3488,-65.8421],[18.4321,-65.8921]],
+  "Luquillo":[[18.3688,-65.7321],[18.3921,-65.6721],[18.3588,-65.5921],[18.2988,-65.6021],[18.2821,-65.6821],[18.3688,-65.7321]],
+  "Manatí":[[18.4321,-66.5221],[18.4888,-66.4421],[18.4588,-66.3621],[18.3721,-66.3721],[18.3488,-66.4621],[18.4321,-66.5221]],
+  "Maricao":[[18.1821,-66.9921],[18.2221,-66.9221],[18.2021,-66.8421],[18.1221,-66.8421],[18.0921,-66.9221],[18.1821,-66.9921]],
+  "Maunabo":[[18.0021,-65.9180],[18.0421,-65.8421],[18.0121,-65.7621],[17.9421,-65.7721],[17.9221,-65.8621],[18.0021,-65.9180]],
+  "Mayagüez":[[18.1888,-67.1980],[18.2721,-67.1121],[18.2421,-67.0321],[18.1521,-67.0421],[18.1021,-67.1321],[18.1888,-67.1980]],
+  "Moca":[[18.3788,-67.1021],[18.4321,-67.0421],[18.4121,-66.9721],[18.3321,-66.9721],[18.3021,-67.0521],[18.3788,-67.1021]],
+  "Morovis":[[18.3221,-66.4121],[18.3688,-66.3421],[18.3388,-66.2621],[18.2588,-66.2721],[18.2321,-66.3521],[18.3221,-66.4121]],
+  "Naguabo":[[18.2121,-65.7380],[18.2521,-65.6621],[18.2221,-65.5921],[18.1421,-65.6021],[18.1221,-65.6821],[18.2121,-65.7380]],
+  "Naranjito":[[18.2988,-66.2580],[18.3388,-66.1821],[18.3088,-66.1021],[18.2288,-66.1121],[18.2021,-66.1921],[18.2988,-66.2580]],
+  "Orocovis":[[18.2221,-66.4280],[18.2688,-66.3521],[18.2388,-66.2721],[18.1588,-66.2721],[18.1388,-66.3521],[18.2221,-66.4280]],
+  "Patillas":[[18.0021,-66.0180],[18.0421,-65.9421],[18.0121,-65.8621],[17.9421,-65.8721],[17.9221,-65.9621],[18.0021,-66.0180]],
+  "Peñuelas":[[17.9921,-66.7080],[18.0621,-66.6321],[18.0421,-66.5521],[17.9621,-66.5521],[17.9321,-66.6321],[17.9921,-66.7080]],
+  "Ponce":[[18.0021,-66.6480],[18.0721,-66.5721],[18.0521,-66.4921],[17.9621,-66.4921],[17.9321,-66.5821],[18.0021,-66.6480]],
+  "Quebradillas":[[18.4788,-67.0321],[18.5188,-66.9621],[18.4921,-66.8821],[18.4121,-66.8921],[18.3888,-66.9721],[18.4788,-67.0321]],
+  "Rincón":[[18.3421,-67.2780],[18.3921,-67.2221],[18.3721,-67.1521],[18.3021,-67.1521],[18.2721,-67.2221],[18.3421,-67.2780]],
+  "Río Grande":[[18.3521,-65.8521],[18.3888,-65.7821],[18.3588,-65.6921],[18.2888,-65.7121],[18.2688,-65.7921],[18.3521,-65.8521]],
+  "Sabana Grande":[[18.0788,-66.9680],[18.1321,-66.8921],[18.1121,-66.8121],[18.0321,-66.8121],[18.0021,-66.8921],[18.0788,-66.9680]],
+  "Salinas":[[17.9721,-66.3021],[18.0221,-66.2421],[18.0021,-66.1621],[17.9221,-66.1521],[17.8921,-66.2321],[17.9721,-66.3021]],
+  "San Germán":[[18.0821,-67.0480],[18.1421,-66.9721],[18.1221,-66.8921],[18.0421,-66.8921],[18.0121,-66.9721],[18.0821,-67.0480]],
+  "San Juan":[[18.3988,-66.1180],[18.4688,-66.0421],[18.4421,-65.9621],[18.3521,-65.9621],[18.3188,-66.0521],[18.3988,-66.1180]],
+  "San Lorenzo":[[18.1888,-65.9780],[18.2321,-65.9021],[18.2021,-65.8221],[18.1221,-65.8221],[18.0921,-65.9021],[18.1888,-65.9780]],
+  "San Sebastián":[[18.3421,-66.9921],[18.3921,-66.9221],[18.3688,-66.8421],[18.2888,-66.8421],[18.2621,-66.9221],[18.3421,-66.9921]],
+  "Santa Isabel":[[17.9721,-66.4221],[18.0221,-66.3521],[18.0021,-66.2721],[17.9221,-66.2721],[17.8921,-66.3521],[17.9721,-66.4221]],
+  "Toa Alta":[[18.3888,-66.2680],[18.4321,-66.1921],[18.4021,-66.1121],[18.3221,-66.1221],[18.2988,-66.2021],[18.3888,-66.2680]],
+  "Toa Baja":[[18.4421,-66.2321],[18.4888,-66.1521],[18.4588,-66.0821],[18.3788,-66.0921],[18.3588,-66.1721],[18.4421,-66.2321]],
+  "Trujillo Alto":[[18.3521,-66.0280],[18.3888,-65.9521],[18.3588,-65.8821],[18.2888,-65.8921],[18.2688,-65.9721],[18.3521,-66.0280]],
+  "Utuado":[[18.2621,-66.7321],[18.3121,-66.6521],[18.2821,-66.5721],[18.1921,-66.5821],[18.1721,-66.6621],[18.2621,-66.7321]],
+  "Vega Alta":[[18.4121,-66.3480],[18.4621,-66.2721],[18.4321,-66.1921],[18.3521,-66.1921],[18.3221,-66.2721],[18.4121,-66.3480]],
+  "Vega Baja":[[18.4388,-66.4221],[18.4921,-66.3421],[18.4621,-66.2721],[18.3721,-66.2721],[18.3421,-66.3521],[18.4388,-66.4221]],
+  "Vieques":[[18.1721,-65.5221],[18.1621,-65.3721],[18.0921,-65.3721],[18.0421,-65.5121],[18.1021,-65.5821],[18.1721,-65.5221]],
+  "Villalba":[[18.1121,-66.5021],[18.1621,-66.4221],[18.1421,-66.3421],[18.0621,-66.3421],[18.0321,-66.4221],[18.1121,-66.5021]],
+  "Yabucoa":[[18.0521,-65.8880],[18.0988,-65.8021],[18.0688,-65.7221],[17.9888,-65.7321],[17.9688,-65.8221],[18.0521,-65.8880]],
+  "Yauco":[[18.0321,-66.8521],[18.0921,-66.7721],[18.0721,-66.6921],[17.9921,-66.6921],[17.9621,-66.7721],[18.0321,-66.8521]]
+};
+
+/* ── In-memory delivery zones state ─────────────────────────── */
+var deliveryZones = {}; /* { municipio: fee } — only active zones */
+var _dzMapInst    = null; /* Leaflet map instance (manager) */
+var _dzLayers     = {};   /* municipio → Leaflet layer (manager map) */
+var _coMapInst    = null; /* Leaflet map instance (checkout) */
+var _coMarker     = null; /* customer pin */
+var _coZoneLayers = {};   /* checkout zone layers */
+var _detectedZone = null; /* { municipio, fee } or null */
+
+/* ── Load zones from Supabase ────────────────────────────────── */
+function loadZonesFromDB() {
+  sb.from('delivery_zones').select('*').eq('active', true).then(function(res) {
+    if (res.data) {
+      deliveryZones = {};
+      res.data.forEach(function(z) { deliveryZones[z.municipio] = parseFloat(z.fee); });
+    }
+  });
+}
+
+/* ── Save zones to Supabase ──────────────────────────────────── */
+function saveZonesToDB(cb) {
+  /* upsert active zones, delete removed ones */
+  var rows = Object.entries(deliveryZones).map(function(e) {
+    return { municipio: e[0], fee: e[1], active: true };
+  });
+  /* first deactivate all, then upsert active set */
+  sb.from('delivery_zones').update({ active: false }).neq('municipio', '__none__').then(function() {
+    if (!rows.length) { if (cb) cb(); return; }
+    sb.from('delivery_zones').upsert(rows, { onConflict: 'municipio' }).then(function(res) {
+      if (res.error) { alert('Error guardando zonas: ' + res.error.message); return; }
+      if (cb) cb();
+    });
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MANAGER ZONES TAB
+   ══════════════════════════════════════════════════════════════ */
+function renderZonesTab(el) {
+  el.innerHTML = '<div style="font-family:Georgia,serif;font-size:22px;color:var(--text);margin-bottom:8px">&#x1F5FA;&#xFE0F; Zonas de Entrega</div>'
+    + '<div class="dz-hint">Haz clic en un municipio para activarlo o desactivarlo. Ajusta el cargo de entrega por zona debajo del mapa.</div>'
+    + '<div id="dz-map"></div>'
+    + '<div style="margin-top:20px;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Zonas activas</div>'
+    + '<div id="dz-zone-list"></div>'
+    + '<button class="dz-save-btn" onclick="dzSave()">Guardar Zonas</button>'
+    + '<div id="dz-save-msg"></div>';
+
+  setTimeout(function() { initManagerMap(); renderZoneList(); }, 50);
+}
+
+function initManagerMap() {
+  var mapEl = document.getElementById('dz-map');
+  if (!mapEl) return;
+  /* destroy old instance if any */
+  if (_dzMapInst) { _dzMapInst.remove(); _dzMapInst = null; _dzLayers = {}; }
+
+  _dzMapInst = L.map('dz-map', { zoomControl: true, scrollWheelZoom: false })
+    .setView([18.22, -66.59], 9);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap',
+    maxZoom: 14
+  }).addTo(_dzMapInst);
+
+  /* render all 78 municipios */
+  Object.entries(PR_MUNICIPIOS).forEach(function(entry) {
+    var muni = entry[0], coords = entry[1];
+    var active = deliveryZones.hasOwnProperty(muni);
+    var layer = L.polygon(coords, {
+      color: active ? '#E8587A' : '#aaa',
+      fillColor: active ? '#E8587A' : '#ccc',
+      fillOpacity: active ? 0.35 : 0.10,
+      weight: active ? 2 : 1
+    }).addTo(_dzMapInst);
+
+    layer.bindTooltip(muni, { permanent: false, direction: 'center', className: 'dz-tt' });
+
+    layer.on('click', function() { dzToggleMuni(muni); });
+    _dzLayers[muni] = layer;
+  });
+}
+
+function dzToggleMuni(muni) {
+  if (deliveryZones.hasOwnProperty(muni)) {
+    delete deliveryZones[muni];
+  } else {
+    deliveryZones[muni] = 3.00; /* default $3 */
+  }
+  dzRefreshMapLayer(muni);
+  renderZoneList();
+}
+
+function dzRefreshMapLayer(muni) {
+  var layer = _dzLayers[muni];
+  if (!layer) return;
+  var active = deliveryZones.hasOwnProperty(muni);
+  layer.setStyle({
+    color: active ? '#E8587A' : '#aaa',
+    fillColor: active ? '#E8587A' : '#ccc',
+    fillOpacity: active ? 0.35 : 0.10,
+    weight: active ? 2 : 1
+  });
+}
+
+function renderZoneList() {
+  var el = document.getElementById('dz-zone-list');
+  if (!el) return;
+  var keys = Object.keys(deliveryZones);
+  if (!keys.length) {
+    el.innerHTML = '<div class="dz-hint" style="text-align:center">Ningun municipio seleccionado. Haz clic en el mapa para agregar zonas.</div>';
+    return;
+  }
+  el.innerHTML = keys.sort().map(function(m) {
+    return '<div class="dz-zone-row">'
+      + '<div class="dz-zone-dot"></div>'
+      + '<div class="dz-zone-name">' + m + '</div>'
+      + '<span style="font-size:13px;color:var(--muted);margin-right:4px">$</span>'
+      + '<input class="dz-fee-inp" type="number" step="0.50" min="0" value="' + deliveryZones[m].toFixed(2) + '" '
+      + 'onchange="deliveryZones[\'' + m.replace(/'/g, "\\'") + '\']=parseFloat(this.value)||0">'
+      + '<button class="dz-remove-btn" onclick="dzToggleMuni(\'' + m.replace(/'/g, "\\'") + '\')">&#x2715;</button>'
+      + '</div>';
+  }).join('');
+}
+
+function dzSave() {
+  /* sync fees from inputs before saving */
+  Object.keys(deliveryZones).forEach(function(m) {
+    /* fees already updated via onchange, no extra work needed */
+  });
+  saveZonesToDB(function() {
+    var msg = document.getElementById('dz-save-msg');
+    if (msg) {
+      msg.innerHTML = '<div class="dz-status-ok">&#x2713; Zonas guardadas correctamente</div>';
+      setTimeout(function() { if (msg) msg.innerHTML = ''; }, 3000);
+    }
+    /* refresh checkout zones if map is open */
+    refreshCheckoutZones();
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CUSTOMER CHECKOUT MAP
+   ══════════════════════════════════════════════════════════════ */
+
+/* Call this wherever renderCheckout injects the delivery address section */
+function renderCheckoutMap(containerId) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = '<div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Ubica tu direccion</div>'
+    + '<div id="checkout-map"></div>'
+    + '<div id="co-zone-status"></div>'
+    + '<div id="co-addr-auto" style="margin-top:8px;font-size:12px;color:var(--muted)"></div>';
+
+  setTimeout(function() { initCheckoutMap(); }, 80);
+}
+
+function initCheckoutMap() {
+  var mapEl = document.getElementById('checkout-map');
+  if (!mapEl) return;
+  if (_coMapInst) { _coMapInst.remove(); _coMapInst = null; _coZoneLayers = {}; _coMarker = null; _detectedZone = null; }
+
+  _coMapInst = L.map('checkout-map', { zoomControl: true, scrollWheelZoom: false })
+    .setView([18.40, -66.07], 9); /* centered on San Juan metro */
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap',
+    maxZoom: 18
+  }).addTo(_coMapInst);
+
+  /* draw active delivery zones */
+  Object.keys(deliveryZones).forEach(function(muni) {
+    if (!PR_MUNICIPIOS[muni]) return;
+    var layer = L.polygon(PR_MUNICIPIOS[muni], {
+      color: '#E8587A',
+      fillColor: '#E8587A',
+      fillOpacity: 0.20,
+      weight: 2
+    }).addTo(_coMapInst);
+    layer.bindTooltip(muni + ' · $' + deliveryZones[muni].toFixed(2), { sticky: true });
+    _coZoneLayers[muni] = layer;
+  });
+
+  /* click to drop pin */
+  _coMapInst.on('click', function(e) {
+    placeCustomerPin(e.latlng.lat, e.latlng.lng);
+  });
+
+  /* hint label */
+  updateCoZoneStatus(null);
+}
+
+function refreshCheckoutZones() {
+  if (!_coMapInst) return;
+  /* remove old zone layers */
+  Object.values(_coZoneLayers).forEach(function(l) { _coMapInst.removeLayer(l); });
+  _coZoneLayers = {};
+  Object.keys(deliveryZones).forEach(function(muni) {
+    if (!PR_MUNICIPIOS[muni]) return;
+    var layer = L.polygon(PR_MUNICIPIOS[muni], {
+      color: '#E8587A', fillColor: '#E8587A', fillOpacity: 0.20, weight: 2
+    }).addTo(_coMapInst);
+    layer.bindTooltip(muni + ' · $' + deliveryZones[muni].toFixed(2), { sticky: true });
+    _coZoneLayers[muni] = layer;
+  });
+}
+
+function placeCustomerPin(lat, lng) {
+  if (_coMarker) _coMapInst.removeLayer(_coMarker);
+  _coMarker = L.circleMarker([lat, lng], {
+    radius: 10, color: '#E8587A', fillColor: '#E8587A', fillOpacity: 0.9, weight: 3
+  }).addTo(_coMapInst);
+
+  /* check which zone the pin is in */
+  _detectedZone = detectZone(lat, lng);
+  updateCoZoneStatus(_detectedZone);
+
+  /* reverse geocode via Nominatim (free, no key) */
+  fetch('https://nominatim.openstreetmap.org/reverse?lat=' + lat + '&lon=' + lng + '&format=json')
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var addr = data.display_name || '';
+      /* fill the address field if it exists */
+      var addrInp = document.getElementById('co-addr');
+      if (addrInp && addr) addrInp.value = addr;
+      var autoEl = document.getElementById('co-addr-auto');
+      if (autoEl) autoEl.innerHTML = addr ? '&#x1F4CD; ' + addr : '';
+    })
+    .catch(function() {});
+
+  /* update delivery fee in order total if delivery mode active */
+  syncDeliveryFee();
+}
+
+/* Point-in-polygon (ray casting) */
+function pointInPoly(lat, lng, poly) {
+  var inside = false;
+  for (var i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    var xi = poly[i][0], yi = poly[i][1];
+    var xj = poly[j][0], yj = poly[j][1];
+    var intersect = ((yi > lng) !== (yj > lng)) &&
+      (lat < (xj - xi) * (lng - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function detectZone(lat, lng) {
+  var keys = Object.keys(deliveryZones);
+  for (var i = 0; i < keys.length; i++) {
+    var muni = keys[i];
+    var poly = PR_MUNICIPIOS[muni];
+    if (poly && pointInPoly(lat, lng, poly)) {
+      return { municipio: muni, fee: deliveryZones[muni] };
+    }
+  }
+  return null;
+}
+
+function updateCoZoneStatus(zone) {
+  var el = document.getElementById('co-zone-status');
+  if (!el) return;
+  if (!zone) {
+    el.innerHTML = '<div class="dz-status-no">&#x1F4CD; Toca el mapa para indicar tu ubicacion</div>';
+  } else {
+    el.innerHTML = '<div class="dz-status-ok">&#x2705; Entrega disponible en ' + zone.municipio + ' · $' + zone.fee.toFixed(2) + '</div>';
+  }
+}
+
+function syncDeliveryFee() {
+  /* update the delivery fee shown in checkout summary */
+  var mode = window._dm || 'pickup';
+  if (mode !== 'delivery') return;
+  if (_detectedZone) {
+    window._deliveryFee = _detectedZone.fee;
+  } else {
+    window._deliveryFee = null; /* outside zone → force pickup */
+  }
+  /* re-render summary row if it exists */
+  var dfEl = document.getElementById('co-delivery-fee-val');
+  if (dfEl) {
+    if (_detectedZone) {
+      dfEl.textContent = '$' + _detectedZone.fee.toFixed(2);
+    } else {
+      dfEl.textContent = 'No disponible';
+    }
+  }
+}
+
+/* ── Patch renderCheckout to inject the map ──────────────────── */
+/* We wrap the delivery address section to insert the map widget */
+var _origRenderCheckout = typeof renderCheckout === 'function' ? renderCheckout : null;
+
+/* Hook into the checkout delivery address field render.
+   Since renderCheckout builds HTML as a string, we intercept
+   after render and inject our map into the address container. */
+function injectCheckoutMap() {
+  /* look for the address field wrapper by its label */
+  var addrFld = document.getElementById('co-addr');
+  if (!addrFld) return;
+  var parent = addrFld.parentElement;
+  if (!parent) return;
+  /* insert map above the address input */
+  var mapWrap = document.createElement('div');
+  mapWrap.id = 'co-map-wrap';
+  mapWrap.style.marginBottom = '12px';
+  parent.parentElement.insertBefore(mapWrap, parent);
+  renderCheckoutMap('co-map-wrap');
+}
+
+/* Patch placeOrder to use detected zone fee */
+var _origPlaceOrder2 = placeOrder;
+placeOrder = function() {
+  /* if delivery mode and no zone detected, block order */
+  var mode = window._dm || 'pickup';
+  if (mode === 'delivery' && !_detectedZone) {
+    alert('Por favor ubica tu direccion en el mapa para continuar con la entrega, o selecciona "Recoger".');
+    return;
+  }
+  /* inject zone fee into the delivery cost calculation */
+  if (_detectedZone) window._deliveryZoneFee = _detectedZone.fee;
+  _origPlaceOrder2.apply(this, arguments);
+};
+
+/* Override _dm delivery fee: use zone fee if available */
+(function() {
+  var _origSetDM = window.setDeliveryMode;
+  /* we'll patch at render time instead — see renderCheckoutMap call */
+})();
+
+/* ── renderMgrTab extension for 'zones' ──────────────────────── */
+var _origRenderMgrTab = renderMgrTab;
+renderMgrTab = function(tab) {
+  if (tab === 'zones') {
+    var el = document.getElementById('mgr-content');
+    if (el) renderZonesTab(el);
+    return;
+  }
+  _origRenderMgrTab.apply(this, arguments);
+};
+
+/* ── dtMgrTab extension for 'zones' ──────────────────────────── */
+var _origDtMgrTab = dtMgrTab;
+dtMgrTab = function(btn, tab) {
+  if (tab === 'zones') {
+    dtMgrActive = tab;
+    document.querySelectorAll('.dt-mgr-link').forEach(function(l) { l.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    if (rC){rC.destroy();rC=null;} if(oC){oC.destroy();oC=null;}
+    if (cC){cC.destroy();cC=null;} if(ptsC){ptsC.destroy();ptsC=null;}
+    /* swap IDs to render into desktop panel */
+    var orig = document.getElementById('mgr-content');
+    var el   = document.getElementById('dt-mgr-content');
+    if (orig && el) {
+      orig.id = 'mgr-content-hidden';
+      el.id   = 'mgr-content';
+      renderZonesTab(el);
+      el.id   = 'dt-mgr-content';
+      orig.id = 'mgr-content';
+    }
+    return;
+  }
+  _origDtMgrTab.apply(this, arguments);
+};
+
+/* ── Load zones on auth success ──────────────────────────────── */
+var _origOnAuthSuccess2 = onAuthSuccess;
+onAuthSuccess = function() {
+  _origOnAuthSuccess2.apply(this, arguments);
+  loadZonesFromDB();
+};
+
+/* Also load zones at startup for the checkout map (public read) */
+loadZonesFromDB();
+
+/* ── Auto-inject map when checkout renders ───────────────────── */
+/* Patch goTo so that when cart/checkout screen shows, we inject the map */
+var _origGoTo = goTo;
+goTo = function(screen) {
+  _origGoTo.apply(this, arguments);
+  if (screen === 'cart') {
+    /* give renderCart/renderCheckout time to finish, then inject */
+    setTimeout(function() {
+      if (!document.getElementById('co-map-wrap') && document.getElementById('co-addr')) {
+        injectCheckoutMap();
+      }
+    }, 200);
+  }
+};
+
+/* ══════════════════════════════════════════════════════════════ */
 
 /* ── Boot ─────────────────────────────────────── */
 initDesktop();
